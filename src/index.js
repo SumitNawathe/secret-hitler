@@ -3,8 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
-const { generateMessage, generateLocationMessage } = require('./utils/messages');
-const { addUser, removeUser, getUser, getUsersInRoom, getUserByUsername } = require('./utils/users');
+const { addToLobby, updateLobbyInfo, getLobbyInfo } = require('./utils/lobby');
 const { timeLog } = require('console');
 
 const app = express();
@@ -20,69 +19,29 @@ io.on('connection', (socket) => {
     console.log('New WebSocket connection');
     
     socket.on('join', ({ username, room }, callback) => {
-        const { error, user } = addUser({ id: socket.id, username, room });
-        if (error) {
-            return callback(error);
-        }
-        socket.join(user.room);
-        socket.emit('message', generateMessage('Admin', 'Welcome'));
-        socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined`));
-        io.to(user.room).emit('roomData', {
-            room: user.room,
-            users: getUsersInRoom(user.room)
-        });
-        callback();
-    });
+        console.log('join recieved');
+        console.log('username: ' + username);
+        console.log('room: ' + room);
 
-    socket.on('sendMessage', (message, callback) => {
-        const user = getUser(socket.id);
-        // const filter = new Filter();
-        // if (filter.isProfane(message)) {
-        //     return callback('Profanity is not allowed');
-        // }
-
-        if (message.substr(0,3) === 'to:') {
-            const recipientStr = message.substr(3).split(' ')[0];
-            console.log('whisper to ' + recipientStr);
-            const recipientUser = getUserByUsername(recipientStr);
-            if (!recipientUser) {
-                console.log('error: no such user exists');
-                io.to(user.id).emit('message', generateMessage('Error', 'No user <' + recipientStr + '> exists'));
-            } else if (recipientUser.room !== user.room) {
-                console.log('not same room');
-                io.to(user.id).emit('message', generateMessage('Error', '<' + recipientStr + '> is not in this room'));
-            } else {
-                //console.log('recipient id: ' + recipientUser.id);
-                const messageText = message.split(' ').slice(1).join(' ');
-                //dm sender
-                io.to(user.id).emit('message', generateMessage(user.username + ' (whisper to '
-                        + recipientUser.username+')', messageText));
-                //dm recipient
-                io.to(recipientUser.id).emit('message', generateMessage(user.username + ' (whisper)', messageText));
-            }
-            callback();
+        const valid = addToLobby(room, username);
+        if (!valid) {
+            console.log('invalid');
+            callback('Cannot join lobby.');
             return;
         }
+        console.log('valid');
 
-        io.to(user.room).emit('message', generateMessage(user.username, message));
-        callback();
-    });
-
-    socket.on('sendLocation', (coords, callback) => {
-        const user = getUser(socket.id);
-        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
+        socket.join(room);
+        console.log('lobbyInfo');
+        console.log(getLobbyInfo(room));
+        console.log('json string:');
+        console.log(JSON.stringify(getLobbyInfo(room)));
+        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
         callback();
     });
 
     socket.on('disconnect', () => {
-        const user = removeUser(socket.id);
-        if (user) {
-            io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left`));
-            io.to(user.room).emit('roomData', {
-                room: user.room,
-                users: getUsersInRoom(user.room)
-            }); 
-        }
+        //removeUser(socket.id);
     });
 });
 
