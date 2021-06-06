@@ -40,6 +40,19 @@ io.on('connection', (socket) => {
         callback();
     });
 
+    socket.on('changeLobbyInfo', ({ username, room, newType }, callback) => {
+        console.log('recieved newType: ' + newType);
+        const success = updateLobbyInfo(room, username, newType);
+        if (!success) {
+            console.log('failed type change');
+            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+            callback('Failed to change type.');
+            return;
+        }
+        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        callback();
+    })
+
     socket.on('disconnect', () => {
         //removeUser(socket.id);
     });

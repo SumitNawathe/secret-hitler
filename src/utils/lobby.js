@@ -30,12 +30,17 @@ const addToLobby = (room, username) => {
     return true;
 }
 
-const updateLobbyInfo = (room, username, type) => {
+const updateLobbyInfo = (room, username, newtype) => {
     lobby = lobbies.get(room);
     if (!lobby) { return false; }
     user = lobby.filter(x => x.username === username);
     if (!user) { return false; }
-    user.type = type;
+    user = user[0];
+    console.log('user before update');
+    console.log(user);
+    user.type = newtype;
+    console.log('user after update');
+    console.log(user);
     return true;
 }
 

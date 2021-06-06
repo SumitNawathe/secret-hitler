@@ -11,7 +11,17 @@
             <h1>Secret Hitler Lobby {{room}}</h1>
         </script>
 
-        <button>Start Game</button>
+        <div id="lobby-action"></div>
+        <script id="lobby-action-start" type="text/html">
+            <button id="lobby-action-start-button">Start Game</button>
+        </script>
+        <script id="lobby-action-play" type="text/html">
+            <button id="lobby-action-play-button">Play</button>
+        </script>
+        <script id="lobby-action-spectate" type="text/html">
+            <button id="lobby-action-spectate-button">Spectate</button>
+        </script>
+
         <ul id="participant-list"></ul>
 
         <script id="participant-template" type="text/html">
