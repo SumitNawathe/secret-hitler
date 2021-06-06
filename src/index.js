@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
-const { addToLobby, updateLobbyInfo, getLobbyInfo } = require('./utils/lobby');
+const { addToLobby, updateLobbyInfo, getLobbyInfo, removeUser } = require('./utils/lobby');
 const { timeLog } = require('console');
 
 const app = express();
@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
         console.log('username: ' + username);
         console.log('room: ' + room);
 
-        const valid = addToLobby(room, username);
+        const valid = addToLobby(room, username, socket.id);
         if (!valid) {
             console.log('invalid');
             callback('Cannot join lobby.');
@@ -54,7 +54,10 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
-        //removeUser(socket.id);
+        const room = removeUser(socket.id);
+        if (room !== null) {
+            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        }
     });
 });
 
