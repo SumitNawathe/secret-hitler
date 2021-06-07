@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Secret Hitler</title>
+        <link rel="icon" href="/img/favicon.png">
+        <link rel="stylesheet" href="/css/styles.min.css">
+    </head>
+    <body>
+        <a href="/"><button>Lobby Select</button></a>
+
+        <div id="heading"></div>
+        <script id="heading-template" type="text/html">
+            <h1>Secret Hitler Lobby {{room}}</h1>
+        </script>
+
+        <div id="lobby-action"></div>
+        <script id="lobby-action-start" type="text/html">
+            <button id="lobby-action-start-button">Start Game</button>
+        </script>
+        <script id="lobby-action-play" type="text/html">
+            <button id="lobby-action-play-button">Play</button>
+        </script>
+        <script id="lobby-action-spectate" type="text/html">
+            <button id="lobby-action-spectate-button">Spectate</button>
+        </script>
+
+        <ul id="participant-list"></ul>
+
+        <script id="participant-template" type="text/html">
+            <div class="participant">
+                {{ username }}  -  {{ type }}
+            </div>
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/lobby.js"></script>
+    </body>
+</html>
