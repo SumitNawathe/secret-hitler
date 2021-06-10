@@ -1,6 +1,5 @@
-const lobbies = new Map();
-const idToUsername = new Map();
-const usernameToLobby = new Map();
+const path = require('path');
+const { lobbies, idToUsername, usernameToLobby } = require('../utils/data')
 const HOST = 0;
 const SPECTATOR = -1;
 const PLAYER = 1;
@@ -54,10 +53,6 @@ const updateLobbyInfo = (room, username, newtype) => {
     return true;
 }
 
-const getLobbyInfo = (room) => {
-    return lobbies.get(room);
-}
-
 const removeUser = (id) => {
     console.log('removeUser');
     const username = idToUsername.get(id);
@@ -93,6 +88,5 @@ const removeUser = (id) => {
 module.exports = {
     addToLobby,
     updateLobbyInfo,
-    getLobbyInfo,
     removeUser
 };

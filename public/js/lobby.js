@@ -3,10 +3,10 @@ const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true }
 
 const $participantList = document.querySelector('#participant-list');
 const participantTemplate = document.querySelector('#participant-template').innerHTML;
-const $lobbyAction = document.querySelector('#lobby-action');
-const lobbyActionStartTemplate = document.querySelector('#lobby-action-start').innerHTML;
-const lobbyActionPlayTemplate = document.querySelector('#lobby-action-play').innerHTML;
-const lobbyActionSpectateTemplate = document.querySelector('#lobby-action-spectate').innerHTML;
+const $lobbyAction = document.querySelector('#action');
+const lobbyActionStartTemplate = document.querySelector('#action-start').innerHTML;
+const lobbyActionPlayTemplate = document.querySelector('#action-play').innerHTML;
+const lobbyActionSpectateTemplate = document.querySelector('#action-spectate').innerHTML;
 
 const HOST = 0;
 const SPECTATOR = -1;

@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
+const { lobbies, idToUsername, usernameToLobby } = require('./utils/data');
 const { addToLobby, updateLobbyInfo, getLobbyInfo, removeUser } = require('./utils/lobby');
 const { timeLog } = require('console');
 
@@ -33,10 +34,10 @@ io.on('connection', (socket) => {
 
         socket.join(room);
         console.log('lobbyInfo');
-        console.log(getLobbyInfo(room));
+        console.log(lobbies.get(room));
         console.log('json string:');
-        console.log(JSON.stringify(getLobbyInfo(room)));
-        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        console.log(JSON.stringify(lobbies.get(room)));
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         callback();
     });
 
@@ -45,18 +46,18 @@ io.on('connection', (socket) => {
         const success = updateLobbyInfo(room, username, newType);
         if (!success) {
             console.log('failed type change');
-            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
             callback('Failed to change type.');
             return;
         }
-        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         callback();
     })
 
     socket.on('disconnect', () => {
         const room = removeUser(socket.id);
         if (room !== null) {
-            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         }
     });
 });
