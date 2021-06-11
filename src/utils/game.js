@@ -23,6 +23,19 @@ const {
 const startGame = (room) => {
     const lobby = lobbies.get(room);
     randomAssign(room, 2);
+    let deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+    deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+    deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+    deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+    deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+    deck = [true, false, true, true, false, true, false];
+    console.log(randomShuffle(deck));
+
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -48,7 +61,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         for(let j =0; j<ourUsers.length; j++){
             if(traversed==willTraversed){
                 ourUsers[j] = TYPE_FASCIST;
-                console.log(j);
+                // console.log(j);
                 break;
             }
             if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
@@ -64,13 +77,24 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     for(let j =0; j<ourUsers.length; j++){
         if(traversed==willTraversed){
             ourUsers[j] = TYPE_HITLER;
-            console.log("hitler:"+j);
+            // console.log("hitler:"+j);
             break;
         }
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
             traversed++;
         }
     }
+}
+
+// outputs an array of true and falses with the same number as deck but in a different order
+const randomShuffle = (deck) => {
+    let output = [];
+    while(deck.length>0){
+        let index = Math.floor(deck.length*(Math.random()));
+        output.push(deck[index]);
+        deck.splice(index, 1);
+    }
+    return output;
 }
 
 module.exports = {
