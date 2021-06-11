@@ -14,11 +14,13 @@ const {
     TYPE_LIBERAL,
     TYPE_FASCIST,
     TYPE_HITLER,
+    TYPE_DEAD,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
     STATUS_NONE,
     STATUS_VOTING,
+    STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
     STATUS_PRESACT
@@ -84,6 +86,10 @@ io.on('connection', (socket) => {
     socket.on('startGame', ({ room }, callback) => {
         startGame(room);
         io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+    });
+
+    socket.on('chooseChancellor', ({ room, choice }, callback) => {
+        console.log('chose chancellor: ' + choice);
     });
 });
 

@@ -10,11 +10,13 @@ const {
     TYPE_LIBERAL,
     TYPE_FASCIST,
     TYPE_HITLER,
+    TYPE_DEAD,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
     STATUS_NONE,
     STATUS_VOTING,
+    STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
     STATUS_PRESACT
@@ -22,7 +24,16 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
-    randomAssign(room, 2);
+    lobby.gameState = GAMESTATE_ONGOING;
+    randomAssign(room, 2); //TODO: change to depend on number of players
+    lobby.president = 0;
+    lobby.nextPresident = 1;
+    lobby.liberalCards = 0;
+    lobby.fascistCards = 0;
+
+    lobby.users[0].status = STATUS_PRESCHOOSE;
+    console.log('USER 0:');
+    console.log(lobby.users[0]);
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -47,7 +58,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
         for(let j =0; j<ourUsers.length; j++){
             if(traversed==willTraversed){
-                ourUsers[j] = TYPE_FASCIST;
+                ourUsers[j].type = TYPE_FASCIST;
                 console.log(j);
                 break;
             }
@@ -63,7 +74,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
     for(let j =0; j<ourUsers.length; j++){
         if(traversed==willTraversed){
-            ourUsers[j] = TYPE_HITLER;
+            ourUsers[j].type = TYPE_HITLER;
             console.log("hitler:"+j);
             break;
         }
