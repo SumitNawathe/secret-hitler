@@ -94,6 +94,7 @@ const createLobbyButtons = (playerType) => {
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
             console.log('START GAME');
+            socket.emit('startGame', { room: room}, (error) => { if (error) { console.log('error') } });
         });
     } else if (playerType === TYPE_PLAYER) {
         html = Mustache.render(actionButtonTemplate, { text: 'Spectate' });
