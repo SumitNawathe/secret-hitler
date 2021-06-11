@@ -1,7 +1,6 @@
 {
   "name": "chatapp",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -16,5 +15,14 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SumitNawathe/secret-hitler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SumitNawathe/secret-hitler/issues"
+  },
+  "homepage": "https://github.com/SumitNawathe/secret-hitler#readme",
+  "description": ""
 }
