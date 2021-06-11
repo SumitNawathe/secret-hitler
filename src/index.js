@@ -16,7 +16,12 @@ const {
     TYPE_HITLER,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
-    GAMESTATE_FINISHED
+    GAMESTATE_FINISHED,
+    STATUS_NONE,
+    STATUS_VOTING,
+    STATUS_PRESDEC,
+    STATUS_CHANCDEC,
+    STATUS_PRESACT
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
 const { timeLog } = require('console');

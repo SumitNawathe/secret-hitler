@@ -10,25 +10,19 @@
 
         <div id="heading"></div>
         <script id="heading-template" type="text/html">
-            <h1>Secret Hitler Lobby {{room}}</h1>
+            <h1>Secret Hitler Lobby {{ room }}</h1>
         </script>
 
-        <div id="action"></div>
-        <script id="action-start" type="text/html">
-            <button id="action-start-button">Start Game</button>
-        </script>
-        <script id="action-play" type="text/html">
-            <button id="action-play-button">Play</button>
-        </script>
-        <script id="action-spectate" type="text/html">
-            <button id="action-spectate-button">Spectate</button>
+        <div id="actions"></div>
+        <script id="action-button-template" type="text/html">
+            <button id="action-button">{{ text }}</button>
         </script>
 
         <ul id="participant-list"></ul>
 
         <script id="participant-template" type="text/html">
             <div class="participant">
-                {{ username }}  -  {{ type }}
+                {{ username }}  -  {{ type }} - {{ status }}
             </div>
         </script>
 
