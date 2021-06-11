@@ -3,7 +3,22 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
-const { addToLobby, updateLobbyInfo, getLobbyInfo, removeUser } = require('./utils/lobby');
+const {
+    lobbies,
+    idToUsername,
+    usernameToLobby,
+    createLobby,
+    TYPE_SPECTATOR,
+    TYPE_HOST,
+    TYPE_PLAYER,
+    TYPE_LIBERAL,
+    TYPE_FASCIST,
+    TYPE_HITLER,
+    GAMESTATE_LOBBY,
+    GAMESTATE_ONGOING,
+    GAMESTATE_FINISHED
+} = require('./utils/data');
+const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
 const { timeLog } = require('console');
 
 const app = express();
@@ -33,30 +48,30 @@ io.on('connection', (socket) => {
 
         socket.join(room);
         console.log('lobbyInfo');
-        console.log(getLobbyInfo(room));
+        console.log(lobbies.get(room));
         console.log('json string:');
-        console.log(JSON.stringify(getLobbyInfo(room)));
-        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        console.log(JSON.stringify(lobbies.get(room)));
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         callback();
     });
 
     socket.on('changeLobbyInfo', ({ username, room, newType }, callback) => {
         console.log('recieved newType: ' + newType);
-        const success = updateLobbyInfo(room, username, newType);
+        const success = updateLobbyUserType(room, username, newType);
         if (!success) {
             console.log('failed type change');
-            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
             callback('Failed to change type.');
             return;
         }
-        io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         callback();
     })
 
     socket.on('disconnect', () => {
         const room = removeUser(socket.id);
         if (room !== null) {
-            io.to(room).emit('lobbyData', JSON.stringify(getLobbyInfo(room)));
+            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         }
     });
 });

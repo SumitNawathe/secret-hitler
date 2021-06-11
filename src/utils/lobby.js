@@ -1,9 +1,19 @@
-const lobbies = new Map();
-const idToUsername = new Map();
-const usernameToLobby = new Map();
-const HOST = 0;
-const SPECTATOR = -1;
-const PLAYER = 1;
+const path = require('path');
+const {
+    lobbies,
+    idToUsername,
+    usernameToLobby,
+    createLobby,
+    TYPE_SPECTATOR,
+    TYPE_HOST,
+    TYPE_PLAYER,
+    TYPE_LIBERAL,
+    TYPE_FASCIST,
+    TYPE_HITLER,
+    GAMESTATE_LOBBY,
+    GAMESTATE_ONGOING,
+    GAMESTATE_FINISHED
+} = require('../utils/data')
 
 const addToLobby = (room, username, id) => {
     if (lobbies.has(room)) {
@@ -12,38 +22,33 @@ const addToLobby = (room, username, id) => {
         console.log(lobby);
 
         //check if that username is taken
-        for (user in lobby) {
+        for (user in lobby.users) {
             if (user.username === username) {
                 return false;
             }
         }
 
         //include person in lobby
-        lobby.push({
+        lobby.users.push({
             username: username,
-            type: SPECTATOR,
+            type: TYPE_SPECTATOR,
             id: id
         });
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);
     } else {
         //create lobby with user as host
-        lobby = [{
-            username: username,
-            type: HOST,
-            id: id
-        }]
-        lobbies.set(room, lobby);
+        createLobby(room, username, id);
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);
     }
     return true;
 }
 
-const updateLobbyInfo = (room, username, newtype) => {
-    lobby = lobbies.get(room);
-    if (!lobby) { return false; }
-    user = lobby.filter(x => x.username === username);
+const updateLobbyUserType = (room, username, newtype) => {
+    lobbyUsers = lobbies.get(room).users;
+    if (!lobbyUsers) { return false; }
+    user = lobbyUsers.filter(x => x.username === username);
     if (!user) { return false; }
     user = user[0];
     console.log('user before update');
@@ -52,10 +57,6 @@ const updateLobbyInfo = (room, username, newtype) => {
     console.log('user after update');
     console.log(user);
     return true;
-}
-
-const getLobbyInfo = (room) => {
-    return lobbies.get(room);
 }
 
 const removeUser = (id) => {
@@ -70,21 +71,21 @@ const removeUser = (id) => {
     usernameToLobby.delete(username);
     console.log('running filter');
     let hostLeft = false;
-    lobbies.set(room, lobbies.get(room).filter(x => {
+    lobbies.get(room).users = lobbies.get(room).users.filter(x => {
         if (x.username === username) {
-            if (x.type === HOST) {
+            if (x.type === TYPE_HOST) {
                 hostLeft = true;
             }
             return false;
         }
         return true;
-    }));
+    });
     if (hostLeft) {
-        if (lobbies.get(room).length === 0) {
+        if (lobbies.get(room).users.length === 0) {
             lobbies.delete(room);
         } else {
-            console.log(lobbies.get(room));
-            lobbies.get(room)[0].type = HOST;
+            console.log(lobbies.get(room).users);
+            lobbies.get(room).users[0].type = TYPE_HOST;
         }
     }
     return room;
@@ -92,7 +93,6 @@ const removeUser = (id) => {
 
 module.exports = {
     addToLobby,
-    updateLobbyInfo,
-    getLobbyInfo,
+    updateLobbyUserType,
     removeUser
 };
