@@ -12,7 +12,12 @@ const {
     TYPE_HITLER,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
-    GAMESTATE_FINISHED
+    GAMESTATE_FINISHED,
+    STATUS_NONE,
+    STATUS_VOTING,
+    STATUS_PRESDEC,
+    STATUS_CHANCDEC,
+    STATUS_PRESACT
 } = require('../utils/data')
 
 const addToLobby = (room, username, id) => {
@@ -32,7 +37,8 @@ const addToLobby = (room, username, id) => {
         lobby.users.push({
             username: username,
             type: TYPE_SPECTATOR,
-            id: id
+            id: id,
+            status: STATUS_NONE
         });
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);

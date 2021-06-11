@@ -15,6 +15,11 @@ const TYPE_HITLER = 4;
 const GAMESTATE_LOBBY = 0;
 const GAMESTATE_ONGOING = 1;
 const GAMESTATE_FINISHED = 2;
+const STATUS_NONE = 0;
+const STATUS_VOTING = 1;
+const STATUS_PRESDEC = 2;
+const STATUS_CHANCDEC = 3;
+const STATUS_PRESACT = 4;
 
 //create lobby page heading
 const $heading = document.querySelector('#heading');
@@ -44,10 +49,23 @@ socket.on('lobbyData', (lobbyDataString) => {
         let typeString = '';
         if (person.type === TYPE_HOST) { typeString = 'Host' }
         else if (person.type === TYPE_PLAYER) { typeString = 'Player' }
-        else { typeString = 'Spectator' }
+        else if (person.type === TYPE_SPECTATOR) { typeString = 'Spectator' }
+        else if (person.type === TYPE_LIBERAL) { typeString = 'Liberal' }
+        else if (person.type === TYPE_FASCIST) { typeString = 'Fascist' }
+        else if (person.type === TYPE_HITLER) { typeString = 'Hitler' }
+        else { typeString = '' }
+
+        let statusString = '';
+        if (person.status === STATUS_VOTING) { statusString = 'voting...' }
+        else if (person.status === STATUS_PRESDEC) { statusString = 'President deciding...' }
+        else if (person.status === STATUS_CHANCDEC) { statusString = 'Chancellor deciding...' }
+        else if (person.status === STATUS_PRESACT) { statusString = 'President taking action...' }
+        else { person.status = '' }
+
         const html = Mustache.render(participantTemplate, {
             username: person.username,
-            type: typeString
+            type: typeString,
+            status: statusString
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
