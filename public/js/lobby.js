@@ -8,8 +8,8 @@ const lobbyActionStartTemplate = document.querySelector('#action-start').innerHT
 const lobbyActionPlayTemplate = document.querySelector('#action-play').innerHTML;
 const lobbyActionSpectateTemplate = document.querySelector('#action-spectate').innerHTML;
 
-const HOST = 0;
 const SPECTATOR = -1;
+const HOST = 0;
 const PLAYER = 1;
 
 //create lobby page heading
@@ -34,8 +34,8 @@ socket.on('lobbyData', (lobbyDataString) => {
 
     //creating new lobbydata
     console.log('rendering new data');
-    console.log(lobbyData);
-    lobbyData.forEach((person) => {
+    console.log(lobbyData.users);
+    lobbyData.users.forEach((person) => {
         console.log(person);
         let typeString = '';
         if (person.type === HOST) { typeString = 'Host' }
@@ -52,7 +52,7 @@ socket.on('lobbyData', (lobbyDataString) => {
     const currentButton = $lobbyAction.querySelector('button');
     if (currentButton) { console.log('removing button'); currentButton.remove(); }
     let type = -1;
-    lobbyData.every((person) => {
+    lobbyData.users.every((person) => {
         if (person.username === username) {
             type = person.type;
             return false;

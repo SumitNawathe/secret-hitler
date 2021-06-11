@@ -3,8 +3,22 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
-const { lobbies, idToUsername, usernameToLobby } = require('./utils/data');
-const { addToLobby, updateLobbyInfo, getLobbyInfo, removeUser } = require('./utils/lobby');
+const {
+    lobbies,
+    idToUsername,
+    usernameToLobby,
+    createLobby,
+    TYPE_SPECTATOR,
+    TYPE_HOST,
+    TYPE_PLAYER,
+    TYPE_LIBERAL,
+    TYPE_FASCIST,
+    TYPE_HITLER,
+    GAMESTATE_LOBBY,
+    GAMESTATE_ONGOING,
+    GAMESTATE_FINISHED
+} = require('./utils/data');
+const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
 const { timeLog } = require('console');
 
 const app = express();
@@ -43,7 +57,7 @@ io.on('connection', (socket) => {
 
     socket.on('changeLobbyInfo', ({ username, room, newType }, callback) => {
         console.log('recieved newType: ' + newType);
-        const success = updateLobbyInfo(room, username, newType);
+        const success = updateLobbyUserType(room, username, newType);
         if (!success) {
             console.log('failed type change');
             io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
