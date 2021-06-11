@@ -8,9 +8,15 @@ const lobbyActionStartTemplate = document.querySelector('#action-start').innerHT
 const lobbyActionPlayTemplate = document.querySelector('#action-play').innerHTML;
 const lobbyActionSpectateTemplate = document.querySelector('#action-spectate').innerHTML;
 
-const SPECTATOR = -1;
-const HOST = 0;
-const PLAYER = 1;
+const TYPE_SPECTATOR = -1;
+const TYPE_HOST = 0;
+const TYPE_PLAYER = 1;
+const TYPE_LIBERAL = 2;
+const TYPE_FASCIST = 3;
+const TYPE_HITLER = 4;
+const GAMESTATE_LOBBY = 0;
+const GAMESTATE_ONGOING = 1;
+const GAMESTATE_FINISHED = 2;
 
 //create lobby page heading
 const $heading = document.querySelector('#heading');
@@ -38,8 +44,8 @@ socket.on('lobbyData', (lobbyDataString) => {
     lobbyData.users.forEach((person) => {
         console.log(person);
         let typeString = '';
-        if (person.type === HOST) { typeString = 'Host' }
-        else if (person.type === PLAYER) { typeString = 'Player' }
+        if (person.type === TYPE_HOST) { typeString = 'Host' }
+        else if (person.type === TYPE_PLAYER) { typeString = 'Player' }
         else { typeString = 'Spectator' }
         const html = Mustache.render(participantTemplate, {
             username: person.username,
@@ -60,28 +66,28 @@ socket.on('lobbyData', (lobbyDataString) => {
         return true;
     });
     let html = null;
-    if (type === HOST) {
+    if (type === TYPE_HOST) {
         html = Mustache.render(lobbyActionStartTemplate);
-    } else if (type === PLAYER) {
+    } else if (type === TYPE_PLAYER) {
         html = Mustache.render(lobbyActionSpectateTemplate);
-    } else { //type === SPECTATOR
+    } else { //type === TYPE_SPECTATOR
         html = Mustache.render(lobbyActionPlayTemplate);
     }
     $lobbyAction.insertAdjacentHTML('beforeend', html);
     const newButton = $lobbyAction.querySelector('button');
-    if (type === HOST) {
+    if (type === TYPE_HOST) {
         newButton.addEventListener('click', () => {
             console.log('START GAME');
         });
-    } else if (type === PLAYER) {
+    } else if (type === TYPE_PLAYER) {
         newButton.addEventListener('click', () => {
             console.log('should change to spectate');
-            socket.emit('changeLobbyInfo', { username, room, newType: SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+            socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
         });
-    } else { //type === SPECTATOR
+    } else { //type === TYPE_SPECTATOR
         newButton.addEventListener('click', () => {
             console.log('should change to play');
-            socket.emit('changeLobbyInfo', { username, room, newType: PLAYER }, (error) => { if (error) { console.log('error'); } })
+            socket.emit('changeLobbyInfo', { username, room, newType: TYPE_PLAYER }, (error) => { if (error) { console.log('error'); } })
         });
     }
 });
