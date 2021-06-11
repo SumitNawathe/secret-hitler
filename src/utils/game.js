@@ -22,13 +22,55 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
-    lobby.users.forEach(person => {
-        if (Math.random() < 0.5) {
-            person.type = TYPE_LIBERAL;
-        } else {
-            person.type = TYPE_FASCIST
+    randomAssign(room, 2);
+}
+
+const randomAssign = (room, numOfFascists /*not including hilter*/) => {
+    // takes an variable number of fascists and then randomly assigns them to the players
+    // also randomly assigns hitler
+
+    // removes last game's assignments
+    let players = 0; // determines the number of active players
+    for(let i=0; i<lobbies.get(room).users.length; i++){
+        if(lobbies.get(room).users[i].type != TYPE_SPECTATOR){
+            players++;
+            lobbies.get(room).users[i].type = TYPE_LIBERAL;
         }
-    });
+    } 
+
+    let ourUsers = lobbies.get(room).users;
+
+    // assigns the fascists
+    for(let i =0; i<numOfFascists; i++){
+        // number of players (ignoring already determined fascists and spectators) we will skip over before choosing the next fascist
+        let willTraversed = Math.floor((players-i)*(Math.random())); 
+        let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
+        for(let j =0; j<ourUsers.length; j++){
+            if(traversed==willTraversed){
+                ourUsers[j] = TYPE_FASCIST;
+                console.log(j);
+                break;
+            }
+            if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+                traversed++;
+            }
+        }
+    }
+
+    // assigns hitler
+    // number of players (ignoring already determined fascists and spectators) we will skip over before choosing hitler
+    let willTraversed = Math.floor((players-numOfFascists)*(Math.random())); 
+    let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
+    for(let j =0; j<ourUsers.length; j++){
+        if(traversed==willTraversed){
+            ourUsers[j] = TYPE_HITLER;
+            console.log("hitler:"+j);
+            break;
+        }
+        if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+            traversed++;
+        }
+    }
 }
 
 module.exports = {
