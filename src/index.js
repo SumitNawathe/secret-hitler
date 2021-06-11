@@ -24,6 +24,7 @@ const {
     STATUS_PRESACT
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
+const { startGame } = require('./utils/game');
 const { timeLog } = require('console');
 
 const app = express();
@@ -78,6 +79,11 @@ io.on('connection', (socket) => {
         if (room !== null) {
             io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         }
+    });
+
+    socket.on('startGame', ({ room }, callback) => {
+        startGame(room);
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
     });
 });
 
