@@ -12,8 +12,8 @@
         <script src="{{asset('../semantic/dist/semantic.min.js')}}"></script>
     </head> 
     <body>
-        <div class="ui dimmer modals page transition visible active" style="display: flex !important;">
-            <section class="signin-modal ui modal small segment column transition visible active" style="display: block !important;">
+        <div class="ui dimmer modals page transition visible active" id="pop1" style="display: flex !important;">
+            <section class="signin-modal ui modal small segment column transition visible active" id="pop2" style="display: block !important;">
                 <!--<h2 class=header>Join a Room</h2>-->
                 <form class="ui form" action="/lobby.html" style="text-align: center">
                     <!--<label>Display Name</label>-->
@@ -32,7 +32,24 @@
                     </div>
                     <button class="ui primary button fluid large signin-submit">Join</button>
                 </form>
+                <button class="ui primary button fluid large signin-submit" id="rules" onclick="rules()">Rules</button>
             </section>
         </div>
+        <div class="ui dimmer modals" id='rulesheader'>Lorem ipsum dolor sit amet, consectetur 
+            adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in 
+             reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupida
+             tat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+        </div>
+        <script>
+            function rules() {
+                document.getElementById("pop1").classList.remove("active");
+                document.getElementById("pop2").classList.remove("active");
+                document.getElementById("rulesheader").classList.add("visible");
+                document.getElementById("rulesheader").classList.add("active");
+                //document.getElementById("rulesheader").style.display = "flex !important;";
+            }   
+        </script>
     </body>
 </html>
