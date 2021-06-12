@@ -136,6 +136,17 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     }
 }
 
+// outputs an array of true and falses with the same number as deck but in a different order
+const randomShuffle = (deck) => {
+    let output = []; 
+    while(deck.length>0){
+        let index = Math.floor(deck.length*(Math.random()));
+        output.push(deck[index]);
+        deck.splice(index, 1);
+    }
+    return output;
+}
+
 module.exports = {
     startGame,
     setUpVote,

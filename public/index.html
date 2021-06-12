@@ -3,20 +3,36 @@
     <head>
         <title>Secret Hitler</title>
         <link rel="icon" href="/img/favicon.png">
-        <link rel="stylesheet" href="/css/styles.min.css">
-    </head>
+        <!--<link rel="stylesheet" href="/css/styles.min.css">-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+        <!--<link rel="stylesheet" type="text/css" href="{{asset('../semantic/dist/semantic.min.css')}}">-->
+        <!-- this is bad, but can't figure out why it's not working -->
+
+        <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>-->
+        <script src="{{asset('../semantic/dist/semantic.min.js')}}"></script>
+    </head> 
     <body>
-        <div class="centered-form">
-            <div class="centered-form__box">
-                <h1>Join a Room</h1>
-                <form action="/lobby.html">
-                    <label>Display Name</label>
-                    <input type="text" name="username" placeholder="Display Name" required>
-                    <label>Room</label>
-                    <input type="text" name="room" placeholder="Room" required>
-                    <button>Join</button>
+        <div class="ui dimmer modals page transition visible active" style="display: flex !important;">
+            <section class="signin-modal ui modal small segment column transition visible active" style="display: block !important;">
+                <!--<h2 class=header>Join a Room</h2>-->
+                <form class="ui form" action="/lobby.html" style="text-align: center">
+                    <!--<label>Display Name</label>-->
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="username" placeholder="Display Name" required>
+                        </div>
+                    </div>
+                    <!--<label>Room</label>-->
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <input type="text" name="room" placeholder="Room" required>
+                            <i class="hand spock icon"></i>
+                        </div>
+                    </div>
+                    <button class="ui primary button fluid large signin-submit">Join</button>
                 </form>
-            </div>
+            </section>
         </div>
     </body>
 </html>
