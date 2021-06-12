@@ -10,11 +10,13 @@ const {
     TYPE_LIBERAL,
     TYPE_FASCIST,
     TYPE_HITLER,
+    TYPE_DEAD,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
     STATUS_NONE,
     STATUS_VOTING,
+    STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
     STATUS_PRESACT
@@ -22,20 +24,68 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
-    randomAssign(room, 2);
-    let deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
-    deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
-    deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
-    deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
-    deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
-    deck = [true, false, true, true, false, true, false];
-    console.log(randomShuffle(deck));
+    lobby.gameState = GAMESTATE_ONGOING;
+    randomAssign(room, 2); //TODO: change to depend on number of players
+    lobby.president = 0;
+    lobby.nextPresident = 1;
+    lobby.liberalCards = 0;
+    lobby.fascistCards = 0;
 
+    lobby.users[0].status = STATUS_PRESCHOOSE;
+    console.log('USER 0:');
+    console.log(lobby.users[0]);
+}
+
+const setUpVote = (room, chancellorChoice) => { //ERROR: room is undefined
+    const lobby = lobbies.get(room);
+    console.log(lobby);
+    console.log(room);
+    console.log(lobbies);
+    lobby.voteCountYes = 0;
+    lobby.voteCountNo = 0;
+    lobby.users.forEach((person) => {
+        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+            person.status = STATUS_VOTING;
+        }
+    });
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD) {
+            lobby.users[i].status = STATUS_VOTING;
+            if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
+        }
+    }
+}
+
+const registerVote = (room, username, vote) => {
+    const lobby = lobbies.get(room);
+    if (vote) { lobby.voteCountYes += 1; }
+    else { lobby.voteCountNo += 1; }
+    let countPlayers = 0;
+    lobby.users.forEach((person) => {
+        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+            countPlayers += 1;
+            if (person.username === username) {
+                person.lastVote = vote;
+                person.status = STATUS_NONE;
+            }
+        }
+    });
+
+    if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
+        if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
+            lobby.previousPresident = lobby.president;
+            lobby.previousChancellor = lobby.chancellor;
+            lobby.users[lobby.president].status = STATUS_PRESDEC;
+        } else { //election fails
+            lobby.president = lobby.nextPresident;
+            lobby.chancellor = null;
+            lobby.nextPresident = (lobby.nextPresident + 1) % lobby.users.length;
+            while (lobby.nextPresident.type === TYPE_DEAD || lobby.nextPresident.type === TYPE_SPECTATOR) {
+                lobby.nextPresident = (lobby.nextPresident + 1) % lobby.users.length;
+            }
+            lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
+        }
+    }
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -60,8 +110,8 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
         for(let j =0; j<ourUsers.length; j++){
             if(traversed==willTraversed){
-                ourUsers[j] = TYPE_FASCIST;
-                // console.log(j);
+                ourUsers[j].type = TYPE_FASCIST;
+                console.log(j);
                 break;
             }
             if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
@@ -76,8 +126,8 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
     for(let j =0; j<ourUsers.length; j++){
         if(traversed==willTraversed){
-            ourUsers[j] = TYPE_HITLER;
-            // console.log("hitler:"+j);
+            ourUsers[j].type = TYPE_HITLER;
+            console.log("hitler:"+j);
             break;
         }
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
@@ -98,5 +148,7 @@ const randomShuffle = (deck) => {
 }
 
 module.exports = {
-    startGame
+    startGame,
+    setUpVote,
+    registerVote
 }
