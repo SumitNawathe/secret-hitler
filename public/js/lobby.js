@@ -107,7 +107,18 @@ socket.on('lobbyData', (lobbyDataString) => {
         console.log('MY TYPE:' + myType);
 
         if (myStatus === STATUS_VOTING) {
-            console.log('todo'); //TODO
+            const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
+            const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
+            $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
+            $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
+            $lobbyActions.querySelector('#yes').addEventListener('click', () => {
+                console.log('voing yes');
+                socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
+            });
+            $lobbyActions.querySelector('#no').addEventListener('click', () => {
+                console.log('voing no');
+                socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
+            });
         } else if (myStatus === STATUS_PRESCHOOSE) {
             eligible = [];
             for (let i = 0; i < lobbyData.users.length; i++) {
@@ -159,7 +170,7 @@ const createPlayerSelect = (lobbyData, eligible, eventType) => {
             console.log('adding event listener');
             newButton.addEventListener('click', () => {
                 console.log('chosen');
-                socket.emit(eventType, { room: lobbyData.room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
+                socket.emit(eventType, { room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             });
         }
     }

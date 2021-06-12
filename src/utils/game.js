@@ -36,6 +36,58 @@ const startGame = (room) => {
     console.log(lobby.users[0]);
 }
 
+const setUpVote = (room, chancellorChoice) => { //ERROR: room is undefined
+    const lobby = lobbies.get(room);
+    console.log(lobby);
+    console.log(room);
+    console.log(lobbies);
+    lobby.voteCountYes = 0;
+    lobby.voteCountNo = 0;
+    lobby.users.forEach((person) => {
+        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+            person.status = STATUS_VOTING;
+        }
+    });
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD) {
+            lobby.users[i].status = STATUS_VOTING;
+            if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
+        }
+    }
+}
+
+const registerVote = (room, username, vote) => {
+    const lobby = lobbies.get(room);
+    if (vote) { lobby.voteCountYes += 1; }
+    else { lobby.voteCountNo += 1; }
+    let countPlayers = 0;
+    lobby.users.forEach((person) => {
+        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+            countPlayers += 1;
+            if (person.username === username) {
+                person.lastVote = vote;
+                person.status = STATUS_NONE;
+            }
+        }
+    });
+
+    if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
+        if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
+            lobby.previousPresident = lobby.president;
+            lobby.previousChancellor = lobby.chancellor;
+            lobby.users[lobby.president].status = STATUS_PRESDEC;
+        } else { //election fails
+            lobby.president = lobby.nextPresident;
+            lobby.chancellor = null;
+            lobby.nextPresident = (lobby.nextPresident + 1) % lobby.users.length;
+            while (lobby.nextPresident.type === TYPE_DEAD || lobby.nextPresident.type === TYPE_SPECTATOR) {
+                lobby.nextPresident = (lobby.nextPresident + 1) % lobby.users.length;
+            }
+            lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
+        }
+    }
+}
+
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     // takes an variable number of fascists and then randomly assigns them to the players
     // also randomly assigns hitler
@@ -85,5 +137,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
 }
 
 module.exports = {
-    startGame
+    startGame,
+    setUpVote,
+    registerVote
 }

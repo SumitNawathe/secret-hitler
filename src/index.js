@@ -26,7 +26,7 @@ const {
     STATUS_PRESACT
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
-const { startGame } = require('./utils/game');
+const { startGame, setUpVote, registerVote } = require('./utils/game');
 const { timeLog } = require('console');
 
 const app = express();
@@ -90,6 +90,15 @@ io.on('connection', (socket) => {
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
         console.log('chose chancellor: ' + choice);
+        console.log('room: ' + room);
+        setUpVote(room, choice);
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+    });
+
+    socket.on('voting', ({ room, username, choice }, callback) => {
+        console.log('recieved vote: ' + choice);
+        registerVote(room, username, choice);
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
     });
 });
 

@@ -40,7 +40,8 @@ const addToLobby = (room, username, id) => {
             username: username,
             type: TYPE_SPECTATOR,
             id: id,
-            status: STATUS_NONE
+            status: STATUS_NONE,
+            lastVote: false
         });
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);

@@ -35,8 +35,10 @@ const usernameToLobby = new Map();
  * deck: array representing the remaining cards
  * * LIBERAL = true
  * * FASCIST = false
- * previousPresident: previously elected president
- * previousChancellor: previously elected chancellor
+ * previousPresident: index number of previously elected president
+ * previousChancellor: index number of previously elected chancellor
+ * voteCountYes: number of votes yes for this round
+ * voteCountNo: number of votes no for this round
 */
 
 /*
@@ -58,6 +60,7 @@ const usernameToLobby = new Map();
  * * PRESIDENT CARD DECISION: 3
  * * CHANCELLOR CARD DECISION: 4
  * * PRESIDENT ACTION DECISION: 5
+ * lastVote: true/false representing last vote cast yes/no
 */
 
 const createLobby = (room, username, id) => {
@@ -65,7 +68,8 @@ const createLobby = (room, username, id) => {
         username: username,
         type: TYPE_HOST,
         id: id,
-        status: STATUS_NONE
+        status: STATUS_NONE,
+        lastVote: false
     }]
     const lobby = {
         users: userArray,
@@ -77,7 +81,9 @@ const createLobby = (room, username, id) => {
         fascistCards: 0,
         deck: null,
         previousPresident: null,
-        previousChancellor: null
+        previousChancellor: null,
+        voteCountYes: 0,
+        voteCountNo: 0
     };
     lobbies.set(room, lobby);
 }
