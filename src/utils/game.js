@@ -31,6 +31,7 @@ const startGame = (room) => {
     lobby.liberalCards = 0;
     lobby.fascistCards = 0;
 
+    lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
     console.log('USER 0:');
     console.log(lobby.users[0]);
@@ -106,6 +107,12 @@ const drawThreeCards = (room) => {
     lobby.policyCards.push(lobby.deck[1]);
     lobby.policyCards.push(lobby.deck[2]);
     lobby.deck.splice(0, 3);
+}
+
+const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
+    const lobby = lobbies.get(room);
+    lobby.policyCards.splice(index, 1);
+    lobby.gameState = STATUS_CHANCDEC;
 }
 
 
