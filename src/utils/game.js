@@ -88,6 +88,28 @@ const registerVote = (room, username, vote) => {
     }
 }
 
+const drawThreeCards = (room) => {
+    const lobby = lobbies.get(room);
+    if(lobby.deck.length < 3){
+        lobby.deck = [];
+        for(let i=0; i<6-lobby.liberalCards; i++){
+            lobby.deck.push(true);
+        }
+        for(let i=0; i<11-lobby.fascistCards; i++){
+            lobby.deck.push(false);
+        }
+
+        lobby.deck = randomShuffle(lobby.deck);
+    }
+    lobby.policyCards = [];
+    lobby.policyCards.push(lobby.deck[0]);
+    lobby.policyCards.push(lobby.deck[1]);
+    lobby.policyCards.push(lobby.deck[2]);
+    lobby.deck.splice(0, 3);
+}
+
+
+
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     // takes an variable number of fascists and then randomly assigns them to the players
     // also randomly assigns hitler

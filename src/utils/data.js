@@ -83,7 +83,8 @@ const createLobby = (room, username, id) => {
         previousPresident: null,
         previousChancellor: null,
         voteCountYes: 0,
-        voteCountNo: 0
+        voteCountNo: 0,
+        policyCards: null
     };
     lobbies.set(room, lobby);
 }
