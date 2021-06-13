@@ -19,7 +19,9 @@ const {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT
+    STATUS_PRESACT,
+    LIBERAL,
+    FASCIST
 } = require('../utils/data')
 
 const startGame = (room) => {
@@ -115,6 +117,26 @@ const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusi
     lobby.gameState = STATUS_CHANCDEC;
 }
 
+const chancellorChoose = (room, index /*either 0 or 1 */) => {
+    const lobby = lobbies.get(room);
+    if(lobby.policyCards[index]==LIBERAL){
+        lobby.liberalCards++;
+        lobby.gameState = STATUS_PRESCHOOSE;
+    } else {
+        lobby.fascistCards++;
+        lobby.gameState = STATUS_PRESACT;
+    }
+    if(lobby.fascistCards == 6){
+        endGame(room, FASCIST);
+    } else if (lobby.liberalCards == 5){
+        endGame(room, LIBERAL);
+    }
+}
+
+const endGame = (room, winningTeam) => {
+    // just a placeholder for now
+}
+
 
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -179,5 +201,8 @@ const randomShuffle = (deck) => {
 module.exports = {
     startGame,
     setUpVote,
-    registerVote
+    registerVote,
+    drawThreeCards,
+    presidentDiscard,
+    chancellorChoose
 }

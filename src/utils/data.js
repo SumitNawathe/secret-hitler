@@ -19,6 +19,9 @@ const lobbies = new Map();
 const idToUsername = new Map();
 const usernameToLobby = new Map();
 
+const FASCIST = false;
+const LIBERAL = true;
+
 /*
  * Lobby:
  * key: room
@@ -109,5 +112,7 @@ module.exports = {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT
+    STATUS_PRESACT,
+    FASCIST,
+    LIBERAL
 };
