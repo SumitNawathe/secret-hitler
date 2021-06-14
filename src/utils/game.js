@@ -39,24 +39,25 @@ const startGame = (room) => {
     console.log(lobby.users[0]);
 }
 
-const setUpVote = (room, chancellorChoice) => { //ERROR: room is undefined
+const setUpVote = (room, chancellorChoice) => {
     const lobby = lobbies.get(room);
     console.log(lobby);
     console.log(room);
     console.log(lobbies);
     lobby.voteCountYes = 0;
     lobby.voteCountNo = 0;
-    lobby.users.forEach((person) => {
-        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
-            person.status = STATUS_VOTING;
-        }
-    });
+    // lobby.users.forEach((person) => {
+    //     if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+    //         person.status = STATUS_VOTING;
+    //     }
+    // });
     for (let i = 0; i < lobby.users.length; i++) {
         if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD) {
             lobby.users[i].status = STATUS_VOTING;
             if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
         }
     }
+    drawThreeCards(room);
 }
 
 const registerVote = (room, username, vote) => {
@@ -114,19 +115,29 @@ const drawThreeCards = (room) => {
 const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
     const lobby = lobbies.get(room);
     lobby.policyCards.splice(index, 1);
-    lobby.gameState = STATUS_CHANCDEC;
+    // lobby.gameState = STATUS_CHANCDEC;
+    lobby.users[lobby.president].status = STATUS_NONE;
+    lobby.users[lobby.chancellor].status = STATUS_CHANCDEC;
 }
 
 const chancellorChoose = (room, index /*either 0 or 1 */) => {
     const lobby = lobbies.get(room);
-    if(lobby.policyCards[index]==LIBERAL){
+    if (lobby.policyCards[index] == LIBERAL){
         lobby.liberalCards++;
-        lobby.gameState = STATUS_PRESCHOOSE;
+        //lobby.gameState = STATUS_PRESCHOOSE;
+        lobby.previousPresident = lobby.president;
+        lobby.previousChancellor = lobby.chancellor;
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.president = lobby.nextPresident;
+        incrementNextPres(room);
+        lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
     } else {
         lobby.fascistCards++;
-        lobby.gameState = STATUS_PRESACT;
+        //lobby.gameState = STATUS_PRESACT;
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.users[lobby.president].status = STATUS_PRESACT;
     }
-    if(lobby.fascistCards == 6){
+    if (lobby.fascistCards == 6){
         endGame(room, FASCIST);
     } else if (lobby.liberalCards == 5){
         endGame(room, LIBERAL);
@@ -196,6 +207,17 @@ const randomShuffle = (deck) => {
         deck.splice(index, 1);
     }
     return output;
+}
+
+const incrementNextPres = (room) => {
+    const lobby = lobbies.get(room);
+    while(true) {
+        lobby.nextPresident = (lobby.nextPresident+1) % lobby.users.length;
+        if (lobby.users[lobby.nextPresident].type !== TYPE_DEAD 
+                || lobby.users[lobby.nextPresident].type !== TYPE_SPECTATOR) {
+            break;
+        } //TODO: deal with infinite loop case
+    }
 }
 
 module.exports = {

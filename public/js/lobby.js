@@ -22,6 +22,8 @@ const STATUS_PRESCHOOSE = 2;
 const STATUS_PRESDEC = 3;
 const STATUS_CHANCDEC = 4;
 const STATUS_PRESACT = 5;
+const FASCIST = false;
+const LIBERAL = true;
 
 //create lobby page heading
 const $heading = document.querySelector('#heading');
@@ -127,6 +129,38 @@ socket.on('lobbyData', (lobbyDataString) => {
                 else { eligible.push(true); }
             }
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
+        } else if (myStatus === STATUS_PRESDEC) {
+            for (let i = 0; i < lobbyData.policyCards.length; i++) {
+                let html = null, newButton = null;
+                if (lobbyData.policyCards[i] === LIBERAL) {
+                    html = Mustache.render(actionButtonTemplate, { text: 'Liberal', id:"choice"+i });
+                } else { //lobbyData.policyCards[i] === FASCIST
+                    html = Mustache.render(actionButtonTemplate, { text: 'Fascist', id:"choice"+i });
+                }
+                $lobbyActions.insertAdjacentHTML('beforeend', html);
+                newButton = $lobbyActions.querySelector('#choice'+i);
+                console.log('Chose ' + i);
+                newButton.addEventListener('click', () => {
+                    console.log('Chose ' + i);
+                    socket.emit('presDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
+                });
+            }
+        } else if (myStatus === STATUS_CHANCDEC) { //basically the same as STATUS_PRESDEC
+            for (let i = 0; i < lobbyData.policyCards.length; i++) {
+                let html = null, newButton = null;
+                if (lobbyData.policyCards[i] === LIBERAL) {
+                    html = Mustache.render(actionButtonTemplate, { text: 'Liberal', id:"choice"+i });
+                } else { //lobbyData.policyCards[i] === FASCIST
+                    html = Mustache.render(actionButtonTemplate, { text: 'Fascist', id:"choice"+i });
+                }
+                $lobbyActions.insertAdjacentHTML('beforeend', html);
+                newButton = $lobbyActions.querySelector('#choice'+i);
+                console.log('Chose ' + i);
+                newButton.addEventListener('click', () => {
+                    console.log('Chose ' + i);
+                    socket.emit('chancDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
+                });
+            }
         }
     }
 });
@@ -139,7 +173,7 @@ const createLobbyButtons = (playerType) => {
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
             console.log('START GAME');
-            socket.emit('startGame', { room: room}, (error) => { if (error) { console.log('error') } });
+            socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
         });
     } else if (playerType === TYPE_PLAYER) {
         html = Mustache.render(actionButtonTemplate, { text: 'Spectate', id:"spectate" });

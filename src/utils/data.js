@@ -42,6 +42,7 @@ const LIBERAL = true;
  * previousChancellor: index number of previously elected chancellor
  * voteCountYes: number of votes yes for this round
  * voteCountNo: number of votes no for this round
+ * policyCards: an array of booleans containing the drawn cards for this round
 */
 
 /*
