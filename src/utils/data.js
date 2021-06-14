@@ -4,18 +4,23 @@ const TYPE_PLAYER = 1;
 const TYPE_LIBERAL = 2;
 const TYPE_FASCIST = 3;
 const TYPE_HITLER = 4;
+const TYPE_DEAD = 5;
 const GAMESTATE_LOBBY = 0;
 const GAMESTATE_ONGOING = 1;
 const GAMESTATE_FINISHED = 2;
 const STATUS_NONE = 0;
 const STATUS_VOTING = 1;
-const STATUS_PRESDEC = 2;
-const STATUS_CHANCDEC = 3;
-const STATUS_PRESACT = 4;
+const STATUS_PRESCHOOSE = 2;
+const STATUS_PRESDEC = 3;
+const STATUS_CHANCDEC = 4;
+const STATUS_PRESACT = 5;
 
 const lobbies = new Map();
 const idToUsername = new Map();
 const usernameToLobby = new Map();
+
+const FASCIST = false;
+const LIBERAL = true;
 
 /*
  * Lobby:
@@ -33,6 +38,10 @@ const usernameToLobby = new Map();
  * deck: array representing the remaining cards
  * * LIBERAL = true
  * * FASCIST = false
+ * previousPresident: index number of previously elected president
+ * previousChancellor: index number of previously elected chancellor
+ * voteCountYes: number of votes yes for this round
+ * voteCountNo: number of votes no for this round
 */
 
 /*
@@ -45,13 +54,16 @@ const usernameToLobby = new Map();
  * * LIBERAL = 2
  * * FASCIST = 3 (not Hitler)
  * * HITLER = 4
+ * * DEAD = 5
  * id: socket id of user
  * status: what action the user is currently taking
  * * NONE: 0
  * * VOTING: 1
- * * PRESIDENT CARD DECISION: 2
- * * CHANCELLOR CARD DECISION: 3
- * * PRESIDENT ACTION DECISION: 4
+ * * PRESIDENT CHOOSING CHANCELLOR: 2
+ * * PRESIDENT CARD DECISION: 3
+ * * CHANCELLOR CARD DECISION: 4
+ * * PRESIDENT ACTION DECISION: 5
+ * lastVote: true/false representing last vote cast yes/no
 */
 
 const createLobby = (room, username, id) => {
@@ -59,7 +71,8 @@ const createLobby = (room, username, id) => {
         username: username,
         type: TYPE_HOST,
         id: id,
-        status: STATUS_NONE
+        status: STATUS_NONE,
+        lastVote: false
     }]
     const lobby = {
         users: userArray,
@@ -69,7 +82,12 @@ const createLobby = (room, username, id) => {
         chancellor: null,
         liberalCards: 0,
         fascistCards: 0,
-        deck: null
+        deck: null,
+        previousPresident: null,
+        previousChancellor: null,
+        voteCountYes: 0,
+        voteCountNo: 0,
+        policyCards: null
     };
     lobbies.set(room, lobby);
 }
@@ -85,12 +103,16 @@ module.exports = {
     TYPE_LIBERAL,
     TYPE_FASCIST,
     TYPE_HITLER,
+    TYPE_DEAD,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
     STATUS_NONE,
     STATUS_VOTING,
+    STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT
+    STATUS_PRESACT,
+    FASCIST,
+    LIBERAL
 };

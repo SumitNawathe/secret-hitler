@@ -10,11 +10,13 @@ const {
     TYPE_LIBERAL,
     TYPE_FASCIST,
     TYPE_HITLER,
+    TYPE_DEAD,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
     STATUS_NONE,
     STATUS_VOTING,
+    STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
     STATUS_PRESACT
@@ -38,7 +40,8 @@ const addToLobby = (room, username, id) => {
             username: username,
             type: TYPE_SPECTATOR,
             id: id,
-            status: STATUS_NONE
+            status: STATUS_NONE,
+            lastVote: false
         });
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);
