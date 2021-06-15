@@ -4,25 +4,51 @@
         <title>Secret Hitler</title>
         <link rel="icon" href="/img/favicon.png">
         <link rel="stylesheet" href="/css/styles.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+        <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+        <script src="../semantic/dist/semantic.min.js"></script>
     </head>
     <body>
-        <a href="/"><button>Lobby Select</button></a>
+        <div class="menu-container" style="z-index: 9999;"> <!--always appears on top-->
+            <section class="ui menu nav-menu">
+                <div id="heading"></div>
+                    <div class="item">
+                        <span>
+                            <div id="actions"></div>
+                        </span>
+                    </div>
+                <div class="item right menu">
+                    <a href="/" class="ui primary button">Lobby Select</a>
+                </div>
+            </section>
+        </div>
 
-        <div id="heading"></div>
         <script id="heading-template" type="text/html">
-            <h1>Secret Hitler Lobby {{ room }}</h1>
+            <a class="item">
+                <h1 class="ui header">Secret Hitler Lobby {{ room }}</h1>
+            </a>
         </script>
 
-        <div id="actions"></div>
         <script id="action-button-template" type="text/html">
-            <button class="action-button" id={{ id }}>{{ text }}</button>
+            <button class="ui primary button" id={{ id }}>{{ text }}</button>
         </script>
 
-        <ul id="participant-list"></ul>
+        <br>
+
+        <div class="ui ten column grid">
+            <div class="row" id="participant-list"></div>
+        </div>
 
         <script id="participant-template" type="text/html">
-            <div class="participant">
+            <div class="column">
+            <img class="ui centered tiny image" src="img/default cardback.png">
+            <div class="ui centered header participant" style="white-space: nowrap; overflow: hidden;
+                position: relative; top: -20px;">
                 {{ username }}  -  {{ type }} - {{ status }}
+            </div>
             </div>
         </script>
 
