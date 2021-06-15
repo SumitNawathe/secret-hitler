@@ -9,13 +9,19 @@
         <!-- this is bad, but can't figure out why it's not working -->
 
         <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>-->
-        <script src="{{asset('../semantic/dist/semantic.min.js')}}"></script>
+        <script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+        <script src="../semantic/dist/semantic.min.js"></script>
     </head> 
     <body>
-        <div class="ui dimmer modals page transition visible active" id="pop1" style="display: flex !important;">
-            <section class="signin-modal ui modal small segment column transition visible active" id="pop2" style="display: block !important;">
-                <!--<h2 class=header>Join a Room</h2>-->
-                <form class="ui form" action="/lobby.html" style="text-align: center">
+        <div class="ui active dimmer">
+            <section class="ui segment">
+                <div class="ui header">
+                    Join a Room
+                </div>
+                <form class="ui form" action="/lobby.html">
                     <!--<label>Display Name</label>-->
                     <div class="field">
                         <div class="ui left icon input">
@@ -30,26 +36,25 @@
                             <i class="hand spock icon"></i>
                         </div>
                     </div>
-                    <button class="ui primary button fluid large signin-submit">Join</button>
+                    <button class="ui positive button fluid large">Join</button>
                 </form>
-                <button class="ui primary button fluid large signin-submit" id="rules" onclick="rules()">Rules</button>
+                <br>
+                <button class="ui primary button fluid large" id="rules-button">Rules</button>
             </section>
-        </div>
-        <div class="ui dimmer modals" id='rulesheader'>Lorem ipsum dolor sit amet, consectetur 
-            adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in 
-             reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupida
-             tat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+            <div class="ui modal" id="modalrules">
+                <div class="header">
+                    TEST
+                </div>
+            </div>
         </div>
         <script>
-            function rules() {
-                document.getElementById("pop1").classList.remove("active");
-                document.getElementById("pop2").classList.remove("active");
-                document.getElementById("rulesheader").classList.add("visible");
-                document.getElementById("rulesheader").classList.add("active");
-                //document.getElementById("rulesheader").style.display = "flex !important;";
-            }   
+            //$('#modalrules').modal('show');
+            $(document).ready(function() {
+                $('#rules-button').click(function() {
+                    document.getElementById("modalrules").classList.add("active", "visible");
+                    document.getElementById("modalrules").classList.remove("hidden");
+                });
+            });
         </script>
     </body>
 </html>
