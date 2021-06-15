@@ -9,13 +9,19 @@
         <!-- this is bad, but can't figure out why it's not working -->
 
         <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>-->
-        <script src="{{asset('../semantic/dist/semantic.min.js')}}"></script>
+        <script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+        <script src="../semantic/dist/semantic.min.js"></script>
     </head> 
     <body>
-        <div class="ui dimmer modals page transition visible active" style="display: flex !important;">
-            <section class="signin-modal ui modal small segment column transition visible active" style="display: block !important;">
-                <!--<h2 class=header>Join a Room</h2>-->
-                <form class="ui form" action="/lobby.html" style="text-align: center">
+        <div class="ui active dimmer">
+            <section class="ui segment">
+                <div class="ui header">
+                    Join a Room
+                </div>
+                <form class="ui form" action="/lobby.html">
                     <!--<label>Display Name</label>-->
                     <div class="field">
                         <div class="ui left icon input">
@@ -30,9 +36,25 @@
                             <i class="hand spock icon"></i>
                         </div>
                     </div>
-                    <button class="ui primary button fluid large signin-submit">Join</button>
+                    <button class="ui positive button fluid large">Join</button>
                 </form>
+                <br>
+                <button class="ui primary button fluid large" id="rules-button">Rules</button>
             </section>
+            <div class="ui modal" id="modalrules">
+                <div class="header">
+                    TEST
+                </div>
+            </div>
         </div>
+        <script>
+            //$('#modalrules').modal('show');
+            $(document).ready(function() {
+                $('#rules-button').click(function() {
+                    document.getElementById("modalrules").classList.add("active", "visible");
+                    document.getElementById("modalrules").classList.remove("hidden");
+                });
+            });
+        </script>
     </body>
 </html>
