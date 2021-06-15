@@ -21,7 +21,10 @@ const STATUS_VOTING = 1;
 const STATUS_PRESCHOOSE = 2;
 const STATUS_PRESDEC = 3;
 const STATUS_CHANCDEC = 4;
-const STATUS_PRESACT = 5;
+const STATUS_PRESACT1 = 5;
+const STATUS_PRESACT2 = 6;
+const STATUS_PRESACT3 = 7;
+const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
 
@@ -161,6 +164,8 @@ socket.on('lobbyData', (lobbyDataString) => {
                     socket.emit('chancDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
                 });
             }
+        } else if (myStatus === STATUS_PRESACT1) { //investigate loyalty
+
         }
     }
 });

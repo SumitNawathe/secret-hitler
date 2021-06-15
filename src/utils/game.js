@@ -19,7 +19,10 @@ const {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT,
+    STATUS_PRESACT1,
+    STATUS_PRESACT2,
+    STATUS_PRESACT3,
+    STATUS_PRESACT4,
     LIBERAL,
     FASCIST
 } = require('../utils/data')
@@ -115,7 +118,6 @@ const drawThreeCards = (room) => {
 const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
     const lobby = lobbies.get(room);
     lobby.policyCards.splice(index, 1);
-    // lobby.gameState = STATUS_CHANCDEC;
     lobby.users[lobby.president].status = STATUS_NONE;
     lobby.users[lobby.chancellor].status = STATUS_CHANCDEC;
 }
@@ -124,7 +126,6 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
     const lobby = lobbies.get(room);
     if (lobby.policyCards[index] == LIBERAL){
         lobby.liberalCards++;
-        //lobby.gameState = STATUS_PRESCHOOSE;
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
         lobby.users[lobby.chancellor].status = STATUS_NONE;
@@ -133,22 +134,40 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
         lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
     } else {
         lobby.fascistCards++;
-        //lobby.gameState = STATUS_PRESACT;
         lobby.users[lobby.chancellor].status = STATUS_NONE;
-        lobby.users[lobby.president].status = STATUS_PRESACT;
+        lobby.users[lobby.president].status = presidentAction(room);
     }
-    if (lobby.fascistCards == 6){
+    if (lobby.fascistCards == 6) {
         endGame(room, FASCIST);
-    } else if (lobby.liberalCards == 5){
+    } else if (lobby.liberalCards == 5) {
         endGame(room, LIBERAL);
+    }
+}
+
+const presidentAction = (room) => {
+    const lobby = lobbies.get(room);
+    let numPlayers = 0;
+    lobby.users.forEach((person) => {
+        if (person.type != TYPE_SPECTATOR && person.type != TYPE_DEAD) {
+            numPlayers += 1;
+        }
+    });
+
+    //TODO: Make it based on the number of players; this is only one case for a medium group
+    if (lobby.fascistCards === 1) {
+        return STATUS_PRESACT1;
+    } else if (lobby.fascistCards === 2) {
+        return STATUS_PRESACT2;
+    } else if (lobby.fascistCards === 3) {
+        return STATUS_PRESACT3;
+    } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+        return STATUS_PRESACT4;
     }
 }
 
 const endGame = (room, winningTeam) => {
     // just a placeholder for now
 }
-
-
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     // takes an variable number of fascists and then randomly assigns them to the players
@@ -214,7 +233,7 @@ const incrementNextPres = (room) => {
     while(true) {
         lobby.nextPresident = (lobby.nextPresident+1) % lobby.users.length;
         if (lobby.users[lobby.nextPresident].type !== TYPE_DEAD 
-                || lobby.users[lobby.nextPresident].type !== TYPE_SPECTATOR) {
+                && lobby.users[lobby.nextPresident].type !== TYPE_SPECTATOR) {
             break;
         } //TODO: deal with infinite loop case
     }
