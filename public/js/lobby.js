@@ -170,7 +170,15 @@ socket.on('lobbyData', (lobbyDataString) => {
                 });
             }
         } else if (myStatus === STATUS_PRESACT1) { //investigate loyalty
-            
+            const eligible = [];
+            lobbyData.users.forEach((person) => {
+                if (person.username === username) {
+                    eligible.push(false);
+                } else {
+                    eligible.push(true);
+                }
+            });
+            createPlayerSelect(lobbyData, eligible, 'presAction1');
         }
     }
 });
@@ -207,6 +215,7 @@ const createLobbyButtons = (playerType) => {
 const createPlayerSelect = (lobbyData, eligible, eventType) => {
     let html = null, newButton = null;
     for (let i = 0; i < lobbyData.users.length; i++) {
+        console.log('player select button: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             html = Mustache.render(actionButtonTemplate, { text: lobbyData.users[i].username, id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $lobbyActions.insertAdjacentHTML('beforeend', html);

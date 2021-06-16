@@ -168,6 +168,18 @@ const presidentAction = (room) => {
     }
 }
 
+const handlePresAction1 = (room, username) => {
+    const lobby = lobbies.get(room);
+    lobby.investigations.push([lobby.users[lobby.president].username, username]);
+    lobby.previousPresident = lobby.president;
+    lobby.previousChancellor = lobby.chancellor;
+    lobby.users[lobby.president].status = STATUS_NONE;
+    lobby.president = lobby.nextPresident;
+    lobby.chancellor = null;
+    incrementNextPres(room);
+    lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
+}
+
 const endGame = (room, winningTeam) => {
     // just a placeholder for now
 }
@@ -193,12 +205,12 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         let willTraversed = Math.floor((players-i)*(Math.random())); 
         let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
         for(let j =0; j<ourUsers.length; j++){
-            if(traversed==willTraversed){
-                ourUsers[j].type = TYPE_FASCIST;
-                console.log(j);
-                break;
-            }
             if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+                if(traversed==willTraversed){
+                    ourUsers[j].type = TYPE_FASCIST;
+                    console.log(j);
+                    break;
+                }
                 traversed++;
             }
         }
@@ -209,12 +221,12 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     let willTraversed = Math.floor((players-numOfFascists)*(Math.random())); 
     let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
     for(let j =0; j<ourUsers.length; j++){
-        if(traversed==willTraversed){
-            ourUsers[j].type = TYPE_HITLER;
-            console.log("hitler:"+j);
-            break;
-        }
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+            if(traversed==willTraversed){
+                ourUsers[j].type = TYPE_HITLER;
+                console.log("hitler:"+j);
+                break;
+            }
             traversed++;
         }
     }
@@ -233,12 +245,24 @@ const randomShuffle = (deck) => {
 
 const incrementNextPres = (room) => {
     const lobby = lobbies.get(room);
+    console.log(lobby);
+    console.log(lobby.nextPresident);
+    console.log(lobby.users.length);
     while(true) {
         lobby.nextPresident = (lobby.nextPresident+1) % lobby.users.length;
         if (lobby.users[lobby.nextPresident].type !== TYPE_DEAD 
                 && lobby.users[lobby.nextPresident].type !== TYPE_SPECTATOR) {
             break;
         } //TODO: deal with infinite loop case
+    }
+}
+
+const getIndexFromId = (room, id) => {
+    const lobby = lobbies.get(room);
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].id === id) {
+            return i;
+        }
     }
 }
 
@@ -252,7 +276,9 @@ const generateMaskedLobby = (room, username) => {
         if (pair[0] === username) { dontMask.push(pair[1]); }
     });
     const userArray = [];
+    //console.log('ENTERING GENERATE MASKED LOBBY LOOP');
     lobby.users.forEach((person) => {
+        //console.log(person);
         if (person.type === TYPE_SPECTATOR) { return; }
         if (person.username === username) {
             userArray.push(person);
@@ -260,7 +286,7 @@ const generateMaskedLobby = (room, username) => {
             userArray.push({
                 username: person.username,
                 type: person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST,
-                id: id,
+                id: person.id,
                 status: person.status
             });
         } else {
@@ -286,7 +312,8 @@ const generateMaskedLobby = (room, username) => {
         fascistCards: lobby.fascistCards,
         previousPresident: lobby.previousPresident,
         previousChancellor: lobby.previousChancellor,
-        policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null
+        policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null,
+        investigations: lobby.investigations
     }
 }
 
@@ -297,5 +324,6 @@ module.exports = {
     drawThreeCards,
     presidentDiscard,
     chancellorChoose,
+    handlePresAction1,
     generateMaskedLobby
 }
