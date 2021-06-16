@@ -52,6 +52,8 @@ const LIBERAL = true;
  * voteCountYes: number of votes yes for this round
  * voteCountNo: number of votes no for this round
  * policyCards: an array of booleans containing the drawn cards for this round
+ * investigations: an array of objects with two elements, the first having the username of the president,
+ *          and the second having the username of the person investigated
 */
 
 /*
@@ -97,7 +99,8 @@ const createLobby = (room, username, id) => {
         previousChancellor: null,
         voteCountYes: 0,
         voteCountNo: 0,
-        policyCards: null
+        policyCards: null,
+        investigations: null
     };
     lobbies.set(room, lobby);
 }

@@ -37,6 +37,7 @@ const headingHtml = Mustache.render(headingTemplate, {
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 socket.on('lobbyData', (lobbyDataString) => {
+    console.log('lobbyDataString:');
     console.log(lobbyDataString);
     lobbyData = JSON.parse(lobbyDataString);
 
@@ -67,7 +68,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         else if (person.status === STATUS_PRESCHOOSE) { statusString = 'President choosing Chancellor...' }
         else if (person.status === STATUS_PRESDEC) { statusString = 'President deciding...' }
         else if (person.status === STATUS_CHANCDEC) { statusString = 'Chancellor deciding...' }
-        else if (person.status === STATUS_PRESACT) { statusString = 'President taking action...' }
+        else if (person.status === STATUS_PRESACT1 || person.status === STATUS_PRESACT2 
+            || person.status === STATUS_PRESACT3 || person.status === STATUS_PRESACT4) { statusString = 'President taking action...' }
         else { statusString = '' }
 
         const html = Mustache.render(participantTemplate, {
@@ -90,6 +92,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         lobbyData.users.every((person) => {
             if (person.username === username) {
                 type = person.type;
+                console.log('TYPE: ' + person.type);
+                console.log('STATUS: ' + person.status);
                 return false;
             }
             return true;
@@ -127,8 +131,9 @@ socket.on('lobbyData', (lobbyDataString) => {
         } else if (myStatus === STATUS_PRESCHOOSE) {
             eligible = [];
             for (let i = 0; i < lobbyData.users.length; i++) {
-                if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
-                else if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username) { eligible.push(false); }
+                //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
+                //else
+                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username) { eligible.push(false); }
                 else { eligible.push(true); }
             }
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
@@ -165,7 +170,7 @@ socket.on('lobbyData', (lobbyDataString) => {
                 });
             }
         } else if (myStatus === STATUS_PRESACT1) { //investigate loyalty
-
+            
         }
     }
 });

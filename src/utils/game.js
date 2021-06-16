@@ -29,7 +29,9 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
+    console.log('SETTING GAMESTATE TO ONGOING');
     lobby.gameState = GAMESTATE_ONGOING;
+    console.log('lobby.gameState: ' + lobby.gameState);
     randomAssign(room, 2); //TODO: change to depend on number of players
     lobby.president = 0;
     lobby.nextPresident = 1;
@@ -38,6 +40,7 @@ const startGame = (room) => {
 
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
+    lobby.investigations = [];
     console.log('USER 0:');
     console.log(lobby.users[0]);
 }
@@ -239,11 +242,60 @@ const incrementNextPres = (room) => {
     }
 }
 
+//allow president and chancellor to see policy cards at appropriate times
+const generateMaskedLobby = (room, username) => {
+    const lobby = lobbies.get(room);
+    // console.log('generateMaskedLobby');
+    // console.log(lobby);
+    const dontMask = [];
+    lobby.investigations.forEach((pair) => {
+        if (pair[0] === username) { dontMask.push(pair[1]); }
+    });
+    const userArray = [];
+    lobby.users.forEach((person) => {
+        if (person.type === TYPE_SPECTATOR) { return; }
+        if (person.username === username) {
+            userArray.push(person);
+        } else if (dontMask.includes(person.username)) {
+            userArray.push({
+                username: person.username,
+                type: person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST,
+                id: id,
+                status: person.status
+            });
+        } else {
+            userArray.push({
+                username: person.username,
+                id: person.id,
+                status: person.status
+            });
+        }
+    });
+
+    let shouldBeGivenPolicyCards = (lobby.users[lobby.president].username === username && (lobby.users[lobby.president].status === STATUS_PRESDEC || lobby.users[lobby.president].status === STATUS_PRESACT3));
+    if (lobby.chancellor) {
+        shouldBeGivenPolicyCards = shouldBeGivenPolicyCards || (lobby.users[lobby.chancellor].username === username && lobby.users[lobby.chancellor].status === STATUS_CHANCDEC);
+    }
+    return {
+        users: userArray,
+        gameState: lobby.gameState,
+        president: lobby.president,
+        nextPresident: lobby.nextPresident,
+        chancellor: lobby.chancellor,
+        liberalCards: lobby.liberalCards,
+        fascistCards: lobby.fascistCards,
+        previousPresident: lobby.previousPresident,
+        previousChancellor: lobby.previousChancellor,
+        policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null
+    }
+}
+
 module.exports = {
     startGame,
     setUpVote,
     registerVote,
     drawThreeCards,
     presidentDiscard,
-    chancellorChoose
+    chancellorChoose,
+    generateMaskedLobby
 }
