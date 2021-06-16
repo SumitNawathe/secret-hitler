@@ -102,21 +102,28 @@ const registerVote = (room, username, vote) => {
 
 const presidentVeto = (room, decision) => {
     const lobby = lobbies.get(room);
+    lobby.users[lobby.president].status = STATUS_NONE;
     if(decision){
         // if pres wants to veto
         lobby.users[lobby.chancellor].status = STATUS_CHANCVETOCHOICE;
     } else {
-        placeCard(policyCards[0]);
+        placeCard(room, lobby.policyCards[0]);
     }
 }
 
-const chancellortVeto = (room, decision) => {
+const chancellorVeto = (room, decision) => {
     const lobby = lobbies.get(room);
+    lobby.users[lobby.chancellor].status = STATUS_NONE;
     if(decision){
         // if chancellor wants to veto
+        lobby.previousPresident = lobby.president;
+        lobby.previousChancellor = lobby.chancellor;
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.president = lobby.nextPresident;
         incrementNextPres(room);
+        lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
     } else {
-        placeCard(room, policyCards[0]);
+        placeCard(room, lobby.policyCards[0]);
     }
 }
 
@@ -152,7 +159,9 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
     if(!lobby.veto){
         placeCard(room, lobby.policyCards[index]);
     } else {
-        lobby.users[lobby.president] = STATUS_PRESVETOCHOICE;
+        console.log("making president veto");
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.users[lobby.president].status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
     }
 }
@@ -177,6 +186,8 @@ const placeCard = (room, type) => {
     } else if (lobby.liberalCards == 5) {
         endGame(room, LIBERAL);
     }
+    console.log("fascists"+lobby.fascistCards);
+    console.log("liberal"+lobby.liberalCards);
 }
 
 const presidentAction = (room) => {
@@ -357,5 +368,7 @@ module.exports = {
     presidentDiscard,
     chancellorChoose,
     handlePresAction1,
-    generateMaskedLobby
+    generateMaskedLobby,
+    chancellorVeto,
+    presidentVeto
 }
