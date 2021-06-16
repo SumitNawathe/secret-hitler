@@ -1,3 +1,4 @@
+
 const socket = io();
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
@@ -27,6 +28,9 @@ const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
+
+const STATUS_PRESVETOCHOICE = 9;
+const STATUS_CHANCVETOCHOICE = 10;
 
 //create lobby page heading
 const $heading = document.querySelector('#heading');
@@ -179,6 +183,33 @@ socket.on('lobbyData', (lobbyDataString) => {
                 }
             });
             createPlayerSelect(lobbyData, eligible, 'presAction1');
+        } else if (myStatus === STATUS_PRESVETOCHOICE){
+            console.log("president veto choice");
+            const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
+            const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
+            $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
+            $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
+            $lobbyActions.querySelector('#yes').addEventListener('click', () => {
+                console.log('veto voting yes');
+                socket.emit('presVetoVoting', { room, choice: true }, (error) => { if (error) { console.log('error'); } })
+            });
+            $lobbyActions.querySelector('#no').addEventListener('click', () => {
+                console.log('veto voting no');
+                socket.emit('presVetoVoting', { room, choice: false }, (error) => { if (error) { console.log('error'); } })
+            });
+        }  else if (myStatus === STATUS_CHANCVETOCHOICE){
+            const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
+            const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
+            $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
+            $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
+            $lobbyActions.querySelector('#yes').addEventListener('click', () => {
+                console.log('veto voting yes');
+                socket.emit('chancellorVetoVoting', { room, choice: true }, (error) => { if (error) { console.log('error'); } })
+            });
+            $lobbyActions.querySelector('#no').addEventListener('click', () => {
+                console.log('veto voting no');
+                socket.emit('chancellorVetoVoting', { room, choice: false }, (error) => { if (error) { console.log('error'); } })
+            });
         }
     }
 });
