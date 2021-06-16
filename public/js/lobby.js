@@ -36,7 +36,7 @@ socket.on('lobbyData', (lobbyDataString) => {
     lobbyData = JSON.parse(lobbyDataString);
 
     //remove all current lobbyData
-    console.log('deleting lobbyData')
+    console.log('deleting lobbyData');
     participant = $participantList.querySelector('.participant');
     while(participant) {
         participant.remove();
