@@ -24,7 +24,9 @@ const {
     STATUS_PRESACT3,
     STATUS_PRESACT4,
     LIBERAL,
-    FASCIST
+    FASCIST,
+    STATUS_CHANCVETOCHOICE,
+    STATUS_PRESVETOCHOICE
 } = require('../utils/data')
 
 const startGame = (room) => {
@@ -98,6 +100,26 @@ const registerVote = (room, username, vote) => {
     }
 }
 
+const presidentVeto = (room, decision) => {
+    const lobby = lobbies.get(room);
+    if(decision){
+        // if pres wants to veto
+        lobby.users[lobby.chancellor].status = STATUS_CHANCVETOCHOICE;
+    } else {
+        placeCard(policyCards[0]);
+    }
+}
+
+const chancellortVeto = (room, decision) => {
+    const lobby = lobbies.get(room);
+    if(decision){
+        // if chancellor wants to veto
+        incrementNextPres(room);
+    } else {
+        placeCard(room, policyCards[0]);
+    }
+}
+
 const drawThreeCards = (room) => {
     const lobby = lobbies.get(room);
     if(lobby.deck.length < 3){
@@ -127,7 +149,17 @@ const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusi
 
 const chancellorChoose = (room, index /*either 0 or 1 */) => {
     const lobby = lobbies.get(room);
-    if (lobby.policyCards[index] == LIBERAL){
+    if(!lobby.veto){
+        placeCard(room, lobby.policyCards[index]);
+    } else {
+        lobby.users[lobby.president] = STATUS_PRESVETOCHOICE;
+        lobby.policyCards = [lobby.policyCards[index]];
+    }
+}
+
+const placeCard = (room, type) => {
+    const lobby = lobbies.get(room);
+    if (type == LIBERAL){
         lobby.liberalCards++;
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;

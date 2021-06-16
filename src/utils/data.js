@@ -17,6 +17,9 @@ const STATUS_PRESACT1 = 5;
 const STATUS_PRESACT2 = 6;
 const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
+const STATUS_PRESVETOCHOICE = 9;
+const STATUS_CHANCVETOCHOICE = 10;
+
 /*
  * STATUS_PRESACT1: investigate party loyalty
  * STATUS_PRESACT2: special election
@@ -100,7 +103,8 @@ const createLobby = (room, username, id) => {
         voteCountYes: 0,
         voteCountNo: 0,
         policyCards: null,
-        investigations: null
+        investigations: null,
+        veto: false
     };
     lobbies.set(room, lobby);
 }
@@ -129,6 +133,8 @@ module.exports = {
     STATUS_PRESACT2,
     STATUS_PRESACT3,
     STATUS_PRESACT4,
+    STATUS_PRESVETOCHOICE,
+    STATUS_CHANCVETOCHOICE,
     FASCIST,
     LIBERAL
 };
