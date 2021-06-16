@@ -6,6 +6,7 @@ const $participantList = document.querySelector('#participant-list');
 const participantTemplate = document.querySelector('#participant-template').innerHTML;
 const $lobbyActions = document.querySelector('#actions');
 const actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
+const imageSelectTemplate = document.querySelector('#image-select-template').innerHTML;
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -78,8 +79,10 @@ socket.on('lobbyData', (lobbyDataString) => {
 
         const html = Mustache.render(participantTemplate, {
             username: person.username,
+            username_img: person.username+"_img",
             type: typeString,
-            status: statusString
+            status: statusString,
+            image_select_id: "image-select-"+person.username
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
@@ -244,6 +247,7 @@ const createLobbyButtons = (playerType) => {
 }
 
 const createPlayerSelect = (lobbyData, eligible, eventType) => {
+    playerImageSelect(lobbyData, eligible, eventType);
     let html = null, newButton = null;
     for (let i = 0; i < lobbyData.users.length; i++) {
         console.log('player select button: ' + lobbyData.users[i].username);
@@ -251,6 +255,24 @@ const createPlayerSelect = (lobbyData, eligible, eventType) => {
             html = Mustache.render(actionButtonTemplate, { text: lobbyData.users[i].username, id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $lobbyActions.insertAdjacentHTML('beforeend', html);
             newButton = $lobbyActions.querySelector("#" + lobbyData.users[i].username);
+            console.log('adding event listener');
+            newButton.addEventListener('click', () => {
+                console.log('chosen');
+                socket.emit(eventType, { room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
+            });
+        }
+    }
+}
+
+const playerImageSelect = (lobbyData, eligible, eventType) => {
+    let html=null; newButton=null;
+    for (let i = 0; i < lobbyData.users.length; i++) {
+        console.log('player select image: ' + lobbyData.users[i].username);
+        if (eligible[i]) {
+            const $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
+            html = Mustache.render(imageSelectTemplate, {image_id: "image-overlay-" + lobbyData.users[i].username, src: "test carback.png", id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
+            $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+            newButton = $imageSelectOverlay.querySelector("#image-overlay-" + lobbyData.users[i].username);
             console.log('adding event listener');
             newButton.addEventListener('click', () => {
                 console.log('chosen');
