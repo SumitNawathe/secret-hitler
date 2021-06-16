@@ -5,6 +5,20 @@
         <link rel="icon" href="/img/favicon.png">
         <link rel="stylesheet" href="/css/styles.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+
+        <style>
+            .layered-image {
+                position: relative;
+            }
+            /*this is really bad, but works for testing (not robust for later resizing of graphics)*/
+            .image-overlay {
+                position: absolute;
+                top: -108px;
+                left: -0px;
+                opacity: .4;
+            }
+        </style>
+
         <script
             src="https://code.jquery.com/jquery-3.1.1.min.js"
             integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
@@ -38,18 +52,30 @@
 
         <br>
 
+        <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
+        <img class="ui image" src="img/lib_back.png">
+        <!--TODO: dynamic fascist board depending on player number-->
+        <img class="ui image" src="img/fascist_back_78.png">
+
         <div class="ui ten column grid">
             <div class="row" id="participant-list"></div>
         </div>
 
         <script id="participant-template" type="text/html">
             <div class="column participant">
-                <img class="ui centered tiny image" src="img/default cardback.png">
-                <div class="ui centered header" style="white-space: nowrap; overflow: hidden;
-                    position: relative; top: -20px;">
+                <div class="ui centered tiny header" style="white-space: nowrap; overflow: hidden;
+                    position: relative; bottom: -10px;">
                     {{ username }}  -  {{ type }} - {{ status }}
                 </div>
+                <div class="layered-image">
+                    <img class="ui centered tiny image" id={{ username_img }} src="img/default cardback.png">
+                    <div id={{ image_select_id }}></div>
+                </div>
             </div>
+        </script>
+
+        <script id="image-select-template" type="text/html">
+            <img class="ui centered tiny image image-overlay" id={{ image_id }} src= "img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
