@@ -19,14 +19,19 @@ const {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT,
+    STATUS_PRESACT1,
+    STATUS_PRESACT2,
+    STATUS_PRESACT3,
+    STATUS_PRESACT4,
     LIBERAL,
     FASCIST
 } = require('../utils/data')
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
+    console.log('SETTING GAMESTATE TO ONGOING');
     lobby.gameState = GAMESTATE_ONGOING;
+    console.log('lobby.gameState: ' + lobby.gameState);
     randomAssign(room, 2); //TODO: change to depend on number of players
     lobby.president = 0;
     lobby.nextPresident = 1;
@@ -35,28 +40,30 @@ const startGame = (room) => {
 
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
+    lobby.investigations = [];
     console.log('USER 0:');
     console.log(lobby.users[0]);
 }
 
-const setUpVote = (room, chancellorChoice) => { //ERROR: room is undefined
+const setUpVote = (room, chancellorChoice) => {
     const lobby = lobbies.get(room);
     console.log(lobby);
     console.log(room);
     console.log(lobbies);
     lobby.voteCountYes = 0;
     lobby.voteCountNo = 0;
-    lobby.users.forEach((person) => {
-        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
-            person.status = STATUS_VOTING;
-        }
-    });
+    // lobby.users.forEach((person) => {
+    //     if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
+    //         person.status = STATUS_VOTING;
+    //     }
+    // });
     for (let i = 0; i < lobby.users.length; i++) {
         if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD) {
             lobby.users[i].status = STATUS_VOTING;
             if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
         }
     }
+    drawThreeCards(room);
 }
 
 const registerVote = (room, username, vote) => {
@@ -114,30 +121,68 @@ const drawThreeCards = (room) => {
 const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
     const lobby = lobbies.get(room);
     lobby.policyCards.splice(index, 1);
-    lobby.gameState = STATUS_CHANCDEC;
+    lobby.users[lobby.president].status = STATUS_NONE;
+    lobby.users[lobby.chancellor].status = STATUS_CHANCDEC;
 }
 
 const chancellorChoose = (room, index /*either 0 or 1 */) => {
     const lobby = lobbies.get(room);
-    if(lobby.policyCards[index]==LIBERAL){
+    if (lobby.policyCards[index] == LIBERAL){
         lobby.liberalCards++;
-        lobby.gameState = STATUS_PRESCHOOSE;
+        lobby.previousPresident = lobby.president;
+        lobby.previousChancellor = lobby.chancellor;
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.president = lobby.nextPresident;
+        incrementNextPres(room);
+        lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
     } else {
         lobby.fascistCards++;
-        lobby.gameState = STATUS_PRESACT;
+        lobby.users[lobby.chancellor].status = STATUS_NONE;
+        lobby.users[lobby.president].status = presidentAction(room);
     }
-    if(lobby.fascistCards == 6){
+    if (lobby.fascistCards == 6) {
         endGame(room, FASCIST);
-    } else if (lobby.liberalCards == 5){
+    } else if (lobby.liberalCards == 5) {
         endGame(room, LIBERAL);
     }
+}
+
+const presidentAction = (room) => {
+    const lobby = lobbies.get(room);
+    let numPlayers = 0;
+    lobby.users.forEach((person) => {
+        if (person.type != TYPE_SPECTATOR && person.type != TYPE_DEAD) {
+            numPlayers += 1;
+        }
+    });
+
+    //TODO: Make it based on the number of players; this is only one case for a medium group
+    if (lobby.fascistCards === 1) {
+        return STATUS_PRESACT1;
+    } else if (lobby.fascistCards === 2) {
+        return STATUS_PRESACT2;
+    } else if (lobby.fascistCards === 3) {
+        return STATUS_PRESACT3;
+    } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+        return STATUS_PRESACT4;
+    }
+}
+
+const handlePresAction1 = (room, username) => {
+    const lobby = lobbies.get(room);
+    lobby.investigations.push([lobby.users[lobby.president].username, username]);
+    lobby.previousPresident = lobby.president;
+    lobby.previousChancellor = lobby.chancellor;
+    lobby.users[lobby.president].status = STATUS_NONE;
+    lobby.president = lobby.nextPresident;
+    lobby.chancellor = null;
+    incrementNextPres(room);
+    lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
 }
 
 const endGame = (room, winningTeam) => {
     // just a placeholder for now
 }
-
-
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     // takes an variable number of fascists and then randomly assigns them to the players
@@ -160,12 +205,12 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         let willTraversed = Math.floor((players-i)*(Math.random())); 
         let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
         for(let j =0; j<ourUsers.length; j++){
-            if(traversed==willTraversed){
-                ourUsers[j].type = TYPE_FASCIST;
-                console.log(j);
-                break;
-            }
             if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+                if(traversed==willTraversed){
+                    ourUsers[j].type = TYPE_FASCIST;
+                    console.log(j);
+                    break;
+                }
                 traversed++;
             }
         }
@@ -176,12 +221,12 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
     let willTraversed = Math.floor((players-numOfFascists)*(Math.random())); 
     let traversed = 0; // number of players (ignoring already determined fascists and spectators) we have traversed in our array 
     for(let j =0; j<ourUsers.length; j++){
-        if(traversed==willTraversed){
-            ourUsers[j].type = TYPE_HITLER;
-            console.log("hitler:"+j);
-            break;
-        }
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
+            if(traversed==willTraversed){
+                ourUsers[j].type = TYPE_HITLER;
+                console.log("hitler:"+j);
+                break;
+            }
             traversed++;
         }
     }
@@ -198,11 +243,87 @@ const randomShuffle = (deck) => {
     return output;
 }
 
+const incrementNextPres = (room) => {
+    const lobby = lobbies.get(room);
+    console.log(lobby);
+    console.log(lobby.nextPresident);
+    console.log(lobby.users.length);
+    while(true) {
+        lobby.nextPresident = (lobby.nextPresident+1) % lobby.users.length;
+        if (lobby.users[lobby.nextPresident].type !== TYPE_DEAD 
+                && lobby.users[lobby.nextPresident].type !== TYPE_SPECTATOR) {
+            break;
+        } //TODO: deal with infinite loop case
+    }
+}
+
+const getIndexFromId = (room, id) => {
+    const lobby = lobbies.get(room);
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].id === id) {
+            return i;
+        }
+    }
+}
+
+//allow president and chancellor to see policy cards at appropriate times
+const generateMaskedLobby = (room, username) => {
+    const lobby = lobbies.get(room);
+    // console.log('generateMaskedLobby');
+    // console.log(lobby);
+    const dontMask = [];
+    lobby.investigations.forEach((pair) => {
+        if (pair[0] === username) { dontMask.push(pair[1]); }
+    });
+    const userArray = [];
+    //console.log('ENTERING GENERATE MASKED LOBBY LOOP');
+    lobby.users.forEach((person) => {
+        //console.log(person);
+        if (person.type === TYPE_SPECTATOR) { return; }
+        if (person.username === username) {
+            userArray.push(person);
+        } else if (dontMask.includes(person.username)) {
+            userArray.push({
+                username: person.username,
+                type: person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST,
+                id: person.id,
+                status: person.status
+            });
+        } else {
+            userArray.push({
+                username: person.username,
+                id: person.id,
+                status: person.status
+            });
+        }
+    });
+
+    let shouldBeGivenPolicyCards = (lobby.users[lobby.president].username === username && (lobby.users[lobby.president].status === STATUS_PRESDEC || lobby.users[lobby.president].status === STATUS_PRESACT3));
+    if (lobby.chancellor) {
+        shouldBeGivenPolicyCards = shouldBeGivenPolicyCards || (lobby.users[lobby.chancellor].username === username && lobby.users[lobby.chancellor].status === STATUS_CHANCDEC);
+    }
+    return {
+        users: userArray,
+        gameState: lobby.gameState,
+        president: lobby.president,
+        nextPresident: lobby.nextPresident,
+        chancellor: lobby.chancellor,
+        liberalCards: lobby.liberalCards,
+        fascistCards: lobby.fascistCards,
+        previousPresident: lobby.previousPresident,
+        previousChancellor: lobby.previousChancellor,
+        policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null,
+        investigations: lobby.investigations
+    }
+}
+
 module.exports = {
     startGame,
     setUpVote,
     registerVote,
     drawThreeCards,
     presidentDiscard,
-    chancellorChoose
+    chancellorChoose,
+    handlePresAction1,
+    generateMaskedLobby
 }

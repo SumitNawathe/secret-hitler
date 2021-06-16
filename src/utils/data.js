@@ -13,7 +13,16 @@ const STATUS_VOTING = 1;
 const STATUS_PRESCHOOSE = 2;
 const STATUS_PRESDEC = 3;
 const STATUS_CHANCDEC = 4;
-const STATUS_PRESACT = 5;
+const STATUS_PRESACT1 = 5;
+const STATUS_PRESACT2 = 6;
+const STATUS_PRESACT3 = 7;
+const STATUS_PRESACT4 = 8;
+/*
+ * STATUS_PRESACT1: investigate party loyalty
+ * STATUS_PRESACT2: special election
+ * STATUS_PRESACT3: policy peek
+ * STATUS_PRESACT4: execution
+*/
 
 const lobbies = new Map();
 const idToUsername = new Map();
@@ -42,6 +51,9 @@ const LIBERAL = true;
  * previousChancellor: index number of previously elected chancellor
  * voteCountYes: number of votes yes for this round
  * voteCountNo: number of votes no for this round
+ * policyCards: an array of booleans containing the drawn cards for this round
+ * investigations: an array of objects with two elements, the first having the username of the president,
+ *          and the second having the username of the person investigated
 */
 
 /*
@@ -62,7 +74,7 @@ const LIBERAL = true;
  * * PRESIDENT CHOOSING CHANCELLOR: 2
  * * PRESIDENT CARD DECISION: 3
  * * CHANCELLOR CARD DECISION: 4
- * * PRESIDENT ACTION DECISION: 5
+ * * PRESIDENT ACTION DECISION: 5+
  * lastVote: true/false representing last vote cast yes/no
 */
 
@@ -87,7 +99,8 @@ const createLobby = (room, username, id) => {
         previousChancellor: null,
         voteCountYes: 0,
         voteCountNo: 0,
-        policyCards: null
+        policyCards: null,
+        investigations: null
     };
     lobbies.set(room, lobby);
 }
@@ -112,7 +125,10 @@ module.exports = {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT,
+    STATUS_PRESACT1,
+    STATUS_PRESACT2,
+    STATUS_PRESACT3,
+    STATUS_PRESACT4,
     FASCIST,
     LIBERAL
 };

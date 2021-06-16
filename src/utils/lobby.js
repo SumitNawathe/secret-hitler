@@ -19,7 +19,12 @@ const {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT
+    STATUS_PRESACT1,
+    STATUS_PRESACT2,
+    STATUS_PRESACT3,
+    STATUS_PRESACT4,
+    FASCIST,
+    LIBERAL
 } = require('../utils/data')
 
 const addToLobby = (room, username, id) => {

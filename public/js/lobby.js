@@ -21,7 +21,12 @@ const STATUS_VOTING = 1;
 const STATUS_PRESCHOOSE = 2;
 const STATUS_PRESDEC = 3;
 const STATUS_CHANCDEC = 4;
-const STATUS_PRESACT = 5;
+const STATUS_PRESACT1 = 5;
+const STATUS_PRESACT2 = 6;
+const STATUS_PRESACT3 = 7;
+const STATUS_PRESACT4 = 8;
+const FASCIST = false;
+const LIBERAL = true;
 
 //create lobby page heading
 const $heading = document.querySelector('#heading');
@@ -32,6 +37,7 @@ const headingHtml = Mustache.render(headingTemplate, {
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 socket.on('lobbyData', (lobbyDataString) => {
+    console.log('lobbyDataString:');
     console.log(lobbyDataString);
     lobbyData = JSON.parse(lobbyDataString);
 
@@ -62,7 +68,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         else if (person.status === STATUS_PRESCHOOSE) { statusString = 'President choosing Chancellor...' }
         else if (person.status === STATUS_PRESDEC) { statusString = 'President deciding...' }
         else if (person.status === STATUS_CHANCDEC) { statusString = 'Chancellor deciding...' }
-        else if (person.status === STATUS_PRESACT) { statusString = 'President taking action...' }
+        else if (person.status === STATUS_PRESACT1 || person.status === STATUS_PRESACT2 
+            || person.status === STATUS_PRESACT3 || person.status === STATUS_PRESACT4) { statusString = 'President taking action...' }
         else { statusString = '' }
 
         const html = Mustache.render(participantTemplate, {
@@ -85,6 +92,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         lobbyData.users.every((person) => {
             if (person.username === username) {
                 type = person.type;
+                console.log('TYPE: ' + person.type);
+                console.log('STATUS: ' + person.status);
                 return false;
             }
             return true;
@@ -122,11 +131,54 @@ socket.on('lobbyData', (lobbyDataString) => {
         } else if (myStatus === STATUS_PRESCHOOSE) {
             eligible = [];
             for (let i = 0; i < lobbyData.users.length; i++) {
-                if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
-                else if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username) { eligible.push(false); }
+                //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
+                //else
+                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username) { eligible.push(false); }
                 else { eligible.push(true); }
             }
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
+        } else if (myStatus === STATUS_PRESDEC) {
+            for (let i = 0; i < lobbyData.policyCards.length; i++) {
+                let html = null, newButton = null;
+                if (lobbyData.policyCards[i] === LIBERAL) {
+                    html = Mustache.render(actionButtonTemplate, { text: 'Liberal', id:"choice"+i });
+                } else { //lobbyData.policyCards[i] === FASCIST
+                    html = Mustache.render(actionButtonTemplate, { text: 'Fascist', id:"choice"+i });
+                }
+                $lobbyActions.insertAdjacentHTML('beforeend', html);
+                newButton = $lobbyActions.querySelector('#choice'+i);
+                console.log('Chose ' + i);
+                newButton.addEventListener('click', () => {
+                    console.log('Chose ' + i);
+                    socket.emit('presDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
+                });
+            }
+        } else if (myStatus === STATUS_CHANCDEC) { //basically the same as STATUS_PRESDEC
+            for (let i = 0; i < lobbyData.policyCards.length; i++) {
+                let html = null, newButton = null;
+                if (lobbyData.policyCards[i] === LIBERAL) {
+                    html = Mustache.render(actionButtonTemplate, { text: 'Liberal', id:"choice"+i });
+                } else { //lobbyData.policyCards[i] === FASCIST
+                    html = Mustache.render(actionButtonTemplate, { text: 'Fascist', id:"choice"+i });
+                }
+                $lobbyActions.insertAdjacentHTML('beforeend', html);
+                newButton = $lobbyActions.querySelector('#choice'+i);
+                console.log('Chose ' + i);
+                newButton.addEventListener('click', () => {
+                    console.log('Chose ' + i);
+                    socket.emit('chancDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
+                });
+            }
+        } else if (myStatus === STATUS_PRESACT1) { //investigate loyalty
+            const eligible = [];
+            lobbyData.users.forEach((person) => {
+                if (person.username === username) {
+                    eligible.push(false);
+                } else {
+                    eligible.push(true);
+                }
+            });
+            createPlayerSelect(lobbyData, eligible, 'presAction1');
         }
     }
 });
@@ -139,7 +191,7 @@ const createLobbyButtons = (playerType) => {
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
             console.log('START GAME');
-            socket.emit('startGame', { room: room}, (error) => { if (error) { console.log('error') } });
+            socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
         });
     } else if (playerType === TYPE_PLAYER) {
         html = Mustache.render(actionButtonTemplate, { text: 'Spectate', id:"spectate" });
@@ -163,6 +215,7 @@ const createLobbyButtons = (playerType) => {
 const createPlayerSelect = (lobbyData, eligible, eventType) => {
     let html = null, newButton = null;
     for (let i = 0; i < lobbyData.users.length; i++) {
+        console.log('player select button: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             html = Mustache.render(actionButtonTemplate, { text: lobbyData.users[i].username, id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $lobbyActions.insertAdjacentHTML('beforeend', html);

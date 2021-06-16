@@ -23,10 +23,15 @@ const {
     STATUS_PRESCHOOSE,
     STATUS_PRESDEC,
     STATUS_CHANCDEC,
-    STATUS_PRESACT
+    STATUS_PRESACT1,
+    STATUS_PRESACT2,
+    STATUS_PRESACT3,
+    STATUS_PRESACT4,
+    FASCIST,
+    LIBERAL
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
-const { startGame, setUpVote, registerVote } = require('./utils/game');
+const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, generateMaskedLobby } = require('./utils/game');
 const { timeLog } = require('console');
 
 const app = express();
@@ -37,6 +42,14 @@ const port = process.env.PORT || 3000;
 const publicDirectoryPath = path.join(__dirname, '../public');
 
 app.use(express.static(publicDirectoryPath));
+
+const emitMidgameLobbyData = (room) => {
+    // console.log('emitting midgame lobbyData');
+    const lobby = lobbies.get(room);
+    lobby.users.forEach((person) => {
+        io.to(person.id).emit('lobbyData', JSON.stringify(generateMaskedLobby(room, person.username)));
+    });
+}
 
 io.on('connection', (socket) => {
     console.log('New WebSocket connection');
@@ -85,20 +98,38 @@ io.on('connection', (socket) => {
 
     socket.on('startGame', ({ room }, callback) => {
         startGame(room);
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        emitMidgameLobbyData(room);
     });
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
         console.log('chose chancellor: ' + choice);
         console.log('room: ' + room);
         setUpVote(room, choice);
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        emitMidgameLobbyData(room);
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
         console.log('recieved vote: ' + choice);
         registerVote(room, username, choice);
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        emitMidgameLobbyData(room);
+    });
+
+    socket.on('presDecision', ({ room, index }, callback) => {
+        console.log('chose card ' + index);
+        presidentDiscard(room, index);
+        emitMidgameLobbyData(room);
+    });
+
+    socket.on('chancDecision', ({room, index}, callback) => {
+        console.log('chose card ' + index);
+        chancellorChoose(room, index);
+        emitMidgameLobbyData(room);
+    });
+
+    socket.on('presAction1', ({room, choice}, callback) => {
+        console.log('chose to investigate ' + choice);
+        handlePresAction1(room, choice);
+        emitMidgameLobbyData(room);
     });
 });
 
