@@ -17,6 +17,18 @@
                 left: -0px;
                 opacity: .4;
             }
+
+            .glowing {
+                animation: glowing 1s ease-in-out infinite alternate;
+            }
+
+            @-webkit-keyframes glowing {
+                from {
+                    box-shadow: 0px 0px 5px 5px #000;
+                } to {
+                    box-shadow: 0px 0px 0px 0px #000;
+                }
+            }
         </style>
 
         <script
@@ -75,7 +87,7 @@
         </script>
 
         <script id="image-select-template" type="text/html">
-            <img class="ui centered tiny image image-overlay" id={{ image_id }} src= "img/{{ src }}">
+            <img class="ui centered tiny image image-overlay glowing" id={{ image_id }} src= "img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
