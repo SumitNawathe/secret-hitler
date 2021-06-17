@@ -38,6 +38,14 @@
                 animation: fadein 2s;
             }
 
+            .slideup {
+                animation: slideup 1s forwards;
+            }
+
+            .slidedown {
+                animation: slideup 1s backwards;
+            }
+
             @-webkit-keyframes fadein {
                 from {opacity: 0;}
                 to {opacity: 1;}
@@ -52,9 +60,9 @@
             }
 
             @-webkit-keyframes slideup {
-                from {
-                    
-                }
+                from { bottom: 0px; }
+                /* again this is terrible must change later */
+                to { bottom: 91px; }
             }
 
         </style>
@@ -111,6 +119,7 @@
                     <img class="ui centered tiny image" id={{ username_img }} src="img/default cardback.png">
                     <div id={{ image_select_id }}></div>
                 </div>
+                <img class="ui centered tiny image" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
             </div>
         </script>
 

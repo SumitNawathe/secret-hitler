@@ -82,7 +82,8 @@ socket.on('lobbyData', (lobbyDataString) => {
             username_img: person.username+"_img",
             type: typeString,
             status: statusString,
-            image_select_id: "image-select-"+person.username
+            image_select_id: "image-select-"+person.username,
+            voteback_id: person.username
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
@@ -123,12 +124,15 @@ socket.on('lobbyData', (lobbyDataString) => {
         console.log('MY TYPE:' + myType);
 
         if (myStatus === STATUS_VOTING) {
+            if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")) {
+                voteanim("slideup")
+            }
             const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
             const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
             $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
             $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
             $lobbyActions.querySelector('#yes').addEventListener('click', () => {
-                console.log('voing yes');
+                console.log('voting yes');
                 socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
             });
             $lobbyActions.querySelector('#no').addEventListener('click', () => {
@@ -280,6 +284,15 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
             });
         }
     }
+}
+
+const voteanim = (slide) => {
+    console.log('voteanim')
+    for (let i = 0; i < lobbyData.users.length; i++) {
+        const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+        $voteback.classList.add(slide)
+    }
+    
 }
 
 socket.emit('join', { username, room }, (error) => {
