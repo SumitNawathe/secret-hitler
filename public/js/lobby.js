@@ -186,6 +186,16 @@ socket.on('lobbyData', (lobbyDataString) => {
                 }
             });
             createPlayerSelect(lobbyData, eligible, 'presAction1');
+        } else if (myStatus === STATUS_PRESACT2){
+            const eligible = [];
+            for(let i=0; i<lobbyData.users.length; i++){
+                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].username === username || i === lobbyData.chancellor){
+                    eligible.push(false);
+                } else {
+                    eligible.push(true);
+                }
+            }
+            createPlayerSelect(lobbyData, eligible, 'presAction2');
         } else if (myStatus === STATUS_PRESVETOCHOICE){
             console.log("president veto choice");
             const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
