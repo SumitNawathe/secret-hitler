@@ -342,7 +342,7 @@ const generateMaskedLobby = (room, username) => {
     });
 
     let shouldBeGivenPolicyCards = (lobby.users[lobby.president].username === username && (lobby.users[lobby.president].status === STATUS_PRESDEC || lobby.users[lobby.president].status === STATUS_PRESACT3));
-    if (lobby.chancellor) {
+    if (!(lobby.chancellor === null)) {
         shouldBeGivenPolicyCards = shouldBeGivenPolicyCards || (lobby.users[lobby.chancellor].username === username && lobby.users[lobby.chancellor].status === STATUS_CHANCDEC);
     }
     return {

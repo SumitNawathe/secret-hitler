@@ -104,7 +104,7 @@ const createLobby = (room, username, id) => {
         voteCountNo: 0,
         policyCards: null,
         investigations: null,
-        veto: true
+        veto: false
     };
     lobbies.set(room, lobby);
 }
