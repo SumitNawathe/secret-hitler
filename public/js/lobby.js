@@ -140,7 +140,7 @@ socket.on('lobbyData', (lobbyDataString) => {
             for (let i = 0; i < lobbyData.users.length; i++) {
                 //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 //else
-                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username) { eligible.push(false); }
+                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username || lobbyData.users[i].type === TYPE_SPECTATOR) { eligible.push(false); }
                 else { eligible.push(true); }
             }
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
