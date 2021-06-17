@@ -556,7 +556,7 @@
 .ui.brown.loading.loading.loading.loading .input > i.icon:after,
 .ui.brown.loading.loading.loading.loading > i.icon:after,
 .ui.brown.loader.loader.loader:after {
-  color: #A5673F;
+  color: #0000ff;
 }
 .ui.inverted.brown.elastic.loader:before,
 .ui.inverted.brown.elastic.loading.loading.loading:not(.segment):before,

@@ -368,14 +368,14 @@
 }
 .ui.brown.rating .active.icon {
   color: #D67C1C;
-  text-shadow: 0px -1px 0px #A5673F, -1px 0px 0px #A5673F, 0px 1px 0px #A5673F, 1px 0px 0px #A5673F;
+  text-shadow: 0px -1px 0px #0000ff, -1px 0px 0px #0000ff, 0px 1px 0px #0000ff, 1px 0px 0px #0000ff;
 }
 .ui.brown.rating .icon.selected,
 .ui.brown.rating .icon.selected.active,
 .ui.brown.rating .icon.selected.partial.active {
   background: inherit;
   color: #b0620f;
-  text-shadow: 0px -1px 0px #975b33, -1px 0px 0px #975b33, 0px 1px 0px #975b33, 1px 0px 0px #975b33;
+  text-shadow: 0px -1px 0px #0000e6, -1px 0px 0px #0000e6, 0px 1px 0px #0000e6, 1px 0px 0px #0000e6;
   -webkit-text-stroke: unset;
   background-clip: unset;
 }
@@ -384,7 +384,7 @@
   background: -webkit-linear-gradient(left, #D67C1C 0% var(--full), rgba(0, 0, 0, 0.15) var(--full) 100%);
   background: linear-gradient(to right, #D67C1C 0% var(--full), rgba(0, 0, 0, 0.15) var(--full) 100%);
   text-shadow: none;
-  -webkit-text-stroke: #A5673F 0.78px;
+  -webkit-text-stroke: #0000ff 0.78px;
   -webkit-background-clip: text;
           background-clip: text;
   color: transparent;

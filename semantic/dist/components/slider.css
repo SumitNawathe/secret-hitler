@@ -575,7 +575,7 @@
 
 /* Standard */
 .ui.brown.slider .inner .track-fill {
-  background-color: #A5673F;
+  background-color: #0000ff;
 }
 .ui.brown.inverted.slider .inner .track-fill {
   background-color: #D67C1C;
@@ -583,11 +583,11 @@
 
 /* Basic */
 .ui.brown.slider.basic .inner .thumb {
-  background-color: #A5673F;
+  background-color: #0000ff;
 }
 .ui.brown.slider.basic .inner .thumb:hover,
 .ui.brown.slider.basic:focus .inner .thumb {
-  background-color: #975b33;
+  background-color: #0000e6;
 }
 
 /* Basic Inverted */

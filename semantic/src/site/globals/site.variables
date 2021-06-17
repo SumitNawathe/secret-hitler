@@ -1,4 +1,5 @@
 /*******************************
      User Global Variables
 *******************************/
-@pageBackground: #ffffff;
+@pageBackground: #000000;
+@brown: #0000ff;
