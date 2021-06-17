@@ -577,7 +577,7 @@
 .ui.indeterminate.brown.progress .bar::before,
 .ui.brown.progress .bar,
 .ui.progress .brown.bar {
-  background-color: #A5673F;
+  background-color: #0000ff;
 }
 .ui.inverted.indeterminate.brown.progress .bar::before,
 .ui.brown.inverted.progress .bar,

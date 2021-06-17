@@ -1648,36 +1648,36 @@ a.ui.ui.ui.inverted.basic.pink.label:hover {
 }
 .ui.brown.labels .label,
 .ui.ui.ui.brown.label {
-  background-color: #A5673F;
-  border-color: #A5673F;
+  background-color: #0000ff;
+  border-color: #0000ff;
   color: #FFFFFF;
 }
 
 /* Link */
 .ui.brown.labels a.label:hover,
 a.ui.ui.ui.brown.label:hover {
-  background-color: #975b33;
-  border-color: #975b33;
+  background-color: #0000e6;
+  border-color: #0000e6;
   color: #FFFFFF;
 }
 
 /* Ribbon */
 .ui.ui.ui.brown.ribbon.label {
-  border-color: #805031;
+  border-color: #0000cc;
 }
 
 /* Basic */
 .ui.basic.labels .brown.label,
 .ui.ui.ui.basic.brown.label {
   background: none #FFFFFF;
-  border-color: #A5673F;
-  color: #A5673F;
+  border-color: #0000ff;
+  color: #0000ff;
 }
 .ui.basic.labels a.brown.label:hover,
 a.ui.ui.ui.basic.brown.label:hover {
   background: none #FFFFFF;
-  border-color: #975b33;
-  color: #975b33;
+  border-color: #0000e6;
+  color: #0000e6;
 }
 
 /* Inverted */

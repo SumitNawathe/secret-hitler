@@ -371,14 +371,14 @@ i.inverted.circular.pink.icon.icon.icon.icon {
   color: #FFFFFF;
 }
 i.brown.icon.icon.icon.icon {
-  color: #A5673F;
+  color: #0000ff;
 }
 i.inverted.brown.icon.icon.icon.icon {
   color: #D67C1C;
 }
 i.inverted.bordered.brown.icon.icon.icon.icon,
 i.inverted.circular.brown.icon.icon.icon.icon {
-  background-color: #A5673F;
+  background-color: #0000ff;
   color: #FFFFFF;
 }
 i.grey.icon.icon.icon.icon {
