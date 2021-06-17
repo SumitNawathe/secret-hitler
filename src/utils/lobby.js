@@ -41,13 +41,24 @@ const addToLobby = (room, username, id) => {
         }
 
         //include person in lobby
-        lobby.users.push({
-            username: username,
-            type: TYPE_SPECTATOR,
-            id: id,
-            status: STATUS_NONE,
-            lastVote: false
-        });
+        if(lobby.gameState === GAMESTATE_ONGOING){
+            lobby.users.push({
+                username: username,
+                type: TYPE_SPECTATOR,
+                id: id,
+                status: STATUS_NONE,
+                lastVote: false
+            });
+        } else {
+            lobby.users.push({
+                username: username,
+                type: TYPE_PLAYER,
+                id: id,
+                status: STATUS_NONE,
+                lastVote: false
+            });
+        }
+        
         idToUsername.set(id, username);
         usernameToLobby.set(username, room);
     } else {
