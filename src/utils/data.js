@@ -93,7 +93,6 @@ const createLobby = (room, username, id) => {
         users: userArray,
         gameState: GAMESTATE_LOBBY,
         president: null,
-        nextPresident: null,
         chancellor: null,
         liberalCards: 0,
         fascistCards: 0,
@@ -104,7 +103,8 @@ const createLobby = (room, username, id) => {
         voteCountNo: 0,
         policyCards: null,
         investigations: null,
-        veto: false
+        veto: false,
+        nextPres : [1] // array with the indices of the next few presidents
     };
     lobbies.set(room, lobby);
 }
