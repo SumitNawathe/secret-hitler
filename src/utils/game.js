@@ -200,9 +200,13 @@ const handlePresAction1 = (room, username) => {
     nextPresident(room, true);
 }
 
-const handlePresAction2 = (room, specialPresIndex) => {
+const handlePresAction2 = (room, specialPres) => {
+    console.log("special election to " + specialPres);
     const lobby = lobbies.get(room);
-    lobby.nextPres.unshift(specialPresIndex); 
+    let index = 0;
+    for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
+    console.log("special election index "+index);
+    lobby.nextPres.unshift(index);
     nextPresident(room, true);
 }
 
@@ -361,6 +365,7 @@ module.exports = {
     presidentDiscard,
     chancellorChoose,
     handlePresAction1,
+    handlePresAction2,
     generateMaskedLobby,
     chancellorVeto,
     presidentVeto
