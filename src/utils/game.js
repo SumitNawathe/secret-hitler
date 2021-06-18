@@ -349,13 +349,14 @@ const generateMaskedLobby = (room, username) => {
         } else if (dontMask.includes(person.username)) {
             userArray.push({
                 username: person.username,
-                type: person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST,
+                type: person.type === TYPE_DEAD ? TYPE_DEAD : (person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST),
                 id: person.id,
                 status: person.status
             });
         } else {
             userArray.push({
                 username: person.username,
+                type: person.type === TYPE_DEAD ? TYPE_DEAD : null,
                 id: person.id,
                 status: person.status
             });
