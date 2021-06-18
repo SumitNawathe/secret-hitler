@@ -37,7 +37,7 @@ const startGame = (room) => {
     randomAssign(room, 2); //TODO: change to depend on number of players
     lobby.president = 0;
     lobby.liberalCards = 0;
-    lobby.fascistCards = 3;
+    lobby.fascistCards = 0;
 
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
