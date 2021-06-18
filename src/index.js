@@ -138,9 +138,11 @@ io.on('connection', (socket) => {
         emitMidgameLobbyData(room);
     });
 
-    socket.on('presAction3', ({room}, callback) => {
-        handlePresAction3(room);
-        emitMidgameLobbyData(room);
+    socket.on('presAction3', ({room, id}, callback) => {
+        const cards = handlePresAction3(room);
+        io.to(id).emit('policyPeek', JSON.stringify(cards));
+        setTimeout(emitMidgameLobbyData, 5000, room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {

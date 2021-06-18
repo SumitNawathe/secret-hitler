@@ -211,7 +211,14 @@ const handlePresAction2 = (room, specialPres) => {
 }
 
 const handlePresAction3 = (room) => {
+    const lobby = lobbies.get(room);
+    drawThreeCards(room);
+    const cards = lobby.policyCards;
+    lobby.deck.unshift(cards[0]);
+    lobby.deck.unshift(cards[0]);
+    lobby.deck.unshift(cards[0]);
     nextPresident(room, true);
+    return cards;
 }
 
 const handlePresAction4 = (room, killUser) => {
