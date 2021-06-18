@@ -31,7 +31,7 @@ const {
     LIBERAL
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
-const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
+const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
 const { timeLog } = require('console');
 
 const app = express();
@@ -135,6 +135,16 @@ io.on('connection', (socket) => {
     socket.on('presAction2', ({room, choice}, callback) => {
         console.log('chose to investigate ' + choice);
         handlePresAction2(room, choice);
+        emitMidgameLobbyData(room);
+    });
+
+    socket.on('presAction3', ({room}, callback) => {
+        handlePresAction3(room);
+        emitMidgameLobbyData(room);
+    });
+
+    socket.on('presAction4', ({room, choice}, callback) => {
+        handlePresAction4(room, choice);
         emitMidgameLobbyData(room);
     });
 

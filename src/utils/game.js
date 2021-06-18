@@ -37,7 +37,7 @@ const startGame = (room) => {
     randomAssign(room, 2); //TODO: change to depend on number of players
     lobby.president = 0;
     lobby.liberalCards = 0;
-    lobby.fascistCards = 0;
+    lobby.fascistCards = 3;
 
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
@@ -210,6 +210,18 @@ const handlePresAction2 = (room, specialPres) => {
     nextPresident(room, true);
 }
 
+const handlePresAction3 = (room) => {
+    nextPresident(room, true);
+}
+
+const handlePresAction4 = (room, killUser) => {
+    const lobby = lobbies.get(room);
+    let index = 0;
+    for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
+    lobby.users[index].type = TYPE_DEAD;
+    nextPresident(room, true);
+}
+
 const nextPresident = (room, electionPassed) => {
     
     const lobby = lobbies.get(room);
@@ -366,6 +378,8 @@ module.exports = {
     chancellorChoose,
     handlePresAction1,
     handlePresAction2,
+    handlePresAction3,
+    handlePresAction4,
     generateMaskedLobby,
     chancellorVeto,
     presidentVeto

@@ -140,9 +140,13 @@ socket.on('lobbyData', (lobbyDataString) => {
             for (let i = 0; i < lobbyData.users.length; i++) {
                 //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 //else
-                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username || lobbyData.users[i].type === TYPE_SPECTATOR) { eligible.push(false); }
+                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username 
+                    || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 else { eligible.push(true); }
             }
+            console.log("president choosing");
+            console.log(lobbyData.users);
+            console.log(eligible);
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
         } else if (myStatus === STATUS_PRESDEC) {
             for (let i = 0; i < lobbyData.policyCards.length; i++) {
@@ -189,13 +193,29 @@ socket.on('lobbyData', (lobbyDataString) => {
         } else if (myStatus === STATUS_PRESACT2){
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
-                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].username === username || i === lobbyData.chancellor){
+                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username || i === lobbyData.chancellor){
                     eligible.push(false);
                 } else {
                     eligible.push(true);
                 }
             }
             createPlayerSelect(lobbyData, eligible, 'presAction2');
+        } else if (myStatus === STATUS_PRESACT3){
+            let eligible = [];
+            for(let i=0; i<lobbyData.users.length; i++){
+                eligible.push(true);
+            }
+            createPlayerSelect(lobbyData, eligible, 'presAction3');
+        } else if (myStatus === STATUS_PRESACT4){
+            const eligible = [];
+            for(let i=0; i<lobbyData.users.length; i++){
+                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username){
+                    eligible.push(false);
+                } else {
+                    eligible.push(true);
+                }
+            }
+            createPlayerSelect(lobbyData, eligible, 'presAction4');
         } else if (myStatus === STATUS_PRESVETOCHOICE){
             console.log("president veto choice");
             const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
