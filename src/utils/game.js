@@ -235,7 +235,12 @@ const nextPresident = (room, electionPassed) => {
     lobby.president = lobby.nextPres[0];
     lobby.chancellor = null;
     if(lobby.nextPres.length===1){
-        let index = (lobby.nextPres[0]+1) % lobby.users.length;
+        let index = (lobby.nextPres[0]) % lobby.users.length;
+        while(lobby.users[index].type === TYPE_DEAD || lobby.users[index].type === TYPE_SPECTATOR){
+            index = (index+1) % lobby.users.length;
+        }
+        lobby.president = index;
+        index = (index+1) % lobby.users.length;
         while(lobby.users[index].type === TYPE_DEAD || lobby.users[index].type === TYPE_SPECTATOR){
             index = (index+1) % lobby.users.length;
         }
