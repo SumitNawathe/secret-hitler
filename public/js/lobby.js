@@ -44,6 +44,11 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+socket.on('joinLobbyData', (playerJoiningString) => {
+    const joinLobbyData = JSON.parse(playerJoiningString);
+    const joinUsername = joinLobbyData.player;
+});
+
 socket.on('updateLobbyData', (lobbyDataUpdateString) => {
     const lobbyDataUpdate = JSON.parse(lobbyDataUpdateString);
     const updateUsername = lobbyDataUpdate[0];
