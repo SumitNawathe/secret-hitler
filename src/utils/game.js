@@ -427,12 +427,20 @@ const generateMaskedLobby = (room, username) => {
     lobby.investigations.forEach((pair) => {
         if (pair[0] === username) { dontMask.push(pair[1]); }
     });
+    const hardDontMask = [];
+    if (getUserFromUsername(room, username).type === TYPE_FASCIST) {
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_FASCIST || person.type === TYPE_HITLER) {
+                hardDontMask.push(person.username);
+            }
+        });
+    }
     const userArray = [];
     //console.log('ENTERING GENERATE MASKED LOBBY LOOP');
     lobby.users.forEach((person) => {
         //console.log(person);
         if (person.type === TYPE_SPECTATOR) { return; }
-        if (person.username === username) {
+        if (person.username === username || hardDontMask.includes(person.username)) {
             userArray.push(person);
         } else if (dontMask.includes(person.username)) {
             userArray.push({
