@@ -32,9 +32,11 @@ const {
     STATUS_PRESVETOCHOICE
 } = require('../utils/data')
 
-const startGame = (room) => {
+const startGame = (room) => { //TODO: dont allow start if not enough users
     const lobby = lobbies.get(room);
     // console.log('SETTING GAMESTATE TO ONGOING');
+    //lobby.nextPres.push(lobby.users[1].username); //could cause crash if only 1 user
+    lobby.nextPres = [lobby.users[1].username];
     let players = 0;
     for(let i = 0; i<lobby.users.length; i++){
         if(lobby.users[i].type === TYPE_HOST || lobby.users[i].type === TYPE_PLAYER){
@@ -49,7 +51,7 @@ const startGame = (room) => {
     } else {
         randomAssign(room, 3);
     }
-    lobby.president = 0;
+    lobby.president = lobby.users[0].username;
     lobby.liberalCards = 0;
     
     if(players===5){
@@ -80,9 +82,10 @@ const setUpVote = (room, chancellorChoice) => {
     for (let i = 0; i < lobby.users.length; i++) {
         if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_DEAD_FAS) {
             lobby.users[i].status = STATUS_VOTING;
-            if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
+            // if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
         }
     }
+    lobby.chancellor = chancellorChoice;
     drawThreeCards(room);
 }
 
@@ -125,15 +128,15 @@ const registerVote = (room, username, vote) => {
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
             console.log('numOfFascists: ' + lobby.numOfFascists);
-            console.log('chancellor type: ' + lobby.users[lobby.chancellor].type);
-            if (lobby.fascistCards >= 3 && lobby.users[lobby.chancellor].type === TYPE_HITLER) {
+            console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
+            if (lobby.fascistCards >= 3 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
                 endGame(room, FASCIST);
                 return;
             }
 
             lobby.previousPresident = lobby.president;
             lobby.previousChancellor = lobby.chancellor;
-            lobby.users[lobby.president].status = STATUS_PRESDEC;
+            getUserFromUsername(room, lobby.president).status = STATUS_PRESDEC;
         } else { //election fails
             nextPresident(room, false);
         }
@@ -142,10 +145,10 @@ const registerVote = (room, username, vote) => {
 
 const presidentVeto = (room, decision) => {
     const lobby = lobbies.get(room);
-    lobby.users[lobby.president].status = STATUS_NONE;
+    getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     if(decision){
         // if pres wants to veto
-        lobby.users[lobby.chancellor].status = STATUS_CHANCVETOCHOICE;
+        getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCVETOCHOICE;
     } else {
         placeCard(room, lobby.policyCards[0]);
     }
@@ -153,7 +156,7 @@ const presidentVeto = (room, decision) => {
 
 const chancellorVeto = (room, decision) => {
     const lobby = lobbies.get(room);
-    lobby.users[lobby.chancellor].status = STATUS_NONE;
+    getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
     if(decision){
         // if chancellor wants to veto
         nextPresident(room, true);
@@ -185,8 +188,8 @@ const drawThreeCards = (room) => {
 const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
     const lobby = lobbies.get(room);
     lobby.policyCards.splice(index, 1);
-    lobby.users[lobby.president].status = STATUS_NONE;
-    lobby.users[lobby.chancellor].status = STATUS_CHANCDEC;
+    getUserFromUsername(room, lobby.president).status = STATUS_NONE;
+    getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCDEC;
 }
 
 const chancellorChoose = (room, index /*either 0 or 1 */) => {
@@ -195,8 +198,8 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
         placeCard(room, lobby.policyCards[index]);
     } else {
         // console.log("making president veto");
-        lobby.users[lobby.chancellor].status = STATUS_NONE;
-        lobby.users[lobby.president].status = STATUS_PRESVETOCHOICE;
+        getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+        getUserFromUsername(room, lobby.president).status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
     }
 }
@@ -208,8 +211,8 @@ const placeCard = (room, type) => {
         nextPresident(room, true);
     } else {
         lobby.fascistCards++;
-        lobby.users[lobby.chancellor].status = STATUS_NONE;
-        lobby.users[lobby.president].status = presidentAction(room);
+        getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+        getUserFromUsername(room, lobby.president).status = presidentAction(room);
     }
     if (lobby.fascistCards == 6) {
         endGame(room, FASCIST);
@@ -242,22 +245,25 @@ const presidentAction = (room) => {
 }
 
 const handlePresAction1 = (room, username) => {
+    console.log('recieved presAction1');
     const lobby = lobbies.get(room);
-    lobby.investigations.push([lobby.users[lobby.president].username, username]);
+    lobby.investigations.push([lobby.president, username]);
     nextPresident(room, true);
 }
 
 const handlePresAction2 = (room, specialPres) => {
+    console.log('recieved presAction2');
     // console.log("special election to " + specialPres);
     const lobby = lobbies.get(room);
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
     // console.log("special election index "+index);
-    lobby.nextPres.unshift(index);
+    lobby.nextPres.unshift(lobby.users[index].username);
     nextPresident(room, true);
 }
 
 const handlePresAction3 = (room) => {
+    console.log('recieved presAction3');
     const lobby = lobbies.get(room);
     drawThreeCards(room);
     const cards = lobby.policyCards;
@@ -269,6 +275,7 @@ const handlePresAction3 = (room) => {
 }
 
 const handlePresAction4 = (room, killUser) => {
+    console.log('recieved presAction3');
     const lobby = lobbies.get(room);
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
@@ -282,31 +289,36 @@ const handlePresAction4 = (room, killUser) => {
 }
 
 const nextPresident = (room, electionPassed) => {
-    
     const lobby = lobbies.get(room);
     // console.log(lobby.nextPres);
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
     }
-    lobby.users[lobby.president].status = STATUS_NONE;
-    lobby.users[lobby.chancellor].status = STATUS_NONE;
+    getUserFromUsername(room, lobby.president).status = STATUS_NONE;
+    getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+    
     lobby.president = lobby.nextPres[0];
     lobby.chancellor = null;
-    if(lobby.nextPres.length===1){
-        let index = (lobby.nextPres[0]) % lobby.users.length;
+    console.log('nextPres array:');
+    console.log(lobby.nextPres);
+
+    if (lobby.nextPres.length === 1) {
+        let index = getIndexFromUsername(room, lobby.nextPres[0]) % lobby.users.length;
         while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
             index = (index+1) % lobby.users.length;
         }
-        lobby.president = index;
+        lobby.president = lobby.users[index].username;
+        console.log('lobby.president');
+        console.log(lobby.president);
         index = (index+1) % lobby.users.length;
         while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
             index = (index+1) % lobby.users.length;
         }
-        lobby.nextPres.push(index);
+        lobby.nextPres.push(lobby.users[index].username);
     }
     lobby.nextPres.splice(0, 1);
-    lobby.users[lobby.president].status = STATUS_PRESCHOOSE;
+    getUserFromUsername(room, lobby.president).status = STATUS_PRESCHOOSE;
 }
 
 
@@ -422,9 +434,9 @@ const generateMaskedLobby = (room, username) => {
         }
     });
 
-    let shouldBeGivenPolicyCards = (lobby.users[lobby.president].username === username && (lobby.users[lobby.president].status === STATUS_PRESDEC || lobby.users[lobby.president].status === STATUS_PRESACT3));
+    let shouldBeGivenPolicyCards = (lobby.president === username && (getUserFromUsername(room, lobby.president).status === STATUS_PRESDEC || getUserFromUsername(room, lobby.president).status === STATUS_PRESACT3));
     if (!(lobby.chancellor === null)) {
-        shouldBeGivenPolicyCards = shouldBeGivenPolicyCards || (lobby.users[lobby.chancellor].username === username && lobby.users[lobby.chancellor].status === STATUS_CHANCDEC);
+        shouldBeGivenPolicyCards = shouldBeGivenPolicyCards || (lobby.chancellor === username && getUserFromUsername(room, lobby.chancellor).status === STATUS_CHANCDEC);
     }
     return {
         users: userArray,
@@ -458,6 +470,32 @@ const generatePostGameLobbyData = (room) => {
         previousPresident: lobby.previousPresident,
         previousChancellor: lobby.previousChancellor,
         postGameData: lobby.postGameData
+    }
+}
+
+const getUserFromUsername = (room, username) => {
+    const lobby = lobbies.get(room);
+    // console.log('lobbies')
+    // console.log(lobbies);
+    // console.log('room');
+    // console.log(room);
+    // console.log('lobby');
+    // console.log(lobby);
+    // console.log('users');
+    // console.log(lobby.users);
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].username === username) {
+            return lobby.users[i];
+        }
+    }
+}
+
+const getIndexFromUsername = (room, username) => {
+    const lobby = lobbies.get(room);
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].username === username) {
+            return i;
+        }
     }
 }
 
