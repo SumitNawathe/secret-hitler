@@ -44,21 +44,21 @@ const LIBERAL = true;
  * * LOBBY: 0
  * * DURING GAME: 1
  * * AFTER GAME: 2
- * president: index number of current president
- * nextPresident: index number of next president
- * chancellor: index number of current or prospective Chancellor
+ * president: index number of current president <USERNAME>
+ * chancellor: index number of current or prospective Chancellor <USERNAME>
  * liberalCards: number of liberal cards placed
  * fascistCards: number of fascist cards placed
  * deck: array representing the remaining cards
  * * LIBERAL = true
  * * FASCIST = false
- * previousPresident: index number of previously elected president
- * previousChancellor: index number of previously elected chancellor
+ * previousPresident: index number of previously elected president <USERNAME>
+ * previousChancellor: index number of previously elected chancellor <USERNAME>
  * voteCountYes: number of votes yes for this round
  * voteCountNo: number of votes no for this round
  * policyCards: an array of booleans containing the drawn cards for this round
  * investigations: an array of objects with two elements, the first having the username of the president,
  *          and the second having the username of the person investigated
+ * nextPres: array containing the indicies of the next few presidents <USERNAME>
  * postGameData: an object containing information relevant after the game
  * * winningParty: either liberal or fascist
  * * prospectiveHost: the username of the person who must confirm to remake the lobby
@@ -109,7 +109,7 @@ const createLobby = (room, username, id) => {
         policyCards: null,
         investigations: null,
         veto: false,
-        nextPres : [1], // array with the indices of the next few presidents
+        nextPres : [], // array with the indices of the next few presidents
         postGameData: null
     };
     lobbies.set(room, lobby);
@@ -130,7 +130,7 @@ const resetLobby = (room) => {
     lobby.policyCards = null;
     lobby.investigations = null;
     lobby.veto = null;
-    lobby.nextPres = [1];
+    lobby.nextPres = [];
     lobby.postGameData = null;
     lobby.users.forEach((person) => {
         person.status = STATUS_NONE;
