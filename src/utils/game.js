@@ -46,10 +46,10 @@ const startGame = (room) => { //TODO: dont allow start if not enough users
     lobby.gameState = GAMESTATE_ONGOING;
     // console.log('lobby.gameState: ' + lobby.gameState);
     console.log("players: "+players);
-    if(players === 5){
-        randomAssign(room, 2);
+    if (players <= 6) {
+        randomAssign(room, 1);
     } else {
-        randomAssign(room, 3);
+        randomAssign(room, 2);
     }
     lobby.president = lobby.users[0].username;
     lobby.liberalCards = 0;
