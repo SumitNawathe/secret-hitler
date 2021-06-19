@@ -44,12 +44,33 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+socket.on('joinLobbyData', (playerJoiningString) => {
+    const joinLobbyData = JSON.parse(playerJoiningString);
+    const joinUsername = joinLobbyData.player;
+});
+
 socket.on('updateLobbyData', (lobbyDataUpdateString) => {
     const lobbyDataUpdate = JSON.parse(lobbyDataUpdateString);
-    const updateUsername = lobbyDataUpdate[0];
-    const newState = lobbyDataUpdate[1];
+    const updateUsername = lobbyDataUpdate.username;
+    const newState = lobbyDataUpdate.state;
     if (updateUsername === username) {
-        //delete and recreate buttons
+        if (newState === TYPE_PLAYER) {
+            newButton = $lobbyActions.querySelector('button');
+            newButton.innerHTML = 'Spectate'
+            newButton.removeEventListener('click')
+            newButton.addEventListener('click', () => {
+                // console.log('should change to spectate');
+                socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+            });
+        } else { //playerType === TYPE_SPECTATOR
+            newButton = $lobbyActions.querySelector('button');
+            newButton.innerHTML = 'Play Game'
+            newButton.removeEventListener('click')
+            newButton.addEventListener('click', () => {
+                // console.log('should change to play');
+                socket.emit('changeLobbyInfo', { username, room, newType: TYPE_PLAYER }, (error) => { if (error) { console.log('error'); } })
+            });
+        }
     }
     //do stuff
 });
