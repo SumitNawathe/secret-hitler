@@ -138,7 +138,7 @@ socket.on('lobbyData', (lobbyDataString) => {
         if (lobbyData.postGameData[0] === LIBERAL && type === TYPE_LIBERAL
                 || lobbyData.postGameData[0] === FASCIST && (type === TYPE_FASCIST || type === TYPE_HITLER)) {
             winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Won!', id: 'won' });
-        } else {
+        } else if (type !== TYPE_SPECTATOR) {
             winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Lost!', id: 'loss' });
         }
         $lobbyActions.insertAdjacentHTML('beforeend', winLossHtml);
