@@ -30,6 +30,7 @@ const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
 let slideup = false, startslide = true;
+let gameStartReveal = true;
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
@@ -123,6 +124,11 @@ socket.on('lobbyData', (lobbyDataString) => {
 
         console.log('MY STATUS: ' + myStatus);
         console.log('MY TYPE:' + myType);
+
+        if (gameStartReveal) {
+            gameStartReveal = false;
+        }
+
         if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
             //voteanim("slidedown");
         }

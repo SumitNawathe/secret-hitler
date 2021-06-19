@@ -20,7 +20,7 @@
                 top: 0;
                 left: 0;
                 width: 80px;
-                height: 107.5px;
+                height: 106px;
                 overflow: hidden;
                 position: relative;
             }
@@ -50,7 +50,7 @@
                 flex: 0 0 100px;
             }
 
-            .votecard {
+            .hiddencard {
                 position: absolute;
             }
 
@@ -83,7 +83,13 @@
             }
 
             .slidedown {
-                animation: slideup 1s backwards;
+                animation: slideup 1s forwards;
+                animation-direction: reverse;
+            }
+
+            .slideupanddown {
+                animation: slideup 1s;
+                animation-direction: alternate;
             }
 
             @-webkit-keyframes fadein {
@@ -101,8 +107,13 @@
 
             @-webkit-keyframes slideup {
                 from { bottom: 0px; }
-                /* again this is terrible must change later */
                 to { bottom: 107.5px; }
+            }
+
+            @-webkit-keyframes slideupanddown {
+                0% { bottom: 0px; }
+                50% { bottom: 107.5px; }
+                100% { bottom: 0px; }
             }
 
         </style>
@@ -151,14 +162,15 @@
 
         <script id="participant-template" type="text/html">
             <div class="col participant">
-                <div class="ui inverted centered header {{ type }}" style="white-space: nowrap; overflow: hidden;
+                <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
                     position: relative; bottom: -10px;">
                     {{ username }} - {{ status }}
                 </div>
                 <div class="layered-image">
                     <div class="test-image">
-                    <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
-                    <img class="ui tiny image centered votecard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
+                        <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
+                        <img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
+                        <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">
                     </div>
                     <div id={{ image_select_id }}></div>
                 </div>
