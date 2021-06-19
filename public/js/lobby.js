@@ -125,6 +125,32 @@ socket.on('lobbyData', (lobbyDataString) => {
             return true;
         });
         createLobbyButtons(type);
+    } else if (lobbyData.gameState === GAMESTATE_FINISHED) {
+        let type = null;
+        lobbyData.users.every((person) => {
+            if (person.username === username) {
+                type = person.type;
+                return false;
+            }
+            return true;
+        });
+        let winLossHtml = null;
+        if (lobbyData.postGameData[0] === LIBERAL && type === TYPE_LIBERAL
+                || lobbyData.postGameData[0] === FASCIST && (type === TYPE_FASCIST || type === TYPE_HITLER)) {
+            winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Won!', id: 'won' });
+        } else {
+            winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Lost!', id: 'loss' });
+        }
+        $lobbyActions.insertAdjacentHTML('beforeend', winLossHtml);
+
+        if (lobbyData.postGameData[1] === username) {
+            const remakeLobbyHtml = Mustache.render(actionButtonTemplate, { text: 'Remake Lobby', id: 'remake' });
+            $lobbyActions.insertAdjacentHTML('beforeend', remakeLobbyHtml);
+            $lobbyActions.querySelector('#remake').addEventListener('click', () => {
+                console.log('request remake lobby');
+                socket.emit('remakeLobby', { room }, (error) => { if (error) { console.log('error'); } });
+            });
+        }
     } else if (lobbyData.gameState === GAMESTATE_ONGOING) {
         let myType = 0, myStatus = 0;
         lobbyData.users.every((person) => {

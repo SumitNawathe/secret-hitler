@@ -8,6 +8,7 @@ const {
     idToUsername,
     usernameToLobby,
     createLobby,
+    resetLobby,
     TYPE_SPECTATOR,
     TYPE_HOST,
     TYPE_PLAYER,
@@ -15,6 +16,8 @@ const {
     TYPE_FASCIST,
     TYPE_HITLER,
     TYPE_DEAD,
+    TYPE_DEAD_LIB,
+    TYPE_DEAD_FAS,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
@@ -30,7 +33,7 @@ const {
     FASCIST,
     LIBERAL
 } = require('./utils/data');
-const { addToLobby, updateLobbyUserType, removeUser } = require('./utils/lobby');
+const { addToLobby, updateLobbyUserType, removeUser, remakeLobby } = require('./utils/lobby');
 const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
 const { timeLog } = require('console');
 
@@ -46,6 +49,12 @@ app.use(express.static(publicDirectoryPath));
 const emitMidgameLobbyData = (room) => {
     // console.log('emitting midgame lobbyData');
     const lobby = lobbies.get(room);
+
+    if (lobby.gameState === GAMESTATE_FINISHED) {
+        io.to(room).emit('lobbyData', JSON.stringify(lobby));
+        return;
+    }
+
     lobby.users.forEach((person) => {
         io.to(person.id).emit('lobbyData', JSON.stringify(generateMaskedLobby(room, person.username)));
     });
@@ -160,6 +169,12 @@ io.on('connection', (socket) => {
         console.log('recieved veto vote: ' + choice);
         chancellorVeto(room, choice);
         emitMidgameLobbyData(room);
+    });
+
+    socket.on('remakeLobby', ({ room }, callback) => {
+        console.log('recieved remakeLobby');
+        remakeLobby(room);
+        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
     });
 });
 

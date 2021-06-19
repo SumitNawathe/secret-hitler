@@ -4,6 +4,7 @@ const {
     idToUsername,
     usernameToLobby,
     createLobby,
+    resetLobby,
     TYPE_SPECTATOR,
     TYPE_HOST,
     TYPE_PLAYER,
@@ -11,6 +12,8 @@ const {
     TYPE_FASCIST,
     TYPE_HITLER,
     TYPE_DEAD,
+    TYPE_DEAD_LIB,
+    TYPE_DEAD_FAS,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
@@ -116,8 +119,18 @@ const removeUser = (id) => {
     return room;
 }
 
+const remakeLobby = (room) => {
+    resetLobby(room);
+    const lobby = lobbies.get(room);
+    lobby.users[0].type = TYPE_HOST;
+    for (let i = 1; i < lobby.users.length; i++) {
+        if (lobby.users[i].type !== TYPE_SPECTATOR) { lobby.users[i].type = TYPE_PLAYER; }
+    }
+}
+
 module.exports = {
     addToLobby,
     updateLobbyUserType,
-    removeUser
+    removeUser,
+    remakeLobby
 };

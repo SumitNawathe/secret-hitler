@@ -5,6 +5,8 @@ const TYPE_LIBERAL = 2;
 const TYPE_FASCIST = 3;
 const TYPE_HITLER = 4;
 const TYPE_DEAD = 5;
+const TYPE_DEAD_LIB = 6;
+const TYPE_DEAD_FAS = 7;
 const GAMESTATE_LOBBY = 0;
 const GAMESTATE_ONGOING = 1;
 const GAMESTATE_FINISHED = 2;
@@ -57,6 +59,9 @@ const LIBERAL = true;
  * policyCards: an array of booleans containing the drawn cards for this round
  * investigations: an array of objects with two elements, the first having the username of the president,
  *          and the second having the username of the person investigated
+ * postGameData: an object containing information relevant after the game
+ * * winningParty: either liberal or fascist
+ * * prospectiveHost: the username of the person who must confirm to remake the lobby
 */
 
 /*
@@ -104,9 +109,33 @@ const createLobby = (room, username, id) => {
         policyCards: null,
         investigations: null,
         veto: false,
-        nextPres : [1] // array with the indices of the next few presidents
+        nextPres : [1], // array with the indices of the next few presidents
+        postGameData: null
     };
     lobbies.set(room, lobby);
+}
+
+const resetLobby = (room) => {
+    const lobby = lobbies.get(room);
+    lobby.gameState = GAMESTATE_LOBBY;
+    lobby.president = null;
+    lobby.chancellor = null;
+    lobby.liberalCards = 0;
+    lobby.fascistCards = 0;
+    lobby.deck = null;
+    lobby.previousPresident = null;
+    lobby.previousChancellor = null;
+    lobby.voteCountYes = 0;
+    lobby.voteCountNo = 0;
+    lobby.policyCards = null;
+    lobby.investigations = null;
+    lobby.veto = null;
+    lobby.nextPres = [1];
+    lobby.postGameData = null;
+    lobby.users.forEach((person) => {
+        person.status = STATUS_NONE;
+        person.lastVote = false;
+    });
 }
 
 module.exports = {
@@ -114,6 +143,7 @@ module.exports = {
     idToUsername,
     usernameToLobby,
     createLobby,
+    resetLobby,
     TYPE_SPECTATOR,
     TYPE_HOST,
     TYPE_PLAYER,
@@ -121,6 +151,8 @@ module.exports = {
     TYPE_FASCIST,
     TYPE_HITLER,
     TYPE_DEAD,
+    TYPE_DEAD_LIB,
+    TYPE_DEAD_FAS,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
