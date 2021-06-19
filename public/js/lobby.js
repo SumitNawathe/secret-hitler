@@ -7,6 +7,7 @@ const participantTemplate = document.querySelector('#participant-template').inne
 const $lobbyActions = document.querySelector('#actions');
 const actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
 const imageSelectTemplate = document.querySelector('#image-select-template').innerHTML;
+const slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -30,6 +31,7 @@ const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
 let slideup = false, startslide = true;
+let gameStartReveal = true;
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
@@ -102,8 +104,10 @@ socket.on('lobbyData', (lobbyDataString) => {
             username_img: person.username+"_img",
             type: typeString,
             status: statusString,
+            slidecard_id: "slidecard"+person.username,
             image_select_id: "image-select-"+person.username,
-            voteback_id: person.username
+            voteback_id: person.username,
+            party_id: person.username
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
@@ -168,15 +172,21 @@ socket.on('lobbyData', (lobbyDataString) => {
 
         // console.log('MY STATUS: ' + myStatus);
         // console.log('MY TYPE:' + myType);
-        if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
-            //voteanim("slidedown");
+
+        if (gameStartReveal) {
+            gameStartReveal = false;
         }
+
         let otherUsersVoting = false;
         lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
+        if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            voteanim("slidedown");
+        }
         if (myStatus === STATUS_VOTING || otherUsersVoting) {
-            // console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
-            if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
-            || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
+            if (!slideup) {
                 // console.log('cha cha real smooth')
                 voteanim("slideup")
             } else {
@@ -361,7 +371,7 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
     for (let i = 0; i < lobbyData.users.length; i++) {
         // console.log('player select image: ' + lobbyData.users[i].username);
         if (eligible[i]) {
-            const $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
+            let $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
             html = Mustache.render(imageSelectTemplate, {image_id: "image-overlay-" + lobbyData.users[i].username, src: "test carback.png", id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
             newButton = $imageSelectOverlay.querySelector("#image-overlay-" + lobbyData.users[i].username);
@@ -375,27 +385,44 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
 }
 
 const voteanim = (slide) => {
-    // console.log('voteanim')
+    console.log('voteanim')
     if (slide === "slideup") {
-        // console.log('slideup')
+        console.log('slideup')
         slideup = true
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidedown") {
-        // console.log('slidedown')
+        console.log('slidedown')
         slideup = false
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidup") {
-        // console.log('slidup')
+        console.log('slidup')
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
+    }
+}
+
+// const slidecard = (template, id, username, src) => {
+//     let $slidecard = document.querySelector('#slidecard'+username)
+//     html = Mustache.render(template, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+//         $slidecard.insertAdjacentHTML('beforeend', html);
+// }
+
+const slidecard = (template, id, src) => {
+    console.log('generating slidecard')
+    for (let i=0; i < lobbyData.users.length; i++) {
+        let username=lobbyData.users[i].username
+        let $slidecard = document.querySelector('#slidecard'+username)
+        console.log($slidecard)
+        html = Mustache.render(slideCardTemplate, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+            $slidecard.insertAdjacentHTML('beforeend', html);
     }
 }
 
