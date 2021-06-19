@@ -7,15 +7,51 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
 
         <style>
+            .background {
+            }
+
             .layered-image {
                 position: relative;
+                top: 0;
+                left: 0;
             }
-            /*this is really bad, but works for testing (not robust for later resizing of graphics)*/
-            .image-overlay {
+            .test-image {
+                position: relative;
+                top: 0;
+                left: 0;
+                width: 80px;
+                height: 107.5px;
+                overflow: hidden;
+                position: relative;
+            }
+            .image-overlay1 {
+                position: relative;
+                top: 0px;
+                left: 0px;
+            }
+            .image-overlay2 {
                 position: absolute;
                 top: -107.5px;
-                left: -0px;
+                left: -10px;
                 opacity: .4;
+            }
+
+            .container {
+            }
+
+            .row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .col {
+                min-width: 0;
+                flex: 0 0 100px;
+            }
+
+            .votecard {
+                position: absolute;
             }
 
             .ui.inverted.centered.tiny.header.Fascist {
@@ -38,6 +74,18 @@
                 animation: fadein 2s;
             }
 
+            .slideup {
+                animation: slideup 1s forwards;
+            }
+
+            .slidup {
+                bottom: 107.5px;
+            }
+
+            .slidedown {
+                animation: slideup 1s backwards;
+            }
+
             @-webkit-keyframes fadein {
                 from {opacity: 0;}
                 to {opacity: 1;}
@@ -52,9 +100,9 @@
             }
 
             @-webkit-keyframes slideup {
-                from {
-                    
-                }
+                from { bottom: 0px; }
+                /* again this is terrible must change later */
+                to { bottom: 107.5px; }
             }
 
         </style>
@@ -66,56 +114,59 @@
         <script src="../semantic/dist/semantic.min.js"></script>
     </head>
     <body style="background-color: black;">
-        <div class="menu-container" style="z-index: 9999;"> <!--always appears on top-->
-            <section class="ui menu nav-menu">
-                <div id="heading"></div>
-                    <div class="item">
-                        <span>
-                            <div id="actions"></div>
-                        </span>
+            <div class="menu-container" style="z-index: 9999;"> <!--always appears on top-->
+                <section class="ui menu nav-menu">
+                    <div id="heading"></div>
+                        <div class="item">
+                            <span>
+                                <div id="actions"></div>
+                            </span>
+                        </div>
+                    <div class="item right menu">
+                        <a href="/" class="ui primary button">Lobby Select</a>
                     </div>
-                <div class="item right menu">
-                    <a href="/" class="ui primary button">Lobby Select</a>
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
 
-        <script id="heading-template" type="text/html">
-            <a class="item">
-                <h1 class="ui header">Secret Hitler Lobby {{ room }}</h1>
-            </a>
-        </script>
+            <script id="heading-template" type="text/html">
+                <a class="item">
+                    <h1 class="ui header">Secret Hitler Lobby {{ room }}</h1>
+                </a>
+            </script>
 
-        <script id="action-button-template" type="text/html">
-            <button class="ui primary button" id={{ id }}>{{ text }}</button>
-        </script>
+            <script id="action-button-template" type="text/html">
+                <button class="ui primary button" id={{ id }}>{{ text }}</button>
+            </script>
 
-        <br>
+            <br>
 
-        <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
-        <img class="ui image" src="img/lib_back.png">
-        <!--TODO: dynamic fascist board depending on player number-->
-        <img class="ui image" src="img/fascist_back_78.png">
+            <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
+            <img class="ui image" src="img/lib_back.png">
+            <!--TODO: dynamic fascist board depending on player number-->
+            <img class="ui image" src="img/fascist_back_78.png">
 
-        <div class="ui ten column grid">
-            <div class="row" id="participant-list"></div>
-        </div>
+            <div class="container">
+                <div class="row" id="participant-list"></div>
+            </div>
 
         <script id="participant-template" type="text/html">
-            <div class="column participant">
-                <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
+            <div class="col participant">
+                <div class="ui inverted centered header {{ type }}" style="white-space: nowrap; overflow: hidden;
                     position: relative; bottom: -10px;">
                     {{ username }} - {{ status }}
                 </div>
                 <div class="layered-image">
-                    <img class="ui centered tiny image" id={{ username_img }} src="img/default cardback.png">
+                    <div class="test-image">
+                    <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
+                    <img class="ui tiny image centered votecard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
+                    </div>
                     <div id={{ image_select_id }}></div>
                 </div>
             </div>
         </script>
 
         <script id="image-select-template" type="text/html">
-            <img class="ui centered tiny image image-overlay glowing" id={{ image_id }} src= "img/{{ src }}">
+            <img class="ui tiny image centered image-overlay2 glowing" id={{ image_id }} src= "img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>

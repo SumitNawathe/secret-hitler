@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
-        console.log('recieved vote: ' + choice);
+        console.log('received vote: ' + choice);
         registerVote(room, username, choice);
         emitMidgameLobbyData(room);
     });

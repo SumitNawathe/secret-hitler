@@ -29,6 +29,7 @@ const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
+let slideup = false, startslide = true;
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
@@ -82,7 +83,8 @@ socket.on('lobbyData', (lobbyDataString) => {
             username_img: person.username+"_img",
             type: typeString,
             status: statusString,
-            image_select_id: "image-select-"+person.username
+            image_select_id: "image-select-"+person.username,
+            voteback_id: person.username
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
@@ -121,14 +123,24 @@ socket.on('lobbyData', (lobbyDataString) => {
 
         console.log('MY STATUS: ' + myStatus);
         console.log('MY TYPE:' + myType);
-
+        if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
+            //voteanim("slidedown");
+        }
         if (myStatus === STATUS_VOTING) {
+            console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
+            if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
+            || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
+                console.log('cha cha real smooth')
+                voteanim("slideup")
+            } else {
+                voteanim("slidup")
+            }
             const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
             const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
             $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
             $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
             $lobbyActions.querySelector('#yes').addEventListener('click', () => {
-                console.log('voing yes');
+                console.log('voting yes');
                 socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
             });
             $lobbyActions.querySelector('#no').addEventListener('click', () => {
@@ -308,6 +320,31 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
                 console.log('chosen');
                 socket.emit(eventType, { room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             });
+        }
+    }
+}
+
+const voteanim = (slide) => {
+    console.log('voteanim')
+    if (slide === "slideup") {
+        console.log('slideup')
+        slideup = true
+        for (let i = 0; i < lobbyData.users.length; i++) {
+            const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+            $voteback.classList.add(slide)
+        }
+    } else if (slide === "slidedown") {
+        console.log('slidedown')
+        slideup = false
+        for (let i = 0; i < lobbyData.users.length; i++) {
+            const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+            $voteback.classList.add(slide)
+        }
+    } else if (slide === "slidup") {
+        console.log('slidup')
+        for (let i = 0; i < lobbyData.users.length; i++) {
+            const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+            $voteback.classList.add(slide)
         }
     }
 }
