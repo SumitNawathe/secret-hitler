@@ -92,7 +92,7 @@ const createLobby = (room, username, id) => {
         type: TYPE_HOST,
         id: id,
         status: STATUS_NONE,
-        lastVote: false
+        lastVote: null
     }]
     const lobby = {
         users: userArray,

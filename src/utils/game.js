@@ -88,39 +88,52 @@ const setUpVote = (room, chancellorChoice) => {
 
 const registerVote = (room, username, vote) => {
     const lobby = lobbies.get(room);
+    let countPlayers = 0;
+
     for(let i = 0; i<lobby.users.length; i++){
+        if(!(lobby.users[i].type === TYPE_DEAD_LIB ||lobby.users[i].type === TYPE_DEAD_FAS|| lobby.users[i].type === TYPE_SPECTATOR)){
+            countPlayers++;
+        }
         if(username === lobby.users[i].username){
-            if(lobby.users[i].status === STATUS_NONE){
+            if(!(lobby.users[i].status === STATUS_VOTING)){
                 // already voted
-                if (vote) { 
-                    lobby.voteCountYes += 1; 
-                    lobby.voteCountNo--;
-                } else { 
-                    lobby.voteCountNo += 1;
-                    lobby.voteCountYes--; 
+                if(vote === lobby.users[i].lastVote){
+                    lobby.users[i].status = STATUS_VOTING;
+                    lobby.users[i].lastVote = null;
+                    if (vote) {
+                        lobby.voteCountYes--;
+                    } else { 
+                        lobby.voteCountNo--; 
+                    }
+                } else {
+                    if (vote) {
+                        lobby.voteCountYes += 1; 
+                        lobby.voteCountNo--;
+                    } else { 
+                        lobby.voteCountNo += 1;
+                        lobby.voteCountYes--; 
+                    }
+                    lobby.users[i].lastVote = vote;
                 }
             } else {
+                // first vote
+                lobby.users[i].status = STATUS_NONE;
                 if (vote) { 
                     lobby.voteCountYes += 1; 
+                    lobby.users[i].lastVote = true;
                 } else { 
                     lobby.voteCountNo += 1; 
+                    lobby.users[i].lastVote = false;
                 }
             }
                 
         }
             
     }
+
+    console.log("vote yes: "+ lobby.voteCountYes);
+    console.log("vote no: "+ lobby.voteCountNo);
     
-    let countPlayers = 0;
-    lobby.users.forEach((person) => {
-        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD_LIB && person.type !== TYPE_DEAD_FAS) {
-            countPlayers += 1;
-            if (person.username === username) {
-                person.lastVote = vote;
-                person.status = STATUS_NONE;
-            }
-        }
-    });
 
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
@@ -137,7 +150,11 @@ const registerVote = (room, username, vote) => {
         } else { //election fails
             nextPresident(room, false);
         }
+        for(let i=0; i<lobby.users.length; i++){
+            lobby.users[i].lastVote = null;
+        }
     }
+    console.log(lobby.users);
 }
 
 const presidentVeto = (room, decision) => {
