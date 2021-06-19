@@ -44,6 +44,30 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+socket.on('updateLobbyData', (lobbyDataUpdateString) => {
+    const lobbyDataUpdate = JSON.parse(lobbyDataUpdateString);
+    const updateUsername = lobbyDataUpdate[0];
+    const newState = lobbyDataUpdate[1];
+    if (updateUsername === username) {
+        //delete and recreate buttons
+    }
+    //do stuff
+});
+
+socket.on('removeLobbyData', (playerRemovedString) => {
+    const playerRemovedData = JSON.parse(playerRemovedString);
+    const deleteUsername = playerRemovedData.player;
+    //do stuff
+});
+
+
+
+
+
+
+
+
+
 socket.on('policyPeek', (cardDataString) => {
     console.log('recieved policyPeek');
     console.log(cardDataString);
