@@ -445,6 +445,13 @@ const generatePostGameLobbyData = (room) => {
     }
 }
 
+const usernameToIndex = (room, username) => {
+    const lobby = lobbies.get(room);
+    for (let i = 0; i < lobby.users.length; i++) {
+        if (lobby.users[i].username === username) { return i; }
+    }
+}
+
 module.exports = {
     startGame,
     setUpVote,

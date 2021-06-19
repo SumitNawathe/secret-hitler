@@ -45,7 +45,7 @@ const addToLobby = (room, username, id) => {
 
         //include person in lobby
         if(lobby.gameState === GAMESTATE_ONGOING){
-            lobby.users.push({
+            lobby.users.set(username, {
                 username: username,
                 type: TYPE_SPECTATOR,
                 id: id,
@@ -53,7 +53,7 @@ const addToLobby = (room, username, id) => {
                 lastVote: false
             });
         } else {
-            lobby.users.push({
+            lobby.users.set(username, {
                 username: username,
                 type: TYPE_PLAYER,
                 id: id,
@@ -76,9 +76,8 @@ const addToLobby = (room, username, id) => {
 const updateLobbyUserType = (room, username, newtype) => {
     lobbyUsers = lobbies.get(room).users;
     if (!lobbyUsers) { return false; }
-    user = lobbyUsers.filter(x => x.username === username);
+    user = lobbyUsers.get(username);
     if (!user) { return false; }
-    user = user[0];
     console.log('user before update');
     console.log(user);
     user.type = newtype;
@@ -108,12 +107,16 @@ const removeUser = (id) => {
         }
         return true;
     });
+    const lobby = lobbies.get(room);
+    const userLeaving = lobby.users.get(username);
+    if (userLeaving.type === TYPE_HOST) { hostLeft = true; }
+    lobby.users.delete(username);
     if (hostLeft) {
-        if (lobbies.get(room).users.length === 0) {
+        if (lobby.users.size === 0) {
             lobbies.delete(room);
         } else {
-            console.log(lobbies.get(room).users);
-            lobbies.get(room).users[0].type = TYPE_HOST;
+            console.log(lobby.users);
+            lobbies.values()[0].type = TYPE_HOST
         }
     }
     return room;

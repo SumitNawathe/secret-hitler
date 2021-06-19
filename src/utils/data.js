@@ -39,26 +39,26 @@ const LIBERAL = true;
 /*
  * Lobby:
  * key: room
- * users: array of user objects
+ * users: map with key username attached to every user object
  * gameState: current state of the lobby
  * * LOBBY: 0
  * * DURING GAME: 1
  * * AFTER GAME: 2
- * president: index number of current president
- * nextPresident: index number of next president
- * chancellor: index number of current or prospective Chancellor
+ * president: index number of current president <username>
+ * chancellor: index number of current or prospective Chancellor <username>
  * liberalCards: number of liberal cards placed
  * fascistCards: number of fascist cards placed
  * deck: array representing the remaining cards
  * * LIBERAL = true
  * * FASCIST = false
- * previousPresident: index number of previously elected president
- * previousChancellor: index number of previously elected chancellor
+ * previousPresident: index number of previously elected president <username>
+ * previousChancellor: index number of previously elected chancellor <username>
  * voteCountYes: number of votes yes for this round
  * voteCountNo: number of votes no for this round
  * policyCards: an array of booleans containing the drawn cards for this round
  * investigations: an array of objects with two elements, the first having the username of the president,
  *          and the second having the username of the person investigated
+ * nextPres: array containing the indicies of the next few presidents <username>
  * postGameData: an object containing information relevant after the game
  * * winningParty: either liberal or fascist
  * * prospectiveHost: the username of the person who must confirm to remake the lobby
@@ -87,13 +87,14 @@ const LIBERAL = true;
 */
 
 const createLobby = (room, username, id) => {
-    const userArray = [{
+    const userMap = new Map();
+    userMap.set(username, {
         username: username,
         type: TYPE_HOST,
         id: id,
         status: STATUS_NONE,
         lastVote: false
-    }]
+    });
     const lobby = {
         users: userArray,
         gameState: GAMESTATE_LOBBY,
