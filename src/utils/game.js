@@ -42,15 +42,15 @@ const startGame = (room) => {
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
     lobby.investigations = [];
-    console.log('USER 0:');
-    console.log(lobby.users[0]);
+    // console.log('USER 0:');
+    // console.log(lobby.users[0]);
 }
 
 const setUpVote = (room, chancellorChoice) => {
     const lobby = lobbies.get(room);
-    console.log(lobby);
-    console.log(room);
-    console.log(lobbies);
+    // console.log(lobby);
+    // console.log(room);
+    // console.log(lobbies);
     lobby.voteCountYes = 0;
     lobby.voteCountNo = 0;
     // lobby.users.forEach((person) => {
@@ -168,7 +168,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
     if(!lobby.veto){
         placeCard(room, lobby.policyCards[index]);
     } else {
-        console.log("making president veto");
+        // console.log("making president veto");
         lobby.users[lobby.chancellor].status = STATUS_NONE;
         lobby.users[lobby.president].status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
@@ -222,11 +222,11 @@ const handlePresAction1 = (room, username) => {
 }
 
 const handlePresAction2 = (room, specialPres) => {
-    console.log("special election to " + specialPres);
+    // console.log("special election to " + specialPres);
     const lobby = lobbies.get(room);
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
-    console.log("special election index "+index);
+    // console.log("special election index "+index);
     lobby.nextPres.unshift(index);
     nextPresident(room, true);
 }
@@ -246,7 +246,7 @@ const handlePresAction4 = (room, killUser) => {
 const nextPresident = (room, electionPassed) => {
     
     const lobby = lobbies.get(room);
-    console.log(lobby.nextPres);
+    // console.log(lobby.nextPres);
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
@@ -316,7 +316,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
             if(traversed==willTraversed){
                 ourUsers[j].type = TYPE_HITLER;
-                console.log("hitler:"+j);
+                // console.log("hitler:"+j);
                 break;
             }
             traversed++;

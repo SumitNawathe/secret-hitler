@@ -52,35 +52,35 @@ const emitMidgameLobbyData = (room) => {
 }
 
 io.on('connection', (socket) => {
-    console.log('New WebSocket connection');
+    // console.log('New WebSocket connection');
     
     socket.on('join', ({ username, room }, callback) => {
-        console.log('join recieved');
-        console.log('username: ' + username);
-        console.log('room: ' + room);
+        // console.log('join recieved');
+        // console.log('username: ' + username);
+        // console.log('room: ' + room);
 
         const valid = addToLobby(room, username, socket.id);
         if (!valid) {
-            console.log('invalid');
+            // console.log('invalid');
             callback('Cannot join lobby.');
             return;
         }
-        console.log('valid');
+        // console.log('valid');
 
         socket.join(room);
-        console.log('lobbyInfo');
-        console.log(lobbies.get(room));
-        console.log('json string:');
-        console.log(JSON.stringify(lobbies.get(room)));
+        // console.log('lobbyInfo');
+        // console.log(lobbies.get(room));
+        // console.log('json string:');
+        // console.log(JSON.stringify(lobbies.get(room)));
         io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
         callback();
     });
 
     socket.on('changeLobbyInfo', ({ username, room, newType }, callback) => {
-        console.log('recieved newType: ' + newType);
+        // console.log('recieved newType: ' + newType);
         const success = updateLobbyUserType(room, username, newType);
         if (!success) {
-            console.log('failed type change');
+            // console.log('failed type change');
             io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
             callback('Failed to change type.');
             return;
@@ -102,38 +102,38 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
-        console.log('chose chancellor: ' + choice);
-        console.log('room: ' + room);
+        // console.log('chose chancellor: ' + choice);
+        // console.log('room: ' + room);
         setUpVote(room, choice);
         emitMidgameLobbyData(room);
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
-        console.log('received vote: ' + choice);
+        // console.log('received vote: ' + choice);
         registerVote(room, username, choice);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presDecision', ({ room, index }, callback) => {
-        console.log('chose card ' + index);
+        // console.log('chose card ' + index);
         presidentDiscard(room, index);
         emitMidgameLobbyData(room);
     });
 
     socket.on('chancDecision', ({room, index}, callback) => {
-        console.log('chose card ' + index);
+        // console.log('chose card ' + index);
         chancellorChoose(room, index);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presAction1', ({room, choice}, callback) => {
-        console.log('chose to investigate ' + choice);
+        // console.log('chose to investigate ' + choice);
         handlePresAction1(room, choice);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presAction2', ({room, choice}, callback) => {
-        console.log('chose to investigate ' + choice);
+        // console.log('chose to investigate ' + choice);
         handlePresAction2(room, choice);
         emitMidgameLobbyData(room);
     });
@@ -149,13 +149,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('presVetoVoting', ({ room, choice }, callback) => {
-        console.log('recieved veto vote: ' + choice);
+        // console.log('recieved veto vote: ' + choice);
         presidentVeto(room, choice);
         emitMidgameLobbyData(room);
     });
 
     socket.on('chancellorVetoVoting', ({ room, choice }, callback) => {
-        console.log('recieved veto vote: ' + choice);
+        // console.log('recieved veto vote: ' + choice);
         chancellorVeto(room, choice);
         emitMidgameLobbyData(room);
     });
