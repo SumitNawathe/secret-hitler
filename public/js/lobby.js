@@ -205,11 +205,15 @@ socket.on('lobbyData', (lobbyDataString) => {
                 socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
             });
         } else if (myStatus === STATUS_PRESCHOOSE) {
+            let numPlayers = 0;
+            lobbyData.users.forEach((person) => {
+                if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) { numPlayers += 1; }
+            });
             eligible = [];
             for (let i = 0; i < lobbyData.users.length; i++) {
                 //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 //else
-                if (lobbyData.users[i].username === lobbyData.previousPresident || lobbyData.users[i].username === lobbyData.previousChancellor || lobbyData.users[i].username === username 
+                if ((numPlayers > 5 && lobbyData.users[i].username === lobbyData.previousPresident) || lobbyData.users[i].username === lobbyData.previousChancellor || lobbyData.users[i].username === username 
                     || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 else { eligible.push(true); }
             }
