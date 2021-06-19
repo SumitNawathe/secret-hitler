@@ -4,6 +4,7 @@ const {
     idToUsername,
     usernameToLobby,
     createLobby,
+    resetLobby,
     TYPE_SPECTATOR,
     TYPE_HOST,
     TYPE_PLAYER,
@@ -11,6 +12,8 @@ const {
     TYPE_FASCIST,
     TYPE_HITLER,
     TYPE_DEAD,
+    TYPE_DEAD_LIB,
+    TYPE_DEAD_FAS,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
@@ -30,8 +33,8 @@ const {
 const addToLobby = (room, username, id) => {
     if (lobbies.has(room)) {
         lobby = lobbies.get(room);
-        console.log('room seems to exist');
-        console.log(lobby);
+        // console.log('room seems to exist');
+        // console.log(lobby);
 
         //check if that username is taken
         for (user in lobby.users) {
@@ -76,25 +79,25 @@ const updateLobbyUserType = (room, username, newtype) => {
     user = lobbyUsers.filter(x => x.username === username);
     if (!user) { return false; }
     user = user[0];
-    console.log('user before update');
-    console.log(user);
+    // console.log('user before update');
+    // console.log(user);
     user.type = newtype;
-    console.log('user after update');
-    console.log(user);
+    // console.log('user after update');
+    // console.log(user);
     return true;
 }
 
 const removeUser = (id) => {
-    console.log('removeUser');
+    // console.log('removeUser');
     const username = idToUsername.get(id);
     if (!username) {
-        console.log('no such user exists');
+        // console.log('no such user exists');
         return null;
     }
     idToUsername.delete(id);
     const room = usernameToLobby.get(username);
     usernameToLobby.delete(username);
-    console.log('running filter');
+    // console.log('running filter');
     let hostLeft = false;
     lobbies.get(room).users = lobbies.get(room).users.filter(x => {
         if (x.username === username) {
@@ -109,15 +112,25 @@ const removeUser = (id) => {
         if (lobbies.get(room).users.length === 0) {
             lobbies.delete(room);
         } else {
-            console.log(lobbies.get(room).users);
+            // console.log(lobbies.get(room).users);
             lobbies.get(room).users[0].type = TYPE_HOST;
         }
     }
     return room;
 }
 
+const remakeLobby = (room) => {
+    resetLobby(room);
+    const lobby = lobbies.get(room);
+    lobby.users[0].type = TYPE_HOST;
+    for (let i = 1; i < lobby.users.length; i++) {
+        if (lobby.users[i].type !== TYPE_SPECTATOR) { lobby.users[i].type = TYPE_PLAYER; }
+    }
+}
+
 module.exports = {
     addToLobby,
     updateLobbyUserType,
-    removeUser
+    removeUser,
+    remakeLobby
 };

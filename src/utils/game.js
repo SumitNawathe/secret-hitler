@@ -4,6 +4,7 @@ const {
     idToUsername,
     usernameToLobby,
     createLobby,
+    resetLobby,
     TYPE_SPECTATOR,
     TYPE_HOST,
     TYPE_PLAYER,
@@ -11,6 +12,8 @@ const {
     TYPE_FASCIST,
     TYPE_HITLER,
     TYPE_DEAD,
+    TYPE_DEAD_LIB,
+    TYPE_DEAD_FAS,
     GAMESTATE_LOBBY,
     GAMESTATE_ONGOING,
     GAMESTATE_FINISHED,
@@ -31,26 +34,42 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
-    console.log('SETTING GAMESTATE TO ONGOING');
+    // console.log('SETTING GAMESTATE TO ONGOING');
+    let players = 0;
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type === TYPE_HOST || lobby.users[i].type === TYPE_PLAYER){
+            players++;
+        }
+    }
     lobby.gameState = GAMESTATE_ONGOING;
-    console.log('lobby.gameState: ' + lobby.gameState);
-    randomAssign(room, 2); //TODO: change to depend on number of players
+    // console.log('lobby.gameState: ' + lobby.gameState);
+    console.log("players: "+players);
+    if(players === 5){
+        randomAssign(room, 2);
+    } else {
+        randomAssign(room, 3);
+    }
     lobby.president = 0;
     lobby.liberalCards = 0;
-    lobby.fascistCards = 0;
-
+    
+    if(players===5){
+        lobby.fascistCards = 1;
+    } else {
+        lobby.fascistCards = 0;
+    }
+    
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
     lobby.investigations = [];
-    console.log('USER 0:');
-    console.log(lobby.users[0]);
+    // console.log('USER 0:');
+    // console.log(lobby.users[0]);
 }
 
 const setUpVote = (room, chancellorChoice) => {
     const lobby = lobbies.get(room);
-    console.log(lobby);
-    console.log(room);
-    console.log(lobbies);
+    // console.log(lobby);
+    // console.log(room);
+    // console.log(lobbies);
     lobby.voteCountYes = 0;
     lobby.voteCountNo = 0;
     // lobby.users.forEach((person) => {
@@ -59,7 +78,7 @@ const setUpVote = (room, chancellorChoice) => {
     //     }
     // });
     for (let i = 0; i < lobby.users.length; i++) {
-        if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD) {
+        if (lobby.users[i].type !== TYPE_SPECTATOR && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_DEAD_FAS) {
             lobby.users[i].status = STATUS_VOTING;
             if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
         }
@@ -69,49 +88,73 @@ const setUpVote = (room, chancellorChoice) => {
 
 const registerVote = (room, username, vote) => {
     const lobby = lobbies.get(room);
+    let countPlayers = 0;
+
     for(let i = 0; i<lobby.users.length; i++){
+        if(!(lobby.users[i].type === TYPE_DEAD_LIB ||lobby.users[i].type === TYPE_DEAD_FAS|| lobby.users[i].type === TYPE_SPECTATOR)){
+            countPlayers++;
+        }
         if(username === lobby.users[i].username){
-            if(lobby.users[i].status === STATUS_NONE){
+            if(!(lobby.users[i].status === STATUS_VOTING)){
                 // already voted
-                if (vote) { 
-                    lobby.voteCountYes += 1; 
-                    lobby.voteCountNo--;
-                } else { 
-                    lobby.voteCountNo += 1;
-                    lobby.voteCountYes--; 
+                if(vote === lobby.users[i].lastVote){
+                    lobby.users[i].status = STATUS_VOTING;
+                    lobby.users[i].lastVote = null;
+                    if (vote) {
+                        lobby.voteCountYes--;
+                    } else { 
+                        lobby.voteCountNo--; 
+                    }
+                } else {
+                    if (vote) {
+                        lobby.voteCountYes += 1; 
+                        lobby.voteCountNo--;
+                    } else { 
+                        lobby.voteCountNo += 1;
+                        lobby.voteCountYes--; 
+                    }
+                    lobby.users[i].lastVote = vote;
                 }
             } else {
+                // first vote
+                lobby.users[i].status = STATUS_NONE;
                 if (vote) { 
                     lobby.voteCountYes += 1; 
+                    lobby.users[i].lastVote = true;
                 } else { 
                     lobby.voteCountNo += 1; 
+                    lobby.users[i].lastVote = false;
                 }
             }
                 
         }
             
     }
+
+    console.log("vote yes: "+ lobby.voteCountYes);
+    console.log("vote no: "+ lobby.voteCountNo);
     
-    let countPlayers = 0;
-    lobby.users.forEach((person) => {
-        if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
-            countPlayers += 1;
-            if (person.username === username) {
-                person.lastVote = vote;
-                person.status = STATUS_NONE;
-            }
-        }
-    });
 
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
+            console.log('numOfFascists: ' + lobby.numOfFascists);
+            console.log('chancellor type: ' + lobby.users[lobby.chancellor].type);
+            if (lobby.fascistCards >= 3 && lobby.users[lobby.chancellor].type === TYPE_HITLER) {
+                endGame(room, FASCIST);
+                return;
+            }
+
             lobby.previousPresident = lobby.president;
             lobby.previousChancellor = lobby.chancellor;
             lobby.users[lobby.president].status = STATUS_PRESDEC;
         } else { //election fails
             nextPresident(room, false);
         }
+        for(let i=0; i<lobby.users.length; i++){
+            lobby.users[i].lastVote = null;
+        }
     }
+    console.log(lobby.users);
 }
 
 const presidentVeto = (room, decision) => {
@@ -168,7 +211,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
     if(!lobby.veto){
         placeCard(room, lobby.policyCards[index]);
     } else {
-        console.log("making president veto");
+        // console.log("making president veto");
         lobby.users[lobby.chancellor].status = STATUS_NONE;
         lobby.users[lobby.president].status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
@@ -198,7 +241,7 @@ const presidentAction = (room) => {
     const lobby = lobbies.get(room);
     let numPlayers = 0;
     lobby.users.forEach((person) => {
-        if (person.type != TYPE_SPECTATOR && person.type != TYPE_DEAD) {
+        if (person.type != TYPE_SPECTATOR && person.type != TYPE_DEAD_LIB && person.type != TYPE_DEAD_FAS) {
             numPlayers += 1;
         }
     });
@@ -222,31 +265,43 @@ const handlePresAction1 = (room, username) => {
 }
 
 const handlePresAction2 = (room, specialPres) => {
-    console.log("special election to " + specialPres);
+    // console.log("special election to " + specialPres);
     const lobby = lobbies.get(room);
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
-    console.log("special election index "+index);
+    // console.log("special election index "+index);
     lobby.nextPres.unshift(index);
     nextPresident(room, true);
 }
 
 const handlePresAction3 = (room) => {
+    const lobby = lobbies.get(room);
+    drawThreeCards(room);
+    const cards = lobby.policyCards;
+    lobby.deck.unshift(cards[0]);
+    lobby.deck.unshift(cards[0]);
+    lobby.deck.unshift(cards[0]);
     nextPresident(room, true);
+    return cards;
 }
 
 const handlePresAction4 = (room, killUser) => {
     const lobby = lobbies.get(room);
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
-    lobby.users[index].type = TYPE_DEAD;
+    if (lobby.users[index].type === TYPE_HITLER) {
+        endGame(room, LIBERAL);
+        return;
+    }
+    if (lobby.users[index].type === TYPE_LIBERAL) { lobby.users[index].type = TYPE_DEAD_LIB; }
+    else { lobby.users[index].type = TYPE_DEAD_FAS; }
     nextPresident(room, true);
 }
 
 const nextPresident = (room, electionPassed) => {
     
     const lobby = lobbies.get(room);
-    console.log(lobby.nextPres);
+    // console.log(lobby.nextPres);
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
@@ -257,12 +312,12 @@ const nextPresident = (room, electionPassed) => {
     lobby.chancellor = null;
     if(lobby.nextPres.length===1){
         let index = (lobby.nextPres[0]) % lobby.users.length;
-        while(lobby.users[index].type === TYPE_DEAD || lobby.users[index].type === TYPE_SPECTATOR){
+        while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
             index = (index+1) % lobby.users.length;
         }
         lobby.president = index;
         index = (index+1) % lobby.users.length;
-        while(lobby.users[index].type === TYPE_DEAD || lobby.users[index].type === TYPE_SPECTATOR){
+        while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
             index = (index+1) % lobby.users.length;
         }
         lobby.nextPres.push(index);
@@ -273,7 +328,14 @@ const nextPresident = (room, electionPassed) => {
 
 
 const endGame = (room, winningTeam) => {
-    // just a placeholder for now
+    const lobby = lobbies.get(room);
+    lobby.postGameData = [winningTeam, lobby.users[0].username];
+    lobby.gameState = GAMESTATE_FINISHED;
+
+    lobby.users.forEach((person) => {
+        if (person.type === TYPE_DEAD_LIB) { person.type = TYPE_LIBERAL}
+        else if (person.type === TYPE_DEAD_FAS) { person.type = TYPE_FASCIST }
+    });
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -316,7 +378,7 @@ const randomAssign = (room, numOfFascists /*not including hilter*/) => {
         if(ourUsers[j].type!=TYPE_SPECTATOR && ourUsers[j].type!=TYPE_FASCIST){
             if(traversed==willTraversed){
                 ourUsers[j].type = TYPE_HITLER;
-                console.log("hitler:"+j);
+                // console.log("hitler:"+j);
                 break;
             }
             traversed++;
@@ -363,13 +425,14 @@ const generateMaskedLobby = (room, username) => {
         } else if (dontMask.includes(person.username)) {
             userArray.push({
                 username: person.username,
-                type: person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST,
+                type: (person.type === TYPE_DEAD_LIB || person.type === TYPE_DEAD_FAS) ? TYPE_DEAD : (person.type === TYPE_LIBERAL ? TYPE_LIBERAL : TYPE_FASCIST),
                 id: person.id,
                 status: person.status
             });
         } else {
             userArray.push({
                 username: person.username,
+                type: (person.type === TYPE_DEAD_LIB || person.type === TYPE_DEAD_FAS) ? TYPE_DEAD : null,
                 id: person.id,
                 status: person.status
             });
@@ -392,6 +455,26 @@ const generateMaskedLobby = (room, username) => {
         previousChancellor: lobby.previousChancellor,
         policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null,
         investigations: lobby.investigations
+    }
+}
+
+const generatePostGameLobbyData = (room) => {
+    const lobby = lobbies.get(room);
+    const userArray = [];
+    lobby.users.forEach((person) => {
+        if (person.type === TYPE_SPECTATOR) { return; }
+        userArray.push(person);
+    });
+    return {
+        users: userArray,
+        gameState: lobby.gameState,
+        president: lobby.president,
+        chancellor: lobby.chancellor,
+        liberalCards: lobby.liberalCards,
+        fascistCards: lobby.fascistCards,
+        previousPresident: lobby.previousPresident,
+        previousChancellor: lobby.previousChancellor,
+        postGameData: lobby.postGameData
     }
 }
 
