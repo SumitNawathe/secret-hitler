@@ -126,7 +126,9 @@ socket.on('lobbyData', (lobbyDataString) => {
         if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
             //voteanim("slidedown");
         }
-        if (myStatus === STATUS_VOTING) {
+        let otherUsersVoting = false;
+        lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
+        if (myStatus === STATUS_VOTING || otherUsersVoting) {
             // console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
             || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
