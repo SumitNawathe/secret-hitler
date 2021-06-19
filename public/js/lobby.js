@@ -177,14 +177,16 @@ socket.on('lobbyData', (lobbyDataString) => {
             gameStartReveal = false;
         }
 
-        if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
-            //voteanim("slidedown");
+        let otherUsersVoting = false;
+        lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
+        if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            voteanim("slidedown");
         }
-        if (myStatus === STATUS_VOTING) {
+        if (myStatus === STATUS_VOTING || otherUsersVoting) {
             slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
-            if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
-            || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
+            if (!slideup) {
                 // console.log('cha cha real smooth')
                 voteanim("slideup")
             } else {
@@ -383,23 +385,23 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
 }
 
 const voteanim = (slide) => {
-    // console.log('voteanim')
+    console.log('voteanim')
     if (slide === "slideup") {
-        // console.log('slideup')
+        console.log('slideup')
         slideup = true
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidedown") {
-        // console.log('slidedown')
+        console.log('slidedown')
         slideup = false
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidup") {
-        // console.log('slidup')
+        console.log('slidup')
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
