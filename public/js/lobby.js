@@ -262,7 +262,7 @@ socket.on('lobbyData', (lobbyDataString) => {
         } else if (myStatus === STATUS_PRESACT2){
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
-                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username || i === lobbyData.chancellor){
+                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD){
                     eligible.push(false);
                 } else {
                     eligible.push(true);
