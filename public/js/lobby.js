@@ -7,6 +7,7 @@ const participantTemplate = document.querySelector('#participant-template').inne
 const $lobbyActions = document.querySelector('#actions');
 const actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
 const imageSelectTemplate = document.querySelector('#image-select-template').innerHTML;
+const slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -84,8 +85,10 @@ socket.on('lobbyData', (lobbyDataString) => {
             username_img: person.username+"_img",
             type: typeString,
             status: statusString,
+            slidecard_id: "slidecard"+person.username,
             image_select_id: "image-select-"+person.username,
-            voteback_id: person.username
+            voteback_id: person.username,
+            party_id: person.username
         });
         $participantList.insertAdjacentHTML('beforeend', html);
     });
@@ -133,6 +136,7 @@ socket.on('lobbyData', (lobbyDataString) => {
             //voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING) {
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
             || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
@@ -317,7 +321,7 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
     for (let i = 0; i < lobbyData.users.length; i++) {
         console.log('player select image: ' + lobbyData.users[i].username);
         if (eligible[i]) {
-            const $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
+            let $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
             html = Mustache.render(imageSelectTemplate, {image_id: "image-overlay-" + lobbyData.users[i].username, src: "test carback.png", id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
             newButton = $imageSelectOverlay.querySelector("#image-overlay-" + lobbyData.users[i].username);
@@ -352,6 +356,23 @@ const voteanim = (slide) => {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
+    }
+}
+
+// const slidecard = (template, id, username, src) => {
+//     let $slidecard = document.querySelector('#slidecard'+username)
+//     html = Mustache.render(template, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+//         $slidecard.insertAdjacentHTML('beforeend', html);
+// }
+
+const slidecard = (template, id, src) => {
+    console.log('generating slidecard')
+    for (let i=0; i < lobbyData.users.length; i++) {
+        let username=lobbyData.users[i].username
+        let $slidecard = document.querySelector('#slidecard'+username)
+        console.log($slidecard)
+        html = Mustache.render(slideCardTemplate, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+            $slidecard.insertAdjacentHTML('beforeend', html);
     }
 }
 

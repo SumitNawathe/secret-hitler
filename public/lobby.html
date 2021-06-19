@@ -169,8 +169,9 @@
                 <div class="layered-image">
                     <div class="test-image">
                         <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
-                        <img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
-                        <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">
+                        <div id={{ slidecard_id }}></div>
+                        <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
+                        <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
                     </div>
                     <div id={{ image_select_id }}></div>
                 </div>
@@ -179,6 +180,10 @@
 
         <script id="image-select-template" type="text/html">
             <img class="ui tiny image centered image-overlay2 glowing" id={{ image_id }} src= "img/{{ src }}">
+        </script>
+
+        <script id="slidecard-template" type="text/html">
+            <img class="ui tiny image centered hiddencard" id={{ id }} src="img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
