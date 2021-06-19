@@ -8,7 +8,6 @@
 
         <style>
             .background {
-                z-index: 3;
             }
 
             .layered-image {
@@ -16,7 +15,15 @@
                 top: 0;
                 left: 0;
             }
-            /*this is really bad, but works for testing (not robust for later resizing of graphics)*/
+            .test-image {
+                position: relative;
+                top: 0;
+                left: 0;
+                width: 80px;
+                height: 107.5px;
+                overflow: hidden;
+                position: relative;
+            }
             .image-overlay1 {
                 position: relative;
                 top: 0px;
@@ -25,7 +32,7 @@
             .image-overlay2 {
                 position: absolute;
                 top: -107.5px;
-                left: 0px;
+                left: -10px;
                 opacity: .4;
             }
 
@@ -44,7 +51,7 @@
             }
 
             .votecard {
-                z-index: 2;
+                position: absolute;
             }
 
             .ui.inverted.centered.tiny.header.Fascist {
@@ -72,7 +79,7 @@
             }
 
             .slidup {
-                bottom: 91px;
+                bottom: 107.5px;
             }
 
             .slidedown {
@@ -95,7 +102,7 @@
             @-webkit-keyframes slideup {
                 from { bottom: 0px; }
                 /* again this is terrible must change later */
-                to { bottom: 91px; }
+                to { bottom: 107.5px; }
             }
 
         </style>
@@ -106,8 +113,7 @@
             crossorigin="anonymous"></script>
         <script src="../semantic/dist/semantic.min.js"></script>
     </head>
-    <body>
-        <div class="background" style="background-color: black;">
+    <body style="background-color: black;">
             <div class="menu-container" style="z-index: 9999;"> <!--always appears on top-->
                 <section class="ui menu nav-menu">
                     <div id="heading"></div>
@@ -142,7 +148,6 @@
             <div class="container">
                 <div class="row" id="participant-list"></div>
             </div>
-        </div>
 
         <script id="participant-template" type="text/html">
             <div class="col participant">
@@ -151,9 +156,11 @@
                     {{ username }} - {{ status }}
                 </div>
                 <div class="layered-image">
+                    <div class="test-image">
                     <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
-                    <div id={{ image_select_id }}></div>
                     <img class="ui tiny image centered votecard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
+                    </div>
+                    <div id={{ image_select_id }}></div>
                 </div>
             </div>
         </script>
