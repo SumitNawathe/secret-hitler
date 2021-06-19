@@ -209,7 +209,7 @@ socket.on('lobbyData', (lobbyDataString) => {
             for (let i = 0; i < lobbyData.users.length; i++) {
                 //if (lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 //else
-                if (i === lobbyData.previousPresident || i === lobbyData.previousChancellor || lobbyData.users[i].username === username 
+                if (lobbyData.users[i].username === lobbyData.previousPresident || lobbyData.users[i].username === lobbyData.previousChancellor || lobbyData.users[i].username === username 
                     || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 else { eligible.push(true); }
             }
@@ -262,7 +262,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         } else if (myStatus === STATUS_PRESACT2){
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
-                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD){
+                if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username || lobbyData.users[i] === lobbyData.chancellor){
+
                     eligible.push(false);
                 } else {
                     eligible.push(true);
@@ -408,6 +409,8 @@ const voteanim = (slide) => {
         }
     }
 }
+
+
 
 // const slidecard = (template, id, username, src) => {
 //     let $slidecard = document.querySelector('#slidecard'+username)
