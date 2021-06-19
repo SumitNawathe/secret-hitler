@@ -69,8 +69,29 @@ const setUpVote = (room, chancellorChoice) => {
 
 const registerVote = (room, username, vote) => {
     const lobby = lobbies.get(room);
-    if (vote) { lobby.voteCountYes += 1; }
-    else { lobby.voteCountNo += 1; }
+    for(let i = 0; i<lobby.users.length; i++){
+        if(username === lobby.users[i].username){
+            if(lobby.users[i].status === STATUS_NONE){
+                // already voted
+                if (vote) { 
+                    lobby.voteCountYes += 1; 
+                    lobby.voteCountNo--;
+                } else { 
+                    lobby.voteCountNo += 1;
+                    lobby.voteCountYes--; 
+                }
+            } else {
+                if (vote) { 
+                    lobby.voteCountYes += 1; 
+                } else { 
+                    lobby.voteCountNo += 1; 
+                }
+            }
+                
+        }
+            
+    }
+    
     let countPlayers = 0;
     lobby.users.forEach((person) => {
         if (person.type !== TYPE_SPECTATOR && person.type !== TYPE_DEAD) {
