@@ -31,14 +31,30 @@ const {
 
 const startGame = (room) => {
     const lobby = lobbies.get(room);
-    console.log('SETTING GAMESTATE TO ONGOING');
+    // console.log('SETTING GAMESTATE TO ONGOING');
+    let players = 0;
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type === TYPE_HOST || lobby.users[i].type === TYPE_PLAYER){
+            players++;
+        }
+    }
     lobby.gameState = GAMESTATE_ONGOING;
-    console.log('lobby.gameState: ' + lobby.gameState);
-    randomAssign(room, 2); //TODO: change to depend on number of players
+    // console.log('lobby.gameState: ' + lobby.gameState);
+    console.log("players: "+players);
+    if(players === 5){
+        randomAssign(room, 2);
+    } else {
+        randomAssign(room, 3);
+    }
     lobby.president = 0;
     lobby.liberalCards = 0;
-    lobby.fascistCards = 0;
-
+    
+    if(players===5){
+        lobby.fascistCards = 1;
+    } else {
+        lobby.fascistCards = 0;
+    }
+    
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     lobby.users[0].status = STATUS_PRESCHOOSE;
     lobby.investigations = [];
