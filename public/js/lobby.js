@@ -42,6 +42,25 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+socket.on('policyPeek', (cardDataString) => {
+    console.log('recieved policyPeek');
+    console.log(cardDataString);
+    cards = JSON.parse(cardDataString);
+    console.log(cards);
+
+    //remove buttons
+    let currentButton = $lobbyActions.querySelector('button');
+    while(currentButton) {
+        currentButton.remove();
+        currentButton = $lobbyActions.querySelector('button');
+    }
+
+    for (let i = 0; i < 3; i++) {
+        let html = Mustache.render(actionButtonTemplate, { text: cards[i] ? 'Liberal' : 'Fascist', id:"card"+i });
+        $lobbyActions.insertAdjacentHTML('beforeend', html);
+    }
+});
+
 socket.on('lobbyData', (lobbyDataString) => {
     console.log('lobbyDataString:');
     console.log(lobbyDataString);
@@ -108,6 +127,32 @@ socket.on('lobbyData', (lobbyDataString) => {
             return true;
         });
         createLobbyButtons(type);
+    } else if (lobbyData.gameState === GAMESTATE_FINISHED) {
+        let type = null;
+        lobbyData.users.every((person) => {
+            if (person.username === username) {
+                type = person.type;
+                return false;
+            }
+            return true;
+        });
+        let winLossHtml = null;
+        if (lobbyData.postGameData[0] === LIBERAL && type === TYPE_LIBERAL
+                || lobbyData.postGameData[0] === FASCIST && (type === TYPE_FASCIST || type === TYPE_HITLER)) {
+            winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Won!', id: 'won' });
+        } else if (type !== TYPE_SPECTATOR) {
+            winLossHtml = Mustache.render(actionButtonTemplate, { text: 'You Lost!', id: 'loss' });
+        }
+        $lobbyActions.insertAdjacentHTML('beforeend', winLossHtml);
+
+        if (lobbyData.postGameData[1] === username) {
+            const remakeLobbyHtml = Mustache.render(actionButtonTemplate, { text: 'Remake Lobby', id: 'remake' });
+            $lobbyActions.insertAdjacentHTML('beforeend', remakeLobbyHtml);
+            $lobbyActions.querySelector('#remake').addEventListener('click', () => {
+                console.log('request remake lobby');
+                socket.emit('remakeLobby', { room }, (error) => { if (error) { console.log('error'); } });
+            });
+        }
     } else if (lobbyData.gameState === GAMESTATE_ONGOING) {
         let myType = 0, myStatus = 0;
         lobbyData.users.every((person) => {
@@ -213,11 +258,14 @@ socket.on('lobbyData', (lobbyDataString) => {
             }
             createPlayerSelect(lobbyData, eligible, 'presAction2');
         } else if (myStatus === STATUS_PRESACT3){
-            let eligible = [];
-            for(let i=0; i<lobbyData.users.length; i++){
-                eligible.push(true);
-            }
-            createPlayerSelect(lobbyData, eligible, 'presAction3');
+            console.log('doing presAct3');
+            const html = Mustache.render(actionButtonTemplate, { text: 'View Cards', id:'viewCards' });
+            $lobbyActions.insertAdjacentHTML('beforeend', html);
+            const newButton = $lobbyActions.querySelector('#viewCards');
+            newButton.addEventListener('click', () => {
+                console.log('Requesting policy peek');
+                socket.emit('presAction3', { room, id: socket.id }, (error) => { if (error) { console.log('error') } });
+            });
         } else if (myStatus === STATUS_PRESACT4){
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
