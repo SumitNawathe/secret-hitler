@@ -62,12 +62,12 @@ socket.on('policyPeek', (cardDataString) => {
 });
 
 socket.on('lobbyData', (lobbyDataString) => {
-    console.log('lobbyDataString:');
-    console.log(lobbyDataString);
+    // console.log('lobbyDataString:');
+    // console.log(lobbyDataString);
     lobbyData = JSON.parse(lobbyDataString);
 
     //remove all current lobbyData
-    console.log('deleting lobbyData');
+    // console.log('deleting lobbyData');
     participant = $participantList.querySelector('.participant');
     while(participant) {
         participant.remove();
@@ -75,10 +75,10 @@ socket.on('lobbyData', (lobbyDataString) => {
     }
 
     //creating new lobbydata
-    console.log('rendering new data');
-    console.log(lobbyData.users);
+    // console.log('rendering new data');
+    // console.log(lobbyData.users);
     lobbyData.users.forEach((person) => {
-        console.log(person);
+        // console.log(person);
         let typeString = '';
         if (person.type === TYPE_HOST) { typeString = 'Host' }
         else if (person.type === TYPE_PLAYER) { typeString = 'Player' }
@@ -157,8 +157,8 @@ socket.on('lobbyData', (lobbyDataString) => {
         let myType = 0, myStatus = 0;
         lobbyData.users.every((person) => {
             if (person.username === username) {
-                console.log('presChoice user in browser');
-                console.log(person);
+                // console.log('presChoice user in browser');
+                // console.log(person);
                 myType = person.type;
                 myStatus = person.status;
                 return false;
@@ -166,16 +166,16 @@ socket.on('lobbyData', (lobbyDataString) => {
             return true;
         });
 
-        console.log('MY STATUS: ' + myStatus);
-        console.log('MY TYPE:' + myType);
+        // console.log('MY STATUS: ' + myStatus);
+        // console.log('MY TYPE:' + myType);
         if (myStatus !== startslide && myStatus !== STATUS_VOTING) {
             //voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING) {
-            console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
+            // console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slideup")
             || !document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains("slidup")) {
-                console.log('cha cha real smooth')
+                // console.log('cha cha real smooth')
                 voteanim("slideup")
             } else {
                 voteanim("slidup")
@@ -185,11 +185,11 @@ socket.on('lobbyData', (lobbyDataString) => {
             $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
             $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
             $lobbyActions.querySelector('#yes').addEventListener('click', () => {
-                console.log('voting yes');
+                // console.log('voting yes');
                 socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
             });
             $lobbyActions.querySelector('#no').addEventListener('click', () => {
-                console.log('voing no');
+                // console.log('voing no');
                 socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
             });
         } else if (myStatus === STATUS_PRESCHOOSE) {
@@ -201,9 +201,9 @@ socket.on('lobbyData', (lobbyDataString) => {
                     || lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD) { eligible.push(false); }
                 else { eligible.push(true); }
             }
-            console.log("president choosing");
-            console.log(lobbyData.users);
-            console.log(eligible);
+            // console.log("president choosing");
+            // console.log(lobbyData.users);
+            // console.log(eligible);
             createPlayerSelect(lobbyData, eligible, 'chooseChancellor');
         } else if (myStatus === STATUS_PRESDEC) {
             for (let i = 0; i < lobbyData.policyCards.length; i++) {
@@ -215,9 +215,9 @@ socket.on('lobbyData', (lobbyDataString) => {
                 }
                 $lobbyActions.insertAdjacentHTML('beforeend', html);
                 newButton = $lobbyActions.querySelector('#choice'+i);
-                console.log('Chose ' + i);
+                // console.log('Chose ' + i);
                 newButton.addEventListener('click', () => {
-                    console.log('Chose ' + i);
+                    // console.log('Chose ' + i);
                     socket.emit('presDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
                 });
             }
@@ -231,9 +231,9 @@ socket.on('lobbyData', (lobbyDataString) => {
                 }
                 $lobbyActions.insertAdjacentHTML('beforeend', html);
                 newButton = $lobbyActions.querySelector('#choice'+i);
-                console.log('Chose ' + i);
+                // console.log('Chose ' + i);
                 newButton.addEventListener('click', () => {
-                    console.log('Chose ' + i);
+                    // console.log('Chose ' + i);
                     socket.emit('chancDecision', { room: room, index: i}, (error) => { if (error) { console.log('error') } });
                 });
             }
@@ -277,17 +277,17 @@ socket.on('lobbyData', (lobbyDataString) => {
             }
             createPlayerSelect(lobbyData, eligible, 'presAction4');
         } else if (myStatus === STATUS_PRESVETOCHOICE){
-            console.log("president veto choice");
+            // console.log("president veto choice");
             const yesHtml = Mustache.render(actionButtonTemplate, { text: 'Yes', id:'yes' });
             const noHtml = Mustache.render(actionButtonTemplate, { text: 'No', id:'no' });
             $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
             $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
             $lobbyActions.querySelector('#yes').addEventListener('click', () => {
-                console.log('veto voting yes');
+                // console.log('veto voting yes');
                 socket.emit('presVetoVoting', { room, choice: true }, (error) => { if (error) { console.log('error'); } })
             });
             $lobbyActions.querySelector('#no').addEventListener('click', () => {
-                console.log('veto voting no');
+                // console.log('veto voting no');
                 socket.emit('presVetoVoting', { room, choice: false }, (error) => { if (error) { console.log('error'); } })
             });
         }  else if (myStatus === STATUS_CHANCVETOCHOICE){
@@ -296,11 +296,11 @@ socket.on('lobbyData', (lobbyDataString) => {
             $lobbyActions.insertAdjacentHTML('beforeend', yesHtml);
             $lobbyActions.insertAdjacentHTML('beforeend', noHtml);
             $lobbyActions.querySelector('#yes').addEventListener('click', () => {
-                console.log('veto voting yes');
+                // console.log('veto voting yes');
                 socket.emit('chancellorVetoVoting', { room, choice: true }, (error) => { if (error) { console.log('error'); } })
             });
             $lobbyActions.querySelector('#no').addEventListener('click', () => {
-                console.log('veto voting no');
+                // console.log('veto voting no');
                 socket.emit('chancellorVetoVoting', { room, choice: false }, (error) => { if (error) { console.log('error'); } })
             });
         }
@@ -314,7 +314,7 @@ const createLobbyButtons = (playerType) => {
         $lobbyActions.insertAdjacentHTML('beforeend', html);
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
-            console.log('START GAME');
+            // console.log('START GAME');
             socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
         });
     } else if (playerType === TYPE_PLAYER) {
@@ -322,7 +322,7 @@ const createLobbyButtons = (playerType) => {
         $lobbyActions.insertAdjacentHTML('beforeend', html);
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
-            console.log('should change to spectate');
+            // console.log('should change to spectate');
             socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
         });
     } else { //playerType === TYPE_SPECTATOR
@@ -330,7 +330,7 @@ const createLobbyButtons = (playerType) => {
         $lobbyActions.insertAdjacentHTML('beforeend', html);
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
-            console.log('should change to play');
+            // console.log('should change to play');
             socket.emit('changeLobbyInfo', { username, room, newType: TYPE_PLAYER }, (error) => { if (error) { console.log('error'); } })
         });
     }
@@ -340,14 +340,14 @@ const createPlayerSelect = (lobbyData, eligible, eventType) => {
     playerImageSelect(lobbyData, eligible, eventType);
     let html = null, newButton = null;
     for (let i = 0; i < lobbyData.users.length; i++) {
-        console.log('player select button: ' + lobbyData.users[i].username);
+        // console.log('player select button: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             html = Mustache.render(actionButtonTemplate, { text: lobbyData.users[i].username, id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $lobbyActions.insertAdjacentHTML('beforeend', html);
             newButton = $lobbyActions.querySelector("#" + lobbyData.users[i].username);
-            console.log('adding event listener');
+            // console.log('adding event listener');
             newButton.addEventListener('click', () => {
-                console.log('chosen');
+                // console.log('chosen');
                 socket.emit(eventType, { room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             });
         }
@@ -357,15 +357,15 @@ const createPlayerSelect = (lobbyData, eligible, eventType) => {
 const playerImageSelect = (lobbyData, eligible, eventType) => {
     let html=null; newButton=null;
     for (let i = 0; i < lobbyData.users.length; i++) {
-        console.log('player select image: ' + lobbyData.users[i].username);
+        // console.log('player select image: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             const $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
             html = Mustache.render(imageSelectTemplate, {image_id: "image-overlay-" + lobbyData.users[i].username, src: "test carback.png", id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
             newButton = $imageSelectOverlay.querySelector("#image-overlay-" + lobbyData.users[i].username);
-            console.log('adding event listener');
+            // console.log('adding event listener');
             newButton.addEventListener('click', () => {
-                console.log('chosen');
+                // console.log('chosen');
                 socket.emit(eventType, { room, choice: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
             });
         }
@@ -373,23 +373,23 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
 }
 
 const voteanim = (slide) => {
-    console.log('voteanim')
+    // console.log('voteanim')
     if (slide === "slideup") {
-        console.log('slideup')
+        // console.log('slideup')
         slideup = true
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidedown") {
-        console.log('slidedown')
+        // console.log('slidedown')
         slideup = false
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
         }
     } else if (slide === "slidup") {
-        console.log('slidup')
+        // console.log('slidup')
         for (let i = 0; i < lobbyData.users.length; i++) {
             const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
             $voteback.classList.add(slide)
