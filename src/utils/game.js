@@ -46,10 +46,10 @@ const startGame = (room) => { //TODO: dont allow start if not enough users
     lobby.gameState = GAMESTATE_ONGOING;
     // console.log('lobby.gameState: ' + lobby.gameState);
     console.log("players: "+players);
-    if (players <= 6) {
-        randomAssign(room, 1);
-    } else {
+    if(players === 5){
         randomAssign(room, 2);
+    } else {
+        randomAssign(room, 3);
     }
     lobby.president = lobby.users[0].username;
     lobby.liberalCards = 0;
@@ -137,7 +137,6 @@ const registerVote = (room, username, vote) => {
     console.log("vote yes: "+ lobby.voteCountYes);
     console.log("vote no: "+ lobby.voteCountNo);
     
-
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
             console.log('numOfFascists: ' + lobby.numOfFascists);
