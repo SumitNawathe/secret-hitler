@@ -263,6 +263,7 @@ socket.on('lobbyData', (lobbyDataString) => {
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
                 if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username || lobbyData.users[i] === lobbyData.chancellor){
+
                     eligible.push(false);
                 } else {
                     eligible.push(true);
@@ -408,6 +409,8 @@ const voteanim = (slide) => {
         }
     }
 }
+
+
 
 // const slidecard = (template, id, username, src) => {
 //     let $slidecard = document.querySelector('#slidecard'+username)
