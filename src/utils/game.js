@@ -137,7 +137,6 @@ const registerVote = (room, username, vote) => {
     console.log("vote yes: "+ lobby.voteCountYes);
     console.log("vote no: "+ lobby.voteCountNo);
     
-
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
             console.log('numOfFascists: ' + lobby.numOfFascists);

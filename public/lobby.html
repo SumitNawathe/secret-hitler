@@ -54,15 +54,27 @@
                 position: absolute;
             }
 
-            .ui.inverted.centered.tiny.header.Fascist {
+            .ui.inverted.centered.tiny.header.Host.Fascist {
                color: red;
             }
 
-            .ui.inverted.centered.tiny.header.Liberal {
+            .ui.inverted.centered.tiny.header.Host.Liberal {
                 color: turquoise;
             }
 
-            .ui.inverted.centered.tiny.header.Hitler {
+            .ui.inverted.centered.tiny.header.Host.Hitler {
+                color: brown;
+            }
+
+            .ui.inverted.centered.tiny.header.Player.Fascist {
+               color: red;
+            }
+
+            .ui.inverted.centered.tiny.header.Player.Liberal {
+                color: turquoise;
+            }
+
+            .ui.inverted.centered.tiny.header.Player.Hitler {
                 color: brown;
             }
 
@@ -161,7 +173,7 @@
             </div>
 
         <script id="participant-template" type="text/html">
-            <div class="col participant">
+            <div class="col participant" id={{ participant_id }}>
                 <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
                     position: relative; bottom: -10px;">
                     {{ username }} - {{ status }}
@@ -183,7 +195,7 @@
         </script>
 
         <script id="slidecard-template" type="text/html">
-            <img class="ui tiny image centered hiddencard" id={{ id }} src="img/{{ src }}">
+            <img class="ui tiny image centered hiddencard slideup" id={{ id }} src="img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>

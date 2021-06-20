@@ -81,7 +81,17 @@ io.on('connection', (socket) => {
         // console.log(lobbies.get(room));
         // console.log('json string:');
         // console.log(JSON.stringify(lobbies.get(room)));
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+
+        //TODO: only works for lobby mode? maybe?
+        io.to(socket.id).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+
+        lobbies.get(room).users.forEach((person) => {
+            if (person.id !== socket.id) {
+                io.to(person.id).emit('joinLobbyData', JSON.stringify({ player: username }));
+            }
+        });
+
         callback();
     });
 
@@ -90,24 +100,58 @@ io.on('connection', (socket) => {
         const success = updateLobbyUserType(room, username, newType);
         if (!success) {
             // console.log('failed type change');
-            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+            // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
             callback('Failed to change type.');
+            console.log('Failed to change type');
             return;
         }
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        io.to(room).emit('updateLobbyData', JSON.stringify({ username, state: newType }));
         callback();
     })
 
     socket.on('disconnect', () => {
-        const room = removeUser(socket.id);
-        if (room !== null) {
-            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        const username = idToUsername.get(socket.id);
+        const result = removeUser(socket.id);
+        if (result !== null) {
+            const room = result.room;
+            // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+            if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
+                io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
+                console.log(result)
+                if (result.newHost) {
+                    io.to(result.newHost.id).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+                }
+            }
         }
     });
 
     socket.on('startGame', ({ room }, callback) => {
+        console.log('receive startGame')
         startGame(room);
-        emitMidgameLobbyData(room);
+        // emitMidgameLobbyData(room);
+        const lobby = lobbies.get(room);
+        let fascists = [];
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_FASCIST) { fascists.push(person.username); }
+        });
+        let hitler = null;
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_HITLER) { hitler = person.username; }
+        });
+
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_LIBERAL) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_LIBERAL }));
+            } else if (person.type === TYPE_FASCIST) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler }));
+            } else if (person.type === TYPE_HITLER) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER }));
+            } else if (person.type === TYPE_SPECTATOR) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler }));
+            }
+        });
+        //TODO: emit first president
     });
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
