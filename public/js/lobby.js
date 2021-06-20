@@ -117,25 +117,56 @@ socket.on('removeLobbyData', (playerRemovedString) => {
 });
 
 socket.on('startGameData', (startGameDataString) => {
+    console.log('start game')
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type;
-    for (let i=0; i<$participantList.length; i++) {
-        const deleteUsername = playerRemovedData.person;
-        $participantList.querySelector('#participant'+deleteUsername).remove()
+    for (let i=0; i<$participantList.children.length; i++) {
+        try {
+            $participantList.querySelector('.spectator').remove()
+        } catch (error) {}
     }
     if (type === TYPE_LIBERAL) {
+        $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
         slidecardone("voteback", "voting cardback.png", username)
         // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-        const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+        const $voteback = document.querySelector('#voteback'+username)
         $voteback.classList.add("slideupanddown")
     } else if (type === TYPE_FASCIST) {
-        const otherFascists = startGameData.otherFascists
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const fascists = startGameData.fascists
+        for (let i=0; i<fascists.length; i++) {
+            let username=fascists[i]
+            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            slidecardone("voteback", "voting cardback.png", username)
+            const $voteback = document.querySelector('#voteback'+username)
+            $voteback.classList.add("slideupanddown")
+        }
         const hitler = startGameData.hitler
+        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", hitler)
+        const $voteback = document.querySelector('#voteback'+hitler)
+        $voteback.classList.add("slideupanddown")
     } else if (type === TYPE_HITLER) {
+        $participantList.querySelector('#participant'+username).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", username)
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const $voteback = document.querySelector('#voteback'+username)
+        $voteback.classList.add("slideupanddown")
         //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
         const fascists = startGameData.fascists
-        const hitler = startGameData.hitler;
+        for (let i=0; i<fascists.length; i++) {
+            let username=fascists[i]
+            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            slidecardone("voteback", "voting cardback.png", username)
+            const $voteback = document.querySelector('#voteback'+username)
+            $voteback.classList.add("slideupanddown")
+        }
+        const hitler = startGameData.hitler
+        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", hitler)
+        const $voteback = document.querySelector('#voteback'+hitler)
+        $voteback.classList.add("slideupanddown")
     }
 })
 

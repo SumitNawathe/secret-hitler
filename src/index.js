@@ -127,6 +127,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('startGame', ({ room }, callback) => {
+        console.log('receive startGame')
         startGame(room);
         // emitMidgameLobbyData(room);
         const lobby = lobbies.get(room);
@@ -143,11 +144,11 @@ io.on('connection', (socket) => {
             if (person.type === TYPE_LIBERAL) {
                 io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_LIBERAL }));
             } else if (person.type === TYPE_FASCIST) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, facists, hitler }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler }));
             } else if (person.type === TYPE_HITLER) {
                 io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER }));
             } else if (person.type === TYPE_SPECTATOR) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, facists, hitler }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler }));
             }
         });
         //TODO: emit first president
