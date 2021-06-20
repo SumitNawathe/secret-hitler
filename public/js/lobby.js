@@ -117,6 +117,8 @@ socket.on('removeLobbyData', (playerRemovedString) => {
 });
 
 socket.on('startGameData', (startGameDataString) => {
+    var audio = new Audio('audio/CardPlacingSound.mp3');
+    audio.play();
     console.log('start game')
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type;
