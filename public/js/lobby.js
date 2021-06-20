@@ -115,6 +115,27 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
+socket.on('startGameData', (startGameDataString) => {
+    const startGameData = JSON.parse(startGameDataString);
+    const type =  startGameData.type;
+    if (type === TYPE_LIBERAL) {
+        //stuff
+    } else if (type === TYPE_FASCIST) {
+        //stuff
+        const fascists = startGameData.fascists;
+        const hitler = startGameData.hitler;
+    } else if (type === TYPE_HITLER) {
+        //stuff
+    } else if (type === TYPE_SPECTATOR) {
+        //stuff
+        const fascists = startGameData.fascists;
+        const hitler = startGameData.hitler;
+    }
+});
+
+
+
+
 
 
 
