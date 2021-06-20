@@ -22,7 +22,6 @@
                 width: 80px;
                 height: 106px;
                 overflow: hidden;
-                position: relative;
             }
             .image-overlay1 {
                 position: relative;
@@ -100,8 +99,7 @@
             }
 
             .slideupanddown {
-                animation: slideup 1s;
-                animation-direction: alternate;
+                animation: slideupanddown 4s;
             }
 
             @-webkit-keyframes fadein {
@@ -124,7 +122,8 @@
 
             @-webkit-keyframes slideupanddown {
                 0% { bottom: 0px; }
-                50% { bottom: 107.5px; }
+                30% { bottom: 107.5px }
+                70% { bottom: 107.5px; }
                 100% { bottom: 0px; }
             }
 
