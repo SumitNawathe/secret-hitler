@@ -47,38 +47,72 @@ $heading.insertAdjacentHTML('beforeend', headingHtml);
 socket.on('joinLobbyData', (playerJoiningString) => {
     const joinLobbyData = JSON.parse(playerJoiningString);
     const joinUsername = joinLobbyData.player;
+    const html = Mustache.render(participantTemplate, {
+        participant_id: "participant"+joinUsername,
+        username: joinUsername,
+        username_img: joinUsername+"_img",
+        type: 'Player',
+        status: '',
+        slidecard_id: "slidecard"+joinUsername,
+        image_select_id: "image-select-"+joinUsername,
+        voteback_id: joinUsername,
+        party_id: joinUsername
+    });
+    $participantList.insertAdjacentHTML('beforeend', html);
 });
 
 socket.on('updateLobbyData', (lobbyDataUpdateString) => {
+    console.log('updateLobbyData')
     const lobbyDataUpdate = JSON.parse(lobbyDataUpdateString);
     const updateUsername = lobbyDataUpdate.username;
     const newState = lobbyDataUpdate.state;
     if (updateUsername === username) {
-        if (newState === TYPE_PLAYER) {
-            newButton = $lobbyActions.querySelector('button');
-            newButton.innerHTML = 'Spectate'
-            newButton.removeEventListener('click')
+        if (newState === TYPE_HOST) {
+            oldButton = $lobbyActions.querySelector('button');
+            newButton = oldButton.cloneNode(true);
+            newButton.innerHTML = 'Start Game'
             newButton.addEventListener('click', () => {
                 // console.log('should change to spectate');
+                console.log('Start Game')
+                socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+            });
+            oldButton.parentNode.replaceChild(newButton, oldButton);
+        } else if (newState === TYPE_PLAYER) {
+            oldButton = $lobbyActions.querySelector('button');
+            newButton = oldButton.cloneNode(true);
+            newButton.innerHTML = 'Spectate'
+            newButton.addEventListener('click', () => {
+                // console.log('should change to spectate');
+                console.log('change to spectator')
                 socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
             });
+            oldButton.parentNode.replaceChild(newButton, oldButton);
         } else { //playerType === TYPE_SPECTATOR
-            newButton = $lobbyActions.querySelector('button');
+            oldButton = $lobbyActions.querySelector('button');
+            newButton = oldButton.cloneNode(true);
             newButton.innerHTML = 'Play Game'
-            newButton.removeEventListener('click')
             newButton.addEventListener('click', () => {
-                // console.log('should change to play');
+                // console.log('should change to spectate');
+                console.log('change to player')
                 socket.emit('changeLobbyInfo', { username, room, newType: TYPE_PLAYER }, (error) => { if (error) { console.log('error'); } })
             });
+            oldButton.parentNode.replaceChild(newButton, oldButton);
         }
+    }
+    if (newState === TYPE_HOST)
+    document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
+    else if (newState === TYPE_PLAYER)
+        document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
+    else {
+        document.querySelector('#'+updateUsername+'_img').src = "img/test carback.png"
     }
     //do stuff
 });
 
 socket.on('removeLobbyData', (playerRemovedString) => {
     const playerRemovedData = JSON.parse(playerRemovedString);
-    const deleteUsername = playerRemovedData.player;
-    //do stuff
+    const deleteUsername = playerRemovedData.person;
+    $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
 
@@ -145,6 +179,7 @@ socket.on('lobbyData', (lobbyDataString) => {
         else { statusString = '' }
 
         const html = Mustache.render(participantTemplate, {
+            participant_id: "participant"+person.username,
             username: person.username,
             username_img: person.username+"_img",
             type: typeString,
