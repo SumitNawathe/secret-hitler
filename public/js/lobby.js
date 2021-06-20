@@ -87,7 +87,7 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
             });
             oldButton.parentNode.replaceChild(newButton, oldButton);
-        } else { //playerType === TYPE_SPECTATOR
+        } else if (newState === TYPE_SPECTATOR) { //playerType === TYPE_SPECTATOR
             oldButton = $lobbyActions.querySelector('button');
             newButton = oldButton.cloneNode(true);
             newButton.innerHTML = 'Play Game'
@@ -103,7 +103,8 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
     document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
     else if (newState === TYPE_PLAYER)
         document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
-    else {
+    else if (newState === TYPE_SPECTATOR) {
+        $participantList.querySelector('#participant'+updateUsername).classList.add("spectator")
         document.querySelector('#'+updateUsername+'_img').src = "img/test carback.png"
     }
     //do stuff
@@ -115,7 +116,27 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
-
+socket.on('startGameData', (startGameDataString) => {
+    const startGameData = JSON.parse(startGameDataString)
+    const type = startGameData.type;
+    for (let i=0; i<$participantList.length; i++) {
+        const deleteUsername = playerRemovedData.person;
+        $participantList.querySelector('#participant'+deleteUsername).remove()
+    }
+    if (type === TYPE_LIBERAL) {
+        slidecardone("voteback", "voting cardback.png", username)
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const $voteback = document.querySelector('#voteback'+lobbyData.users[i].username)
+        $voteback.classList.add("slideupanddown")
+    } else if (type === TYPE_FASCIST) {
+        const otherFascists = startGameData.otherFascists
+        const hitler = startGameData.hitler
+    } else if (type === TYPE_HITLER) {
+        //TODO: depending on player number see others
+    } else if (type === TYPE_SPECTATOR) {
+        const fascists = startGameData.fascists
+    }
+})
 
 
 
@@ -260,11 +281,11 @@ socket.on('lobbyData', (lobbyDataString) => {
         let otherUsersVoting = false;
         lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
         if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING || otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!slideup) {
                 // console.log('cha cha real smooth')
@@ -502,7 +523,15 @@ const voteanim = (slide) => {
 //         $slidecard.insertAdjacentHTML('beforeend', html);
 // }
 
-const slidecard = (template, id, src) => {
+const slidecardone = (id, src, username) => {
+    console.log('generating slidecardone')
+    let $slidecard = document.querySelector('#slidecard'+username)
+    console.log($slidecard)
+    html = Mustache.render(slideCardTemplate, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+        $slidecard.insertAdjacentHTML('beforeend', html);
+}
+
+const slidecard = (id, src) => {
     console.log('generating slidecard')
     for (let i=0; i < lobbyData.users.length; i++) {
         let username=lobbyData.users[i].username
