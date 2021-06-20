@@ -45,8 +45,28 @@
             }
             .liberal-overlay1 {
                 position: absolute;
-                top: 107.5px;
-                left: 10px;
+                top: 48px;
+                left: 95px;
+            }
+            .liberal-overlay2 {
+                position: absolute;
+                top: 48px;
+                left: 189px;
+            }
+            .liberal-overlay3 {
+                position: absolute;
+                top: 48px;
+                left: 283px;
+            }
+            .liberal-overlay4 {
+                position: absolute;
+                top: 48px;
+                left: 377px;
+            }
+            .liberal-overlay5 {
+                position: absolute;
+                top: 48px;
+                left: 471px;
             }
             .fascist-overlay1 {
                 position: absolute;
@@ -78,6 +98,8 @@
                 top: 48px;
                 left: 515px;
             }
+
+
 
             .container {
             }
@@ -207,7 +229,14 @@
             <br>
 
             <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
-            <img class="image" src="img/lib_back.png">
+            <div class="layered-image">
+                <img class="image image-overlay1" src="img/lib_back.png">
+                <img class="liberal-overlay1 policy" src="img/liberal policy.png">
+                <img class="liberal-overlay2 policy" src="img/liberal policy.png">
+                <img class="liberal-overlay3 policy" src="img/liberal policy.png">
+                <img class="liberal-overlay4 policy" src="img/liberal policy.png">
+                <img class="liberal-overlay5 policy" src="img/liberal policy.png">
+            </div>
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">
                 <img class="image image-overlay1" src="img/fascist_back_78.png">
@@ -217,6 +246,7 @@
                 <img class="fascist-overlay4 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay5 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay6 policy" src="img/fascist policy.png">
+                
 
             </div>
             <div class="container">
