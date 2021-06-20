@@ -120,14 +120,15 @@ socket.on('startGameData', (startGameDataString) => {
     console.log('start game')
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type;
-    for (let i=0; i<$participantList.children.length; i++) {
-        try {
+    try {
+        for (let i=0; i<$participantList.children.length; i++) {
             $participantList.querySelector('.spectator').remove()
-        } catch (error) {}
-    }
+        }
+    } catch (error) {}
     if (type === TYPE_LIBERAL) {
+        console.log('liberal')
         $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
-        slidecardone("voteback", "voting cardback.png", username)
+        slidecardone("voteback", "liberal cardback.png", username)
         // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
         const $voteback = document.querySelector('#voteback'+username)
         $voteback.classList.add("slideupanddown")
@@ -137,36 +138,50 @@ socket.on('startGameData', (startGameDataString) => {
         for (let i=0; i<fascists.length; i++) {
             let username=fascists[i]
             $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
-            slidecardone("voteback", "voting cardback.png", username)
+            slidecardone("voteback", "fascist cardback.png", username)
             const $voteback = document.querySelector('#voteback'+username)
             $voteback.classList.add("slideupanddown")
         }
         const hitler = startGameData.hitler
         $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
-        slidecardone("voteback", "voting cardback.png", hitler)
+        slidecardone("voteback", "hitler cardback.png", hitler)
         const $voteback = document.querySelector('#voteback'+hitler)
         $voteback.classList.add("slideupanddown")
     } else if (type === TYPE_HITLER) {
         $participantList.querySelector('#participant'+username).children[0].classList.add("Hitler")
-        slidecardone("voteback", "voting cardback.png", username)
+        slidecardone("voteback", "hitler cardback.png", username)
         // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
         const $voteback = document.querySelector('#voteback'+username)
         $voteback.classList.add("slideupanddown")
         //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
         const fascists = startGameData.fascists
-        for (let i=0; i<fascists.length; i++) {
-            let username=fascists[i]
+        for (let username of fascists) {
             $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
-            slidecardone("voteback", "voting cardback.png", username)
+            slidecardone("voteback", "fascist cardback.png", username)
             const $voteback = document.querySelector('#voteback'+username)
             $voteback.classList.add("slideupanddown")
         }
         const hitler = startGameData.hitler
         $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
-        slidecardone("voteback", "voting cardback.png", hitler)
+        slidecardone("voteback", "hitler cardback.png", hitler)
         const $voteback = document.querySelector('#voteback'+hitler)
         $voteback.classList.add("slideupanddown")
+        for (let i=0; i<$participantList.children.length; i++) {
+            let participantuser = $participantList.children[i]
+            console.log('children '+participantuser.children[0].classList)
+            if (!participantuser.children[0].classList.contains("Fascist") && !participantuser.children[0].classList.contains("Hitler")) {
+                console.log('asdpofiajsdpfaoijd')
+                participantuser.children[0].classList.add("Liberal")
+                let username = participantuser.id.substring(11)
+                console.log('first '+participantuser.id)
+                console.log('username '+username)
+                slidecardone("voteback", "liberal cardback.png", username)
+                // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+                const $voteback = document.querySelector('#voteback'+username)
+                $voteback.classList.add("slideupanddown")
+            }
+        }
     }
 })
 
