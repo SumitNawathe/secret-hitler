@@ -9,7 +9,11 @@
         <style>
             .background {
             }
-
+            .center {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
             .layered-image {
                 position: relative;
                 top: 0;
@@ -22,7 +26,6 @@
                 width: 80px;
                 height: 106px;
                 overflow: hidden;
-                position: relative;
             }
             .image-overlay1 {
                 position: relative;
@@ -34,6 +37,26 @@
                 top: -107.5px;
                 left: -10px;
                 opacity: .4;
+            }
+            .policy {
+                width: 85px;
+                height: auto;
+                box-shadow: 0 0 5px 2px #fff;
+            }
+            .liberal-overlay1 {
+                position: absolute;
+                top: 107.5px;
+                left: 10px;
+            }
+            .fascist-overlay1 {
+                position: absolute;
+                top: 48px;
+                left: 50px;
+            }
+            .fascist-overlay2 {
+                position: absolute;
+                top: 48px;
+                left: 143px;
             }
 
             .container {
@@ -100,8 +123,7 @@
             }
 
             .slideupanddown {
-                animation: slideup 1s;
-                animation-direction: alternate;
+                animation: slideupanddown 4s;
             }
 
             @-webkit-keyframes fadein {
@@ -124,7 +146,8 @@
 
             @-webkit-keyframes slideupanddown {
                 0% { bottom: 0px; }
-                50% { bottom: 107.5px; }
+                30% { bottom: 107.5px }
+                70% { bottom: 107.5px; }
                 100% { bottom: 0px; }
             }
 
@@ -164,10 +187,14 @@
             <br>
 
             <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
-            <img class="ui image" src="img/lib_back.png">
+            <img class="image" src="img/lib_back.png">
             <!--TODO: dynamic fascist board depending on player number-->
-            <img class="ui image" src="img/fascist_back_78.png">
+            <div class="layered-image">
+                <img class="image image-overlay1" src="img/fascist_back_78.png">
+                <img class="fascist-overlay1 policy" src="img/fascist policy.png">
+                <img class="fascist-overlay2 policy" src="img/fascist policy.png">
 
+            </div>
             <div class="container">
                 <div class="row" id="participant-list"></div>
             </div>
@@ -179,8 +206,8 @@
                     {{ username }} - {{ status }}
                 </div>
                 <div class="layered-image">
-                    <div class="test-image">
-                        <img class="ui tiny image centered image-overlay1" id={{ username_img }} src="img/default cardback.png">
+                    <div class="test-image center">
+                        <img class="ui tiny image image-overlay1" id={{ username_img }} src="img/default cardback.png">
                         <div id={{ slidecard_id }}></div>
                         <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
                         <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
@@ -191,11 +218,11 @@
         </script>
 
         <script id="image-select-template" type="text/html">
-            <img class="ui tiny image centered image-overlay2 glowing" id={{ image_id }} src= "img/{{ src }}">
+            <img class="ui tiny image image-overlay2 glowing" id={{ image_id }} src= "img/{{ src }}">
         </script>
 
         <script id="slidecard-template" type="text/html">
-            <img class="ui tiny image centered hiddencard slideup" id={{ id }} src="img/{{ src }}">
+            <img class="ui tiny image hiddencard slideup" id={{ id }} src="img/{{ src }}">
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
