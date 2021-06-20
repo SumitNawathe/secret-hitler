@@ -135,6 +135,7 @@ socket.on('startGameData', (startGameDataString) => {
         //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
         const fascists = startGameData.fascists
+        const hitler = startGameData.hitler;
     }
 })
 
