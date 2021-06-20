@@ -87,7 +87,7 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 socket.emit('changeLobbyInfo', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
             });
             oldButton.parentNode.replaceChild(newButton, oldButton);
-        } else { //playerType === TYPE_SPECTATOR
+        } else if (newState === TYPE_SPECTATOR) { //playerType === TYPE_SPECTATOR
             oldButton = $lobbyActions.querySelector('button');
             newButton = oldButton.cloneNode(true);
             newButton.innerHTML = 'Play Game'
@@ -103,7 +103,8 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
     document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
     else if (newState === TYPE_PLAYER)
         document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
-    else {
+    else if (newState === TYPE_SPECTATOR) {
+        $participantList.querySelector('#participant'+updateUsername).classList.add("spectator")
         document.querySelector('#'+updateUsername+'_img').src = "img/test carback.png"
     }
     //do stuff
@@ -116,27 +117,58 @@ socket.on('removeLobbyData', (playerRemovedString) => {
 });
 
 socket.on('startGameData', (startGameDataString) => {
-    const startGameData = JSON.parse(startGameDataString);
-    const type =  startGameData.type;
-    if (type === TYPE_LIBERAL) {
-        //stuff
-    } else if (type === TYPE_FASCIST) {
-        //stuff
-        const fascists = startGameData.fascists;
-        const hitler = startGameData.hitler;
-    } else if (type === TYPE_HITLER) {
-        //stuff
-    } else if (type === TYPE_SPECTATOR) {
-        //stuff
-        const fascists = startGameData.fascists;
-        const hitler = startGameData.hitler;
+    console.log('start game')
+    const startGameData = JSON.parse(startGameDataString)
+    const type = startGameData.type;
+    for (let i=0; i<$participantList.children.length; i++) {
+        try {
+            $participantList.querySelector('.spectator').remove()
+        } catch (error) {}
     }
-});
-
-
-
-
-
+    if (type === TYPE_LIBERAL) {
+        $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
+        slidecardone("voteback", "voting cardback.png", username)
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const $voteback = document.querySelector('#voteback'+username)
+        $voteback.classList.add("slideupanddown")
+    } else if (type === TYPE_FASCIST) {
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const fascists = startGameData.fascists
+        for (let i=0; i<fascists.length; i++) {
+            let username=fascists[i]
+            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            slidecardone("voteback", "voting cardback.png", username)
+            const $voteback = document.querySelector('#voteback'+username)
+            $voteback.classList.add("slideupanddown")
+        }
+        const hitler = startGameData.hitler
+        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", hitler)
+        const $voteback = document.querySelector('#voteback'+hitler)
+        $voteback.classList.add("slideupanddown")
+    } else if (type === TYPE_HITLER) {
+        $participantList.querySelector('#participant'+username).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", username)
+        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+        const $voteback = document.querySelector('#voteback'+username)
+        $voteback.classList.add("slideupanddown")
+        //TODO: depending on player number see others
+    } else if (type === TYPE_SPECTATOR) {
+        const fascists = startGameData.fascists
+        for (let i=0; i<fascists.length; i++) {
+            let username=fascists[i]
+            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            slidecardone("voteback", "voting cardback.png", username)
+            const $voteback = document.querySelector('#voteback'+username)
+            $voteback.classList.add("slideupanddown")
+        }
+        const hitler = startGameData.hitler
+        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        slidecardone("voteback", "voting cardback.png", hitler)
+        const $voteback = document.querySelector('#voteback'+hitler)
+        $voteback.classList.add("slideupanddown")
+    }
+})
 
 
 
@@ -281,11 +313,11 @@ socket.on('lobbyData', (lobbyDataString) => {
         let otherUsersVoting = false;
         lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
         if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING || otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!slideup) {
                 // console.log('cha cha real smooth')
@@ -523,7 +555,15 @@ const voteanim = (slide) => {
 //         $slidecard.insertAdjacentHTML('beforeend', html);
 // }
 
-const slidecard = (template, id, src) => {
+const slidecardone = (id, src, username) => {
+    console.log('generating slidecardone')
+    let $slidecard = document.querySelector('#slidecard'+username)
+    console.log($slidecard)
+    html = Mustache.render(slideCardTemplate, {id: id+username, src: src}, (error) => { if (error) { console.log('error'); } })
+        $slidecard.insertAdjacentHTML('beforeend', html);
+}
+
+const slidecard = (id, src) => {
     console.log('generating slidecard')
     for (let i=0; i < lobbyData.users.length; i++) {
         let username=lobbyData.users[i].username
