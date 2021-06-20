@@ -113,10 +113,6 @@
                 animation: slideup 1s forwards;
             }
 
-            .slidup {
-                bottom: 107.5px;
-            }
-
             .slidedown {
                 animation: slideup 1s forwards;
                 animation-direction: reverse;
@@ -124,6 +120,9 @@
 
             .slideupanddown {
                 animation: slideupanddown 4s;
+            }
+            .revealvotes {
+
             }
 
             @-webkit-keyframes fadein {
@@ -149,6 +148,9 @@
                 30% { bottom: 107.5px }
                 70% { bottom: 107.5px; }
                 100% { bottom: 0px; }
+            }
+            @-webkit-keyframes revealvotes {
+                
             }
 
         </style>
@@ -193,8 +195,6 @@
                 <img class="image image-overlay1" src="img/fascist_back_78.png">
                 <img class="fascist-overlay1 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay2 policy" src="img/fascist policy.png">
-
-            </div>
             <div class="container">
                 <div class="row" id="participant-list"></div>
             </div>
