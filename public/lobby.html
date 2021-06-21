@@ -70,8 +70,10 @@
             }
             .fascist-overlay1 {
                 position: absolute;
-                top: 48px;
-                left: 50px;
+                top: 0px;
+                left: 0px;
+                /*top: 48px;
+                left: 50px;*/
             }
             .fascist-overlay2 {
                 position: absolute;
@@ -99,9 +101,11 @@
                 left: 515px;
             }
 
-
-
-            .container {
+            .rotate-container {
+                position: absolute;
+                perspective: 500px;
+                top: 0px;
+                left: 0px;
             }
 
             .row {
@@ -163,8 +167,8 @@
             .slideupanddown {
                 animation: slideupanddown 4s;
             }
-            .revealvotes {
-
+            .rotatetest {
+                animation: rotationtest 4s infinite;
             }
 
             @-webkit-keyframes fadein {
@@ -191,9 +195,52 @@
                 70% { bottom: 107.5px; }
                 100% { bottom: 0px; }
             }
-            @-webkit-keyframes revealvotes {
-                
+            @-webkit-keyframes rotationtest {
+                from {
+                    transform: rotateY(0deg);
+                } to {
+                    transform: rotateY(180deg);
+                }
             }
+
+
+
+
+
+
+
+.flip-card {
+  background-color: transparent;
+  width: 85px;
+  height: 123.58px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg) scaleX(-1);
+}
+.test-overlay {
+    position: absolute;
+                top: 48px;
+                left: 50px;
+}
 
         </style>
 
@@ -242,7 +289,16 @@
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">
                 <img class="image image-overlay1" src="img/fascist_back_78.png">
-                <img class="fascist-overlay1 policy" src="img/fascist policy.png">
+                <div class="flip-card test-overlay rotatetest">
+                    <div class="flip-card-inner rotatetest">
+                        <div class="flip-card-front">
+                            <img class="fascist-overlay1 policy" src="img/fascist policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
                 <img class="fascist-overlay2 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay3 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay4 policy" src="img/fascist policy.png">
