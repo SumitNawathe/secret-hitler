@@ -24,7 +24,7 @@
                 top: 0;
                 left: 0;
                 width: 80px;
-                height: 106px;
+                height: 111.56px;
                 overflow: hidden;
             }
             .image-overlay1 {
@@ -170,6 +170,9 @@
             .rotatetest {
                 animation: rotationtest 4s infinite;
             }
+            .rotateandslideupanddown {
+                animation: slideupanddown 4s, rotationtest 1s;
+            }
 
             @-webkit-keyframes fadein {
                 from {opacity: 0;}
@@ -240,6 +243,11 @@
     position: absolute;
                 top: 48px;
                 left: 50px;
+}
+.test-overlay2 {
+    position: absolute;
+                top: 0px;
+                left: 0px;
 }
 
         </style>
@@ -317,7 +325,15 @@
                 </div>
                 <div class="layered-image">
                     <div class="test-image center">
-                        <img class="ui tiny image image-overlay1" id={{ username_img }} src="img/default cardback.png">
+                        <div class="flip-card test-overlay2 rotatetest">
+                            <div class="flip-card-inner rotatetest">
+                                <div class="flip-card-front">
+                                    <img class="ui tiny image" src="img/party cardback.png">
+                                </div>
+                                <div class="flip-card-back">
+                                </div>
+                            </div>
+                        </div>
                         <div id={{ slidecard_id }}></div>
                         <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
                         <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
