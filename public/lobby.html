@@ -19,7 +19,7 @@
                 top: 0;
                 left: 0;
             }
-            .test-image {
+            .pfpborder {
                 position: relative;
                 top: 0;
                 left: 0;
@@ -171,7 +171,7 @@
                 animation: rotationtest 4s infinite;
             }
             .rotateandslideupanddown {
-                animation: slideupanddown 4s, rotationtest 1s;
+                animation: slideupanddown 4s, rotationtest 1s forwards;
             }
 
             @-webkit-keyframes fadein {
@@ -189,13 +189,13 @@
 
             @-webkit-keyframes slideup {
                 from { bottom: 0px; }
-                to { bottom: 107.5px; }
+                to { bottom: 111.56px; }
             }
 
             @-webkit-keyframes slideupanddown {
                 0% { bottom: 0px; }
-                30% { bottom: 107.5px }
-                70% { bottom: 107.5px; }
+                30% { bottom: 111.56px }
+                70% { bottom: 111.56px; }
                 100% { bottom: 0px; }
             }
             @-webkit-keyframes rotationtest {
@@ -244,8 +244,7 @@
                 top: 48px;
                 left: 50px;
 }
-.test-overlay2 {
-    position: absolute;
+.standard-overlay {
                 top: 0px;
                 left: 0px;
 }
@@ -324,16 +323,8 @@
                     {{ username }}{{ status }}
                 </div>
                 <div class="layered-image">
-                    <div class="test-image center">
-                        <div class="flip-card test-overlay2 rotatetest">
-                            <div class="flip-card-inner rotatetest">
-                                <div class="flip-card-front">
-                                    <img class="ui tiny image" src="img/party cardback.png">
-                                </div>
-                                <div class="flip-card-back">
-                                </div>
-                            </div>
-                        </div>
+                    <div class="pfpborder center">
+                        <img class="ui tiny image image-overlay1" id={{ username_img }} src="img/default cardback.png">
                         <div id={{ slidecard_id }}></div>
                         <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
                         <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
@@ -348,7 +339,27 @@
         </script>
 
         <script id="slidecard-template" type="text/html">
-            <img class="ui tiny image hiddencard slideup" id={{ id }} src="img/{{ src }}">
+            <div class="flip-card standard-overlay">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="ui tiny image" src="img/{{ src }}">
+                    </div>
+                    <div class="flip-card-back"></div>
+                </div>
+            </div>
+        </script>
+
+        <script id="slidecardwithback-template" type="text/html">
+            <div class="flip-card standard-overlay">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="ui tiny image" src="img/{{ src1 }}">
+                    </div>
+                    <div class="flip-card-back">
+                        <img class="ui tiny image" src="img/{{ src2 }}">
+                    </div>
+                </div>
+            </div>
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
