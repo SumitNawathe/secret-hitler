@@ -19,12 +19,12 @@
                 top: 0;
                 left: 0;
             }
-            .test-image {
+            .pfpborder {
                 position: relative;
                 top: 0;
                 left: 0;
                 width: 80px;
-                height: 106px;
+                height: 111.56px;
                 overflow: hidden;
             }
             .image-overlay1 {
@@ -99,9 +99,11 @@
                 left: 515px;
             }
 
-
-
-            .container {
+            .rotate-container {
+                position: absolute;
+                perspective: 500px;
+                top: 0px;
+                left: 0px;
             }
 
             .row {
@@ -163,8 +165,11 @@
             .slideupanddown {
                 animation: slideupanddown 4s;
             }
-            .revealvotes {
-
+            .rotatetest {
+                animation: rotationtest 4s infinite;
+            }
+            .rotateandslideupanddown {
+                animation: slideupanddown 4s, rotationtest 1s forwards;
             }
 
             @-webkit-keyframes fadein {
@@ -182,18 +187,65 @@
 
             @-webkit-keyframes slideup {
                 from { bottom: 0px; }
-                to { bottom: 107.5px; }
+                to { bottom: 111.56px; }
             }
 
             @-webkit-keyframes slideupanddown {
                 0% { bottom: 0px; }
-                30% { bottom: 107.5px }
-                70% { bottom: 107.5px; }
+                30% { bottom: 111.56px }
+                70% { bottom: 111.56px; }
                 100% { bottom: 0px; }
             }
-            @-webkit-keyframes revealvotes {
-                
+            @-webkit-keyframes rotationtest {
+                from {
+                    transform: rotateY(0deg);
+                } to {
+                    transform: rotateY(180deg);
+                }
             }
+
+
+
+
+
+
+
+.flip-card {
+  background-color: transparent;
+  width: 85px;
+  height: 123.58px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg) scaleX(-1);
+}
+.test-overlay {
+    position: absolute;
+                top: 48px;
+                left: 50px;
+}
+.standard-overlay {
+                top: 0px;
+                left: 0px;
+}
 
         </style>
 
@@ -260,7 +312,7 @@
                     {{ username }}{{ status }}
                 </div>
                 <div class="layered-image">
-                    <div class="test-image center">
+                    <div class="pfpborder center">
                         <img class="ui tiny image image-overlay1" id={{ username_img }} src="img/default cardback.png">
                         <div id={{ slidecard_id }}></div>
                         <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
@@ -276,7 +328,27 @@
         </script>
 
         <script id="slidecard-template" type="text/html">
-            <img class="ui tiny image hiddencard slideup" id={{ id }} src="img/{{ src }}">
+            <div class="flip-card standard-overlay">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="ui tiny image" src="img/{{ src }}">
+                    </div>
+                    <div class="flip-card-back"></div>
+                </div>
+            </div>
+        </script>
+
+        <script id="slidecardwithback-template" type="text/html">
+            <div class="flip-card standard-overlay">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img class="ui tiny image" src="img/{{ src1 }}">
+                    </div>
+                    <div class="flip-card-back">
+                        <img class="ui tiny image" src="img/{{ src2 }}">
+                    </div>
+                </div>
+            </div>
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
