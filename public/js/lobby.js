@@ -49,6 +49,9 @@ const participants = []
 const slidecards = []
 const overlays = []
 
+const javote = document.querySelector(".javote")
+const neinvote = document.querySelector(".neinvote")
+
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 socket.on('joinLobbyData', (playerJoiningString) => {
@@ -123,6 +126,12 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 socket.on('startGameData', (startGameDataString) => {
+    let currentButton = $lobbyActions.querySelector('button');
+    while(currentButton) {
+        currentButton.remove();
+        currentButton = $lobbyActions.querySelector('button');
+    }
+
     var audio = new Audio('audio/CardPlacingSound.mp3');
     //audio.play();
     console.log('start game')
@@ -135,10 +144,20 @@ socket.on('startGameData', (startGameDataString) => {
     } catch (error) {}
     const list = $participantList.children
     for (let i=0; i<list.length; i++) {
-        usernames.push(getUsername(i))
-        participants.push($participantList.querySelector('#participant'+getUsername(i)))
-        slidecards.push($participantList.querySelector('#slidecard'+getUsername(i)))
-        overlays.push($participantList.querySelector('#image-select-'+getUsername(i)))
+        let username = getUsername(i)
+        usernames.push(username)
+        var newObject = new Object()
+        newObject.username = username
+        newObject.div = $participantList.querySelector('#participant'+username)
+        participants.push(newObject)
+        newObject = new Object()
+        newObject.username = username
+        newObject.div = $participantList.querySelector('#slidecard'+username)
+        slidecards.push(newObject)
+        newObject = new Object()
+        newObject.username = username
+        newObject.div = $participantList.querySelector('#image-select-'+username)
+        overlays.push(newObject)
     }
     if (type === TYPE_LIBERAL) {
         console.log('liberal')
@@ -241,9 +260,16 @@ socket.on('new president', (newPresidentString) => {
     presParticipant.querySelector(".loader").classList.add("active")
 
     if (newPres === username) {
-        //TODO: eligibility from back end
-        //currently just having the second person as the eligible one
-        let eligible = [false, true]
+        const eligibleChancellors = newPresidentData.eligibleChancellors
+        console.log('eligible '+eligibleChancellors[0])
+        let eligible = []
+        for (let i=0; i<usernames.length; i++) {
+            if (eligibleChancellors.includes(usernames[i])) {
+                eligible.push(true)
+            } else {
+                eligible.push(false)
+            }
+        }
         playerSelect(eligible, 'chooseChancellor')
     }
 })
@@ -263,31 +289,64 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     presParticipant.querySelector(".loader").classList.remove("active")
     
     //TODO: make loaders in sync
-    slideUpVote()
+    setVote()
 })
 
-const slideUpVote = () => {
-    const list = $participantList.children
+socket.on('did vote', (didVoteString) => {
+    const didVoteData = JSON.parse(didVoteString)
+    const username = didVoteData.username
+    findDivFromUsername(participants, username).querySelector(".loader").classList.remove("active")
+})
+
+socket.on('rescind vote', (didVoteString) => {
+    const didVoteData = JSON.parse(didVoteString)
+    const username = didVoteData.username
+    findDivFromUsername(participants, username).querySelector(".loader").classList.add("active")
+}) 
+
+
+const setVote = () => {
     for (let i=0; i<slidecards.length; i++) {
         slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
-        slidecards[i].children[0].classList.add("slideup")
-        slidecards[i].children[0].children[0].classList.add("slideup")
+        slidecards[i].div.children[0].classList.add("slideup")
+        slidecards[i].div.children[0].children[0].classList.add("slideup")
 
-        participants[i].querySelector(".loader").classList.add("active")
+        participants[i].div.querySelector(".loader").classList.add("active")
     }
+
+    javote.classList.add("vote-place")
+    neinvote.classList.add("vote-place")
+    javote.addEventListener('click', function() {
+        if (javote.classList.contains("selectvote")) {
+            javote.classList.remove("selectvote")
+        } else {
+            javote.classList.add("selectvote")
+            neinvote.classList.remove("selectvote")
+        }
+        socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
+    })
+    neinvote.addEventListener('click', function() {
+        if (neinvote.classList.contains("selectvote")) {
+            neinvote.classList.remove("selectvote")
+        } else {
+            neinvote.classList.add("selectvote")
+            javote.classList.remove("selectvote")
+        }
+        socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
+    })
 }
 
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
 }
 
+const findDivFromUsername = (arr, username ) => {
+    return arr.find(o => o.username === username).div;
+}
+
 const clearOverlay = () => {
-    const list = $participantList.children
-    for (let i=0; i<list.length; i++) {
-        let username = getUsername(i)
-        participantuser = list[i]
-        let $imageSelectOverlay = participantuser.querySelector('#image-select-'+username)
-        $imageSelectOverlay.innerHTML = ''
+    for (let i=0; i<overlays.length; i++) {
+        overlays[i].div.innerHTML = ''
     }
 }
 

@@ -164,7 +164,7 @@ io.on('connection', (socket) => {
     socket.on('voting', ({ room, username, choice }, callback) => {
         // console.log('received vote: ' + choice);
         registerVote(room, username, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presDecision', ({ room, index }, callback) => {

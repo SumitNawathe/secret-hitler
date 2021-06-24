@@ -274,6 +274,34 @@
                 left: 0px;
 }
 
+.javote {
+    position: absolute;
+    width: 180px;
+    height: auto;
+    top: -500px;
+    left: 100px;
+}
+.neinvote {
+    position: absolute;
+    width: 180px;
+    height: auto;
+    top: -500px;
+    left: 360px;
+}
+.vote-place {
+    animation: vote-place 1s forwards;
+}
+.selectvote {
+    box-shadow: 0px 0px 5px 5px green;
+}
+@-webkit-keyframes vote-place {
+    100% {
+        top: -130px;
+    }
+}
+.dark {
+    filter: brightness(50%);
+}
 </style>
 
         <script
@@ -283,7 +311,7 @@
         <script src="../semantic/dist/semantic.min.js"></script>
     </head>
     <body style="background-color: black;">
-            <div class="menu-container" style="z-index: 9999;"> <!--always appears on top-->
+            <div class="menu-container" style="z-index: 9999; position: relative;"> <!--always appears on top-->
                 <section class="ui menu nav-menu">
                     <div id="heading"></div>
                         <div class="item">
@@ -309,7 +337,6 @@
 
             <br>
 
-            <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/lib_back.png">
                 <img class="liberal-overlay1 policy" src="img/liberal policy.png">
@@ -336,6 +363,9 @@
                 <img class="fascist-overlay4 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay5 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay6 policy" src="img/fascist policy.png">
+                <img class="javote" src="img/yes cardback.png">
+                <img class="neinvote" src="img/no cardback.png">
+
             </div>
             <div class="container">
                 <div class="row" id="participant-list"></div>
