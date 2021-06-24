@@ -68,7 +68,7 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     // console.log(lobby.users[0]);
     
     let alive = 0;
-    for(let i = 0; i<users.length; i++){
+    for(let i = 0; i<lobby.users.length; i++){
         if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
 
         } else {
@@ -77,7 +77,7 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     }
 
     let eligibleChancellors = [];
-    for(let i = 0; i<users.length; i++){
+    for(let i = 0; i<lobby.users.length; i++){
         if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
 
         } else {
@@ -87,7 +87,7 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
                 if(alive>5 && lobby.users[i].username === lobby.chancellor){
 
                 } else {
-                    eligibleChancellors.push(lobby.users[i]);
+                    eligibleChancellors.push(lobby.users[i].username);
                 }
                 
             }
