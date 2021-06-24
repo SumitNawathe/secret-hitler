@@ -117,10 +117,6 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
-socket.on('new president', () => {
-    console.log("new president :)");
-})
-
 socket.on('startGameData', (startGameDataString) => {
     var audio = new Audio('audio/CardPlacingSound.mp3');
     //audio.play();
@@ -213,19 +209,23 @@ socket.on('new president', (newPresidentString) => {
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
     clearOverlay()
-    let html = Mustache.render(imageSelectTemplate, {src: president_label.png});
+    clearSlide()
+    let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
     let $imageSelectOverlay = document.querySelector('#image-select-'+newPres);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-    $imageSelectOverlay = document.querySelector('#image-select-'+oldPres);
-    $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-    $imageSelectOverlay.children[0].classList.add("previous")
-
-    html = Mustache.render(imageSelectTemplate, {src: chancellor_label.png});
-    $imageSelectOverlay = document.querySelector('#image-select-'+oldChanc);
-    $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-    $imageSelectOverlay.children[0].classList.add("previous")
-
-    let presParticipant = $participantList.querySelector("participant"+newPres)
+    if (oldPres) {
+        $imageSelectOverlay = document.querySelector('#image-select-'+oldPres);
+        $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+        $imageSelectOverlay.children[0].classList.add("previous")
+    }
+    if (oldChanc) {
+        html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
+        $imageSelectOverlay = document.querySelector('#image-select-'+oldChanc);
+        $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+        $imageSelectOverlay.children[0].classList.add("previous")
+    }
+    let presParticipant = $participantList.querySelector("#participant"+newPres)
+    console.log(presParticipant)
     presParticipant.querySelector(".loader").classList.add("active")
 })
 
@@ -233,7 +233,7 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
     const chancellor = chancellorChosenData.chancellor
-    let html = Mustache.render(imageSelectTemplate, {src: chancellor_label.png});
+    let html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
     let $imageSelectOverlay = document.querySelector('#image-select-'+chancellor);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
     $imageSelectOverlay.children[0].classList.add("blink")
@@ -249,6 +249,16 @@ const clearOverlay = () => {
         let username = participantuser.id.substring(11)
         let $imageSelectOverlay = participantuser.querySelector('#image-select-'+username)
         $imageSelectOverlay.innerHTML = ''
+    }
+}
+
+const clearSlide = () => {
+    const list = $participantList.children
+    for (let i=0; i<list.length; i++) {
+        participantuser=list[i]
+        let username = participantuser.id.substring(11)
+        let $slidecard = participantuser.querySelector('#slidecard'+username)
+        $slidecard.innerHTML = ''
     }
 }
 
