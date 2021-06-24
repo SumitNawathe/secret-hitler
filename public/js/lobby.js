@@ -30,8 +30,6 @@ const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
-let slideup = false, startslide = true;
-let gameStartReveal = true;
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
@@ -43,6 +41,7 @@ const headingHtml = Mustache.render(headingTemplate, {
     room: room
 });
 
+let spectator = false
 
 const usernames = []
 const participants = []
@@ -198,6 +197,7 @@ socket.on('startGameData', (startGameDataString) => {
         // $voteback.classList.add("slideupanddown")
         //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
+        spectator = true
         const fascists = startGameData.fascists
         for (let username of fascists) {
             $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
@@ -334,13 +334,13 @@ const setVote = () => {
 
         participants[i].div.querySelector(".loader").classList.add("active")
     }
-
-    javote.classList.add("vote-place")
-    neinvote.classList.add("vote-place")
-
-    //might have to be more specific for veto stuff later
-    javote.addEventListener('click', jaEventListener)
-    neinvote.addEventListener('click', neinEventListener)
+    if (!spectator) {
+        javote.classList.add("vote-place")
+        neinvote.classList.add("vote-place")
+        //might have to be more specific for veto stuff later
+        javote.addEventListener('click', jaEventListener)
+        neinvote.addEventListener('click', neinEventListener)
+    }
 }
 
 function jaEventListener() {
