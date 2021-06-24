@@ -231,6 +231,7 @@ socket.on('startGameData', (startGameDataString) => {
             }
         }
     }
+    
 })
 
 socket.on('new president', (newPresidentString) => {
@@ -280,30 +281,50 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
     const chancellor = chancellorChosenData.chancellor
-    let html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
-    let $imageSelectOverlay = document.querySelector('#image-select-'+chancellor);
+
+    let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
+    $imageSelectOverlay = getDivFromUsername(overlays, president)
+    $imageSelectOverlay.insertAdjacentHTML('beforeend', html)
+    getDivFromUsername(participants, president).querySelector(".loader").classList.remove("active")
+
+    html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
+    $imageSelectOverlay = document.querySelector('#image-select-'+chancellor);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
     $imageSelectOverlay.children[0].classList.add("blink")
-
-    let presParticipant = $participantList.querySelector("#participant"+president)
-    presParticipant.querySelector(".loader").classList.remove("active")
     
-    //TODO: make loaders in sync
+    //TODO: maybe make loaders sync up
     setVote()
 })
 
 socket.on('did vote', (didVoteString) => {
     const didVoteData = JSON.parse(didVoteString)
     const username = didVoteData.username
-    findDivFromUsername(participants, username).querySelector(".loader").classList.remove("active")
+    getDivFromUsername(participants, username).querySelector(".loader").classList.remove("active")
 })
 
 socket.on('rescind vote', (didVoteString) => {
     const didVoteData = JSON.parse(didVoteString)
     const username = didVoteData.username
-    findDivFromUsername(participants, username).querySelector(".loader").classList.add("active")
+    getDivFromUsername(participants, username).querySelector(".loader").classList.add("active")
 }) 
 
+socket.on('vote finished', (voteFinishedString) => {
+    clearVote()
+    const voteData = JSON.parse(voteFinishedString)
+    const votes = voteData.votes
+    for (let i=0; i<votes.length; i++) {
+        const username = votes[i].username
+        const yes = votes[i].yes
+        if (!yes) {
+            getDivFromUsername(slidecards, username).querySelector(".flip-card-back")
+                .children[0].src = 'img/no cardback.png'
+        }
+    }
+    for (let i=0; i<participants.length; i++) {
+        participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
+        participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
+    }
+})
 
 const setVote = () => {
     for (let i=0; i<slidecards.length; i++) {
@@ -316,31 +337,48 @@ const setVote = () => {
 
     javote.classList.add("vote-place")
     neinvote.classList.add("vote-place")
-    javote.addEventListener('click', function() {
-        if (javote.classList.contains("selectvote")) {
-            javote.classList.remove("selectvote")
-        } else {
-            javote.classList.add("selectvote")
-            neinvote.classList.remove("selectvote")
-        }
-        socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
-    })
-    neinvote.addEventListener('click', function() {
-        if (neinvote.classList.contains("selectvote")) {
-            neinvote.classList.remove("selectvote")
-        } else {
-            neinvote.classList.add("selectvote")
-            javote.classList.remove("selectvote")
-        }
-        socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
-    })
+
+    //might have to be more specific for veto stuff later
+    javote.addEventListener('click', jaEventListener)
+    neinvote.addEventListener('click', neinEventListener)
+}
+
+function jaEventListener() {
+    if (javote.classList.contains("selectvote")) {
+        javote.classList.remove("selectvote")
+    } else {
+        javote.classList.add("selectvote")
+        neinvote.classList.remove("selectvote")
+    }
+    socket.emit('voting', { room, username, choice: true }, (error) => { if (error) { console.log('error'); } })
+}
+function neinEventListener() {
+    if (neinvote.classList.contains("selectvote")) {
+        neinvote.classList.remove("selectvote")
+    } else {
+        neinvote.classList.add("selectvote")
+        javote.classList.remove("selectvote")
+    }
+    socket.emit('voting', { room, username, choice: false }, (error) => { if (error) { console.log('error'); } })
+}
+const clearVote = () => {
+    javote.removeEventListener('click', jaEventListener)
+    neinvote.removeEventListener('click', neinEventListener)
+    //javote.classList.remove("vote-place")
+    javote.classList.add("vote-remove")
+    //neinvote.classList.remove("vote-place")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
 }
 
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
 }
 
-const findDivFromUsername = (arr, username ) => {
+const getDivFromUsername = (arr, username ) => {
     return arr.find(o => o.username === username).div;
 }
 

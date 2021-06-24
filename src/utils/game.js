@@ -149,6 +149,7 @@ const registerVote = (room, username, vote, io) => {
                     } else { 
                         lobby.voteCountNo--; 
                     }
+                    io.to(room).emit('rescind vote', JSON.stringify({username: username}));
                 } else {
                     if (vote) {
                         lobby.voteCountYes += 1; 
@@ -159,7 +160,6 @@ const registerVote = (room, username, vote, io) => {
                     }
                     lobby.users[i].lastVote = vote;
                 }
-                io.to(room).emit('rescind vote', JSON.stringify({username: username}));
             } else {
                 // first vote
                 lobby.users[i].status = STATUS_NONE;
