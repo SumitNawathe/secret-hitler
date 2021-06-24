@@ -117,6 +117,10 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
+socket.on('new president', () => {
+    console.log("new president :)");
+})
+
 socket.on('startGameData', (startGameDataString) => {
     var audio = new Audio('audio/CardPlacingSound.mp3');
     //audio.play();
