@@ -66,6 +66,17 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     lobby.investigations = [];
     // console.log('USER 0:');
     // console.log(lobby.users[0]);
+    setTimeout( function() {
+    io.to(room).emit('new president', 
+        JSON.stringify(
+            {
+                newPres: lobby.president,
+                oldChanc: lobby.previousChancellor,
+                oldPres: lobby.previousPresident
+
+            }       
+        ))
+        }, 4000)
 }
 
 const setUpVote = (room, chancellorChoice, io) => {

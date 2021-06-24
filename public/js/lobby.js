@@ -6,7 +6,7 @@ const $participantList = document.querySelector('#participant-list');
 const participantTemplate = document.querySelector('#participant-template').innerHTML;
 const $lobbyActions = document.querySelector('#actions');
 const actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
-const imageSelectTemplate = document.querySelector('#image-select-template').innerHTML;
+const imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
 const slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 const slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
 
@@ -117,10 +117,6 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
-socket.on('new president', () => {
-    console.log("new president :)");
-})
-
 socket.on('startGameData', (startGameDataString) => {
     var audio = new Audio('audio/CardPlacingSound.mp3');
     //audio.play();
@@ -205,6 +201,66 @@ socket.on('startGameData', (startGameDataString) => {
         }
     }
 })
+
+socket.on('new president', (newPresidentString) => {
+    console.log('new president')
+    const newPresidentData = JSON.parse(newPresidentString)
+    const newPres = newPresidentData.newPres
+    const oldChanc = newPresidentData.oldChanc
+    const oldPres = newPresidentData.oldPres
+    clearOverlay()
+    clearSlide()
+    let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
+    let $imageSelectOverlay = document.querySelector('#image-select-'+newPres);
+    $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+    if (oldPres) {
+        $imageSelectOverlay = document.querySelector('#image-select-'+oldPres);
+        $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+        $imageSelectOverlay.children[0].classList.add("previous")
+    }
+    if (oldChanc) {
+        html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
+        $imageSelectOverlay = document.querySelector('#image-select-'+oldChanc);
+        $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+        $imageSelectOverlay.children[0].classList.add("previous")
+    }
+    let presParticipant = $participantList.querySelector("#participant"+newPres)
+    console.log(presParticipant)
+    presParticipant.querySelector(".loader").classList.add("active")
+})
+
+socket.on('chancellor chosen', (chancellorChosenString) => {
+    const chancellorChosenData = JSON.parse(chancellorChosenString)
+    const president = chancellorChosenData.president
+    const chancellor = chancellorChosenData.chancellor
+    let html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
+    let $imageSelectOverlay = document.querySelector('#image-select-'+chancellor);
+    $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+    $imageSelectOverlay.children[0].classList.add("blink")
+
+    let presParticipant = $participantList.querySelector("participant"+president)
+    presParticipant.querySelector(".loader").classList.remove("active")
+})
+
+const clearOverlay = () => {
+    const list = $participantList.children
+    for (let i=0; i<list.length; i++) {
+        participantuser=list[i]
+        let username = participantuser.id.substring(11)
+        let $imageSelectOverlay = participantuser.querySelector('#image-select-'+username)
+        $imageSelectOverlay.innerHTML = ''
+    }
+}
+
+const clearSlide = () => {
+    const list = $participantList.children
+    for (let i=0; i<list.length; i++) {
+        participantuser=list[i]
+        let username = participantuser.id.substring(11)
+        let $slidecard = participantuser.querySelector('#slidecard'+username)
+        $slidecard.innerHTML = ''
+    }
+}
 
 
 
@@ -452,7 +508,7 @@ socket.on('lobbyData', (lobbyDataString) => {
                 console.log('Requesting policy peek');
                 socket.emit('presAction3', { room, id: socket.id }, (error) => { if (error) { console.log('error') } });
             });
-        } else if (myStatus === STATUS_PRESACT4){
+        } else if (myStatus === STATUS_PRESACT4) {
             const eligible = [];
             for(let i=0; i<lobbyData.users.length; i++){
                 if(lobbyData.users[i].type === TYPE_SPECTATOR || lobbyData.users[i].type === TYPE_DEAD || lobbyData.users[i].username === username){
