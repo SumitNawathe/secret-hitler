@@ -170,7 +170,7 @@ io.on('connection', (socket) => {
     socket.on('presDecision', ({ room, index }, callback) => {
         // console.log('chose card ' + index);
         presidentDiscard(room, index, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('chancDecision', ({room, index}, callback) => {

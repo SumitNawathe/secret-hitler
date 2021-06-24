@@ -182,8 +182,7 @@
 }
 
 .slidedown {
-    animation: slideup 1s forwards;
-    animation-direction: reverse;
+    animation: slidedown 1s forwards;
 }
 
 .slideupanddown {
@@ -192,7 +191,27 @@
 .rotateandslideupanddown {
     animation: slideupanddown 4s, rotate 1s forwards;
 }
-
+.rotateandslidedown {
+    animation: rotateandslidedown 4s forwards;
+}
+@-webkit-keyframes rotateandslidedown {
+    0% {
+        transform: rotateY(0deg);
+        bottom: 111.56px;
+    } 30% {
+        transform: rotateY(180deg);
+        bottom: 111.56px;
+    } 70% {
+        transform: rotateY(180deg);
+        bottom: 111.56px; 
+    } 100% {
+        transform: rotateY(180deg);
+        bottom: 0px;
+    }
+}
+.vote-rotate {
+    animation: rotate 1s forwards;
+}
 .blink {
     animation: blink 1s ease-in-out infinite alternate;
 }
@@ -225,6 +244,10 @@
 @-webkit-keyframes slideup {
     from { bottom: 0px; }
     to { bottom: 111.56px; }
+}
+@-webkit-keyframes slidedown {
+    from { bottom: 111.56px; }
+    to { bottom: 0px; }
 }
 
 @-webkit-keyframes slideupanddown {
@@ -291,12 +314,26 @@
 .vote-place {
     animation: vote-place 1s forwards;
 }
+.vote-remove {
+    animation: vote-remove 1s forwards;
+}
 .selectvote {
     box-shadow: 0px 0px 5px 5px green;
 }
 @-webkit-keyframes vote-place {
+    0% {
+        top: -500px
+    }
     100% {
         top: -130px;
+    }
+}
+@-webkit-keyframes vote-remove {
+    0% {
+        top: -130px
+    }
+    100% {
+        top: -500px;
     }
 }
 .dark {
@@ -348,7 +385,7 @@
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/fascist_back_78.png">
-                <div class="flip-card fascist-overlay1 fascist1-placeandrotate">
+                <!--<div class="flip-card fascist-overlay1 fascist1-placeandrotate">
                     <div class="flip-card-inner fascist1-rotate">
                         <div class="flip-card-front">
                             <img class="policy" src="img/policy.png">
@@ -357,7 +394,7 @@
                             <img class="policy" src="img/fascist policy.png">
                         </div>
                     </div>
-                </div>
+                </div>-->
                 <img class="fascist-overlay2 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay3 policy" src="img/fascist policy.png">
                 <img class="fascist-overlay4 policy" src="img/fascist policy.png">
