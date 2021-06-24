@@ -1,4 +1,3 @@
-
 const socket = io();
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
@@ -43,6 +42,13 @@ const headingTemplate = document.querySelector('#heading-template').innerHTML;
 const headingHtml = Mustache.render(headingTemplate, {
     room: room
 });
+
+
+const usernames = []
+const participants = []
+const slidecards = []
+const overlays = []
+
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 socket.on('joinLobbyData', (playerJoiningString) => {
@@ -116,7 +122,6 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     const deleteUsername = playerRemovedData.person;
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
-
 socket.on('startGameData', (startGameDataString) => {
     var audio = new Audio('audio/CardPlacingSound.mp3');
     //audio.play();
@@ -128,6 +133,13 @@ socket.on('startGameData', (startGameDataString) => {
             $participantList.querySelector('.spectator').remove()
         }
     } catch (error) {}
+    const list = $participantList.children
+    for (let i=0; i<list.length; i++) {
+        usernames.push(getUsername(i))
+        participants.push($participantList.querySelector('#participant'+getUsername(i)))
+        slidecards.push($participantList.querySelector('#slidecard'+getUsername(i)))
+        overlays.push($participantList.querySelector('#image-select-'+getUsername(i)))
+    }
     if (type === TYPE_LIBERAL) {
         console.log('liberal')
         $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
@@ -227,9 +239,18 @@ socket.on('new president', (newPresidentString) => {
     let presParticipant = $participantList.querySelector("#participant"+newPres)
     console.log(presParticipant)
     presParticipant.querySelector(".loader").classList.add("active")
+
+    if (newPres === username) {
+        //TODO: eligibility from back end
+        //currently just having the second person as the eligible one
+        let eligible = [false, true]
+        playerSelect(eligible, 'chooseChancellor')
+    }
 })
 
 socket.on('chancellor chosen', (chancellorChosenString) => {
+    clearOverlay()
+    clearSlide()
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
     const chancellor = chancellorChosenData.chancellor
@@ -238,15 +259,33 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
     $imageSelectOverlay.children[0].classList.add("blink")
 
-    let presParticipant = $participantList.querySelector("participant"+president)
+    let presParticipant = $participantList.querySelector("#participant"+president)
     presParticipant.querySelector(".loader").classList.remove("active")
+    
+    //TODO: make loaders in sync
+    slideUpVote()
 })
+
+const slideUpVote = () => {
+    const list = $participantList.children
+    for (let i=0; i<slidecards.length; i++) {
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
+        slidecards[i].children[0].classList.add("slideup")
+        slidecards[i].children[0].children[0].classList.add("slideup")
+
+        participants[i].querySelector(".loader").classList.add("active")
+    }
+}
+
+const getUsername = (i) => {
+    return $participantList.children[i].id.substring(11)
+}
 
 const clearOverlay = () => {
     const list = $participantList.children
     for (let i=0; i<list.length; i++) {
-        participantuser=list[i]
-        let username = participantuser.id.substring(11)
+        let username = getUsername(i)
+        participantuser = list[i]
         let $imageSelectOverlay = participantuser.querySelector('#image-select-'+username)
         $imageSelectOverlay.innerHTML = ''
     }
@@ -259,6 +298,26 @@ const clearSlide = () => {
         let username = participantuser.id.substring(11)
         let $slidecard = participantuser.querySelector('#slidecard'+username)
         $slidecard.innerHTML = ''
+    }
+}
+
+const playerSelect = (eligible, eventType) => {
+    let html=null; newButton=null;
+    for (let i = 0; i < eligible.length; i++) {
+        // console.log('player select image: ' + lobbyData.users[i].username);
+        if (eligible[i]) {
+            let username = getUsername(i)
+            let $imageSelectOverlay = document.querySelector('#image-select-'+username);
+            html = Mustache.render(imageSelectTemplate, { src: "blank.png"}, (error) => { if (error) { console.log('error'); } })
+            $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+            newButton = $imageSelectOverlay.children[0]
+            newButton.classList.add("glowing")
+            // console.log('adding event listener');
+            newButton.addEventListener('click', () => {
+                // console.log('chosen');
+                socket.emit(eventType, { room, choice: username }, (error) => { if (error) { console.log('error'); } })
+            });
+        }
     }
 }
 
@@ -602,7 +661,7 @@ const playerImageSelect = (lobbyData, eligible, eventType) => {
         // console.log('player select image: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             let $imageSelectOverlay = document.querySelector('#image-select-'+lobbyData.users[i].username);
-            html = Mustache.render(imageSelectTemplate, {image_id: "image-overlay-" + lobbyData.users[i].username, src: "test carback.png", id: lobbyData.users[i].username }, (error) => { if (error) { console.log('error'); } })
+            html = Mustache.render(imageSelectTemplate, { src: "blank.png"}, (error) => { if (error) { console.log('error'); } })
             $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
             newButton = $imageSelectOverlay.querySelector("#image-overlay-" + lobbyData.users[i].username);
             // console.log('adding event listener');

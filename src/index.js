@@ -158,7 +158,7 @@ io.on('connection', (socket) => {
         // console.log('chose chancellor: ' + choice);
         // console.log('room: ' + room);
         setUpVote(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {

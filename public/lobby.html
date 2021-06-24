@@ -6,243 +6,240 @@
         <link rel="stylesheet" href="/css/styles.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
 
-        <style>
-            .background {
-            }
-            .center {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .layered-image {
-                position: relative;
-                top: 0;
-                left: 0;
-            }
-            .pfpborder {
-                position: relative;
-                top: 0;
-                left: 0;
-                width: 80px;
-                height: 111.56px;
-                overflow: hidden;
-            }
-            .image-overlay1 {
-                position: relative;
-                top: 0px;
-                left: 0px;
-            }
-            .image-overlay2 {
-                position: absolute;
-                bottom: 111.56px;
-            }
-            .policy {
-                width: 85px;
-                height: auto;
-                box-shadow: 0 0 5px 2px #fff;
-            }
-            .liberal-overlay1 {
-                position: absolute;
-                top: 48px;
-                left: 95px;
-            }
-            .liberal-overlay2 {
-                position: absolute;
-                top: 48px;
-                left: 189px;
-            }
-            .liberal-overlay3 {
-                position: absolute;
-                top: 48px;
-                left: 283px;
-            }
-            .liberal-overlay4 {
-                position: absolute;
-                top: 48px;
-                left: 377px;
-            }
-            .liberal-overlay5 {
-                position: absolute;
-                top: 48px;
-                left: 471px;
-            }
-            .fascist-overlay1 {
-                position: absolute;
-                top: -70px;
-                left: -100px;
+<style>
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.layered-image {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+.pfpborder {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 111.56px;
+    overflow: hidden;
+}
+.image-overlay1 {
+    position: relative;
+    top: 0px;
+    left: 0px;
+}
+.image-overlay2 {
+    position: absolute;
+    bottom: 111.56px;
+    left: 10px;
+}
+.board {
+    width: 650px;
+    height: auto;
+}
+.policy {
+    width: 85px;
+    height: auto;
+    box-shadow: 0 0 5px 2px #fff;
+}
+.liberal-overlay1 {
+    position: absolute;
+    top: 48px;
+    left: 95px;
+}
+.liberal-overlay2 {
+    position: absolute;
+    top: 48px;
+    left: 189px;
+}
+.liberal-overlay3 {
+    position: absolute;
+    top: 48px;
+    left: 283px;
+}
+.liberal-overlay4 {
+    position: absolute;
+    top: 48px;
+    left: 377px;
+}
+.liberal-overlay5 {
+    position: absolute;
+    top: 48px;
+    left: 471px;
+}
+.fascist-overlay1 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
 
-                /*top: 48px;
-                left: 50px;*/
-            }
-            .fascist1-place {
-                animation: fascist1-place 3s forwards;
-            }
-            .fascist1-rotate {
-                animation: rotate 1s ease 1.5s forwards;
-            }
-            .fascist1-placeandrotate {
-                animation: fascist1-place 3s forwards, rotate 1s ease 1.5s forwards;
-            }
-            @-webkit-keyframes fascist1-place {
-                50% {
-                    left: 60px;
-                    top: -70px;
-                }
-                100% {
-                    top: 48px;
-                    left: 50px;
-                }
-            }
+    /*top: 48px;
+    left: 50px;*/
+}
+.fascist1-place {
+    animation: fascist1-place 3s forwards;
+}
+.fascist1-rotate {
+    animation: rotate 1s ease 1.5s forwards;
+}
+.fascist1-placeandrotate {
+    animation: fascist1-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes fascist1-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 50px;
+    }
+}
 
-            .fascist-overlay2 {
-                position: absolute;
-                top: 48px;
-                left: 143px;
-            }
-            .fascist-overlay3 {
-                position: absolute;
-                top: 48px;
-                left: 236px;
-            }
-            .fascist-overlay4 {
-                position: absolute;
-                top: 48px;
-                left: 329px;
-            }
-            .fascist-overlay5 {
-                position: absolute;
-                top: 48px;
-                left: 422px;
-            }
-            .fascist-overlay6 {
-                position: absolute;
-                top: 48px;
-                left: 515px;
-            }
+.fascist-overlay2 {
+    position: absolute;
+    top: 48px;
+    left: 143px;
+}
+.fascist-overlay3 {
+    position: absolute;
+    top: 48px;
+    left: 236px;
+}
+.fascist-overlay4 {
+    position: absolute;
+    top: 48px;
+    left: 329px;
+}
+.fascist-overlay5 {
+    position: absolute;
+    top: 48px;
+    left: 422px;
+}
+.fascist-overlay6 {
+    position: absolute;
+    top: 48px;
+    left: 515px;
+}
 
-            .rotate-container {
-                position: absolute;
-                perspective: 500px;
-                top: 0px;
-                left: 0px;
-            }
+.rotate-container {
+    position: absolute;
+    perspective: 500px;
+    top: 0px;
+    left: 0px;
+}
 
-            .row {
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
 
-            .col {
-                min-width: 0;
-                flex: 0 0 100px;
-            }
+.col {
+    min-width: 0;
+    flex: 0 0 100px;
+}
 
-            .hiddencard {
-                position: absolute;
-            }
+.hiddencard {
+    position: absolute;
+}
 
-            .ui.inverted.centered.tiny.header.Host.Fascist {
-               color: red;
-            }
+.ui.inverted.centered.tiny.header.Host.Fascist {
+    color: red;
+}
 
-            .ui.inverted.centered.tiny.header.Host.Liberal {
-                color: turquoise;
-            }
+.ui.inverted.centered.tiny.header.Host.Liberal {
+    color: turquoise;
+}
 
-            .ui.inverted.centered.tiny.header.Host.Hitler {
-                color: brown;
-            }
+.ui.inverted.centered.tiny.header.Host.Hitler {
+    color: brown;
+}
 
-            .ui.inverted.centered.tiny.header.Player.Fascist {
-               color: red;
-            }
+.ui.inverted.centered.tiny.header.Player.Fascist {
+    color: red;
+}
 
-            .ui.inverted.centered.tiny.header.Player.Liberal {
-                color: turquoise;
-            }
+.ui.inverted.centered.tiny.header.Player.Liberal {
+    color: turquoise;
+}
 
-            .ui.inverted.centered.tiny.header.Player.Hitler {
-                color: brown;
-            }
+.ui.inverted.centered.tiny.header.Player.Hitler {
+    color: brown;
+}
 
-            .glowing {
-                animation: glowing 1s ease-in-out infinite alternate;
-            }
+.glowing {
+    animation: glowing 1s ease-in-out infinite alternate;
+}
 
-            .fadein {
-                animation: fadein 2s;
-            }
+.fadein {
+    animation: fadein 2s;
+}
 
-            .slideup {
-                animation: slideup 1s forwards;
-            }
+.slideup {
+    animation: slideup 1s forwards;
+}
 
-            .slidedown {
-                animation: slideup 1s forwards;
-                animation-direction: reverse;
-            }
+.slidedown {
+    animation: slideup 1s forwards;
+    animation-direction: reverse;
+}
 
-            .slideupanddown {
-                animation: slideupanddown 4s;
-            }
-            .rotateandslideupanddown {
-                animation: slideupanddown 4s, rotate 1s forwards;
-            }
+.slideupanddown {
+    animation: slideupanddown 4s;
+}
+.rotateandslideupanddown {
+    animation: slideupanddown 4s, rotate 1s forwards;
+}
 
-            .blink {
-                animation: blink 1s ease-in-out infinite alternate;
-            }
+.blink {
+    animation: blink 1s ease-in-out infinite alternate;
+}
 
-            .previous {
-                opacity: .3;
-            }
+.previous {
+    opacity: .3;
+}
 
-            @-webkit-keyframes fadein {
-                from {opacity: 0;}
-                to {opacity: 1;}
-            }
+@-webkit-keyframes fadein {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
 
-            @-webkit-keyframes glowing {
-                from {
-                    box-shadow: 0px 0px 0px 0px yellow;
-                } to {
-                    box-shadow: 0px 0px 5px 5px yellow;
-                }
-            }
+@-webkit-keyframes glowing {
+    from {
+        box-shadow: 0px 0px 0px 0px yellow;
+    } to {
+        box-shadow: 0px 0px 5px 5px yellow;
+    }
+}
 
-            @-webkit-keyframes blink {
-                from {
-                    opacity: 0;
-                } to {
-                    opacity: .8;
-                }
-            }
+@-webkit-keyframes blink {
+    from {
+        opacity: 0;
+    } to {
+        opacity: .8;
+    }
+}
 
-            @-webkit-keyframes slideup {
-                from { bottom: 0px; }
-                to { bottom: 111.56px; }
-            }
+@-webkit-keyframes slideup {
+    from { bottom: 0px; }
+    to { bottom: 111.56px; }
+}
 
-            @-webkit-keyframes slideupanddown {
-                0% { bottom: 0px; }
-                30% { bottom: 111.56px }
-                70% { bottom: 111.56px; }
-                100% { bottom: 0px; }
-            }
-            @-webkit-keyframes rotate {
-                from {
-                    transform: rotateY(0deg);
-                } to {
-                    transform: rotateY(180deg);
-                }
-            }
-
-
-
-
-
-
+@-webkit-keyframes slideupanddown {
+    0% { bottom: 0px; }
+    30% { bottom: 111.56px }
+    70% { bottom: 111.56px; }
+    100% { bottom: 0px; }
+}
+@-webkit-keyframes rotate {
+    from {
+        transform: rotateY(0deg);
+    } to {
+        transform: rotateY(180deg);
+    }
+}
 
 .flip-card {
   background-color: transparent;
@@ -277,7 +274,7 @@
                 left: 0px;
 }
 
-        </style>
+</style>
 
         <script
             src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -314,7 +311,7 @@
 
             <!--currently using secrethitler.io backs, mostly just for spacing reference, must change later-->
             <div class="layered-image">
-                <img class="image image-overlay1" src="img/lib_back.png">
+                <img class="image image-overlay1 board" src="img/lib_back.png">
                 <img class="liberal-overlay1 policy" src="img/liberal policy.png">
                 <img class="liberal-overlay2 policy" src="img/liberal policy.png">
                 <img class="liberal-overlay3 policy" src="img/liberal policy.png">
@@ -323,7 +320,7 @@
             </div>
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">
-                <img class="image image-overlay1" src="img/fascist_back_78.png">
+                <img class="image image-overlay1 board" src="img/fascist_back_78.png">
                 <div class="flip-card fascist-overlay1 fascist1-placeandrotate">
                     <div class="flip-card-inner fascist1-rotate">
                         <div class="flip-card-front">
@@ -357,8 +354,8 @@
                         <div id={{ slidecard_id }}></div>
                         <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
                         <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
-                        <div id={{ image_select_id }}></div>
                     </div>
+                    <div id={{ image_select_id }}></div>
                 </div>
             </div>
         </script>
