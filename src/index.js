@@ -128,7 +128,7 @@ io.on('connection', (socket) => {
 
     socket.on('startGame', ({ room }, callback) => {
         console.log('receive startGame')
-        startGame(room);
+        startGame(room, io);
         // emitMidgameLobbyData(room);
         const lobby = lobbies.get(room);
         let fascists = [];
@@ -157,61 +157,61 @@ io.on('connection', (socket) => {
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
         // console.log('chose chancellor: ' + choice);
         // console.log('room: ' + room);
-        setUpVote(room, choice);
+        setUpVote(room, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
         // console.log('received vote: ' + choice);
-        registerVote(room, username, choice);
+        registerVote(room, username, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presDecision', ({ room, index }, callback) => {
         // console.log('chose card ' + index);
-        presidentDiscard(room, index);
+        presidentDiscard(room, index, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('chancDecision', ({room, index}, callback) => {
         // console.log('chose card ' + index);
-        chancellorChoose(room, index);
+        chancellorChoose(room, index, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presAction1', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
-        handlePresAction1(room, choice);
+        handlePresAction1(room, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presAction2', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
-        handlePresAction2(room, choice);
+        handlePresAction2(room, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presAction3', ({room, id}, callback) => {
-        const cards = handlePresAction3(room);
+        const cards = handlePresAction3(room, io);
         io.to(id).emit('policyPeek', JSON.stringify(cards));
         setTimeout(emitMidgameLobbyData, 5000, room);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {
-        handlePresAction4(room, choice);
+        handlePresAction4(room, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('presVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
-        presidentVeto(room, choice);
+        presidentVeto(room, choice, io);
         emitMidgameLobbyData(room);
     });
 
     socket.on('chancellorVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
-        chancellorVeto(room, choice);
+        chancellorVeto(room, choice, io);
         emitMidgameLobbyData(room);
     });
 

@@ -32,7 +32,7 @@ const {
     STATUS_PRESVETOCHOICE
 } = require('../utils/data')
 
-const startGame = (room) => { //TODO: dont allow start if not enough users
+const startGame = (room, io) => { //TODO: dont allow start if not enough users
     const lobby = lobbies.get(room);
     // console.log('SETTING GAMESTATE TO ONGOING');
     //lobby.nextPres.push(lobby.users[1].username); //could cause crash if only 1 user
@@ -67,7 +67,7 @@ const startGame = (room) => { //TODO: dont allow start if not enough users
     // console.log(lobby.users[0]);
 }
 
-const setUpVote = (room, chancellorChoice) => {
+const setUpVote = (room, chancellorChoice, io) => {
     const lobby = lobbies.get(room);
     // console.log(lobby);
     // console.log(room);
@@ -87,9 +87,13 @@ const setUpVote = (room, chancellorChoice) => {
     }
     lobby.chancellor = chancellorChoice;
     drawThreeCards(room);
+
+    for (let i =0; i<lobby.users.length; i++){
+        io.to(lobby.users[i].id).emit('chancellor chosen', JSON.stringify({chancellor: chancellorChoice}));
+    }
 }
 
-const registerVote = (room, username, vote) => {
+const registerVote = (room, username, vote, io) => {
     const lobby = lobbies.get(room);
     let countPlayers = 0;
 
@@ -118,6 +122,7 @@ const registerVote = (room, username, vote) => {
                     }
                     lobby.users[i].lastVote = vote;
                 }
+                io.to(room).emit('rescind vote', JSON.stringify({username: username}));
             } else {
                 // first vote
                 lobby.users[i].status = STATUS_NONE;
@@ -150,7 +155,7 @@ const registerVote = (room, username, vote) => {
             lobby.previousChancellor = lobby.chancellor;
             getUserFromUsername(room, lobby.president).status = STATUS_PRESDEC;
         } else { //election fails
-            nextPresident(room, false);
+            nextPresident(room, false, io);
         }
         for(let i=0; i<lobby.users.length; i++){
             lobby.users[i].lastVote = null;
@@ -159,25 +164,25 @@ const registerVote = (room, username, vote) => {
     console.log(lobby.users);
 }
 
-const presidentVeto = (room, decision) => {
+const presidentVeto = (room, decision, io) => {
     const lobby = lobbies.get(room);
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     if(decision){
         // if pres wants to veto
         getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCVETOCHOICE;
     } else {
-        placeCard(room, lobby.policyCards[0]);
+        placeCard(room, lobby.policyCards[0], io);
     }
 }
 
-const chancellorVeto = (room, decision) => {
+const chancellorVeto = (room, decision, io) => {
     const lobby = lobbies.get(room);
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
     if(decision){
         // if chancellor wants to veto
-        nextPresident(room, true);
+        nextPresident(room, true, io);
     } else {
-        placeCard(room, lobby.policyCards[0]);
+        placeCard(room, lobby.policyCards[0], io);
     }
 }
 
@@ -201,17 +206,17 @@ const drawThreeCards = (room) => {
     lobby.deck.splice(0, 3);
 }
 
-const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */) => {
+const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusive */, io) => {
     const lobby = lobbies.get(room);
     lobby.policyCards.splice(index, 1);
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCDEC;
 }
 
-const chancellorChoose = (room, index /*either 0 or 1 */) => {
+const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
     const lobby = lobbies.get(room);
     if(!lobby.veto){
-        placeCard(room, lobby.policyCards[index]);
+        placeCard(room, lobby.policyCards[index], io);
     } else {
         // console.log("making president veto");
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
@@ -220,11 +225,11 @@ const chancellorChoose = (room, index /*either 0 or 1 */) => {
     }
 }
 
-const placeCard = (room, type) => {
+const placeCard = (room, type, io) => {
     const lobby = lobbies.get(room);
     if (type == LIBERAL){
         lobby.liberalCards++;
-        nextPresident(room, true);
+        nextPresident(room, true, io);
     } else {
         lobby.fascistCards++;
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
@@ -239,7 +244,7 @@ const placeCard = (room, type) => {
     console.log("liberal"+lobby.liberalCards);
 }
 
-const presidentAction = (room) => {
+const presidentAction = (room, io) => {
     const lobby = lobbies.get(room);
     let numPlayers = 0;
     lobby.users.forEach((person) => {
@@ -260,14 +265,14 @@ const presidentAction = (room) => {
     }
 }
 
-const handlePresAction1 = (room, username) => {
+const handlePresAction1 = (room, username, io) => {
     console.log('recieved presAction1');
     const lobby = lobbies.get(room);
     lobby.investigations.push([lobby.president, username]);
-    nextPresident(room, true);
+    nextPresident(room, true, io);
 }
 
-const handlePresAction2 = (room, specialPres) => {
+const handlePresAction2 = (room, specialPres, io) => {
     console.log('recieved presAction2');
     // console.log("special election to " + specialPres);
     const lobby = lobbies.get(room);
@@ -275,10 +280,10 @@ const handlePresAction2 = (room, specialPres) => {
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
     // console.log("special election index "+index);
     lobby.nextPres.unshift(lobby.users[index].username);
-    nextPresident(room, true);
+    nextPresident(room, true, io);
 }
 
-const handlePresAction3 = (room) => {
+const handlePresAction3 = (room, io) => {
     console.log('recieved presAction3');
     const lobby = lobbies.get(room);
     drawThreeCards(room);
@@ -286,11 +291,11 @@ const handlePresAction3 = (room) => {
     lobby.deck.unshift(cards[0]);
     lobby.deck.unshift(cards[0]);
     lobby.deck.unshift(cards[0]);
-    nextPresident(room, true);
+    nextPresident(room, true, io);
     return cards;
 }
 
-const handlePresAction4 = (room, killUser) => {
+const handlePresAction4 = (room, killUser, io) => {
     console.log('recieved presAction3');
     const lobby = lobbies.get(room);
     let index = 0;
@@ -301,10 +306,10 @@ const handlePresAction4 = (room, killUser) => {
     }
     if (lobby.users[index].type === TYPE_LIBERAL) { lobby.users[index].type = TYPE_DEAD_LIB; }
     else { lobby.users[index].type = TYPE_DEAD_FAS; }
-    nextPresident(room, true);
+    nextPresident(room, true, io);
 }
 
-const nextPresident = (room, electionPassed) => {
+const nextPresident = (room, electionPassed, io) => {
     const lobby = lobbies.get(room);
     // console.log(lobby.nextPres);
     if(electionPassed){
@@ -335,6 +340,16 @@ const nextPresident = (room, electionPassed) => {
     }
     lobby.nextPres.splice(0, 1);
     getUserFromUsername(room, lobby.president).status = STATUS_PRESCHOOSE;
+    
+    io.to(room).emit('new president', 
+        JSON.stringify(
+            {
+                newPres: lobby.newPres,
+                oldChanc: lobby.previousChancellor,
+                oldPres: lobby.previousPresident
+
+            }       
+        ));
 }
 
 
