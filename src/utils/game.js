@@ -396,7 +396,14 @@ const nextPresident = (room, electionPassed, io) => {
     }
     lobby.nextPres.splice(0, 1);
     getUserFromUsername(room, lobby.president).status = STATUS_PRESCHOOSE;
-    
+    let alive = 0;
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
+
+        } else {
+            alive++;
+        }
+    }
     let eligibleChancellors = [];
     for(let i = 0; i<lobby.users.length; i++){
         if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
