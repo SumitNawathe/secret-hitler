@@ -81,7 +81,7 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
             // if user is playing the game
             if(lobby.users[i].username !== lobby.president && lobby.users[i].username !== lobby.previousChancellor){
                 // if user is not the president and not the previous chancellor
-                if(alive > 5 || (alive <= 5 && lobby.users[i].username !== lobby.previousPresident)){
+                if(alive <= 5 || (alive > 5 && lobby.users[i].username !== lobby.previousPresident)){
                     eligibleChancellors.push(lobby.users[i].username);
                 }
             }
@@ -313,6 +313,7 @@ const presidentAction = (room, io) => {
 
     //TODO: Make it based on the number of players; this is only one case for a medium group
     if (lobby.fascistCards === 1) {
+
         return STATUS_PRESACT1;
     } else if (lobby.fascistCards === 2) {
         return STATUS_PRESACT2;
