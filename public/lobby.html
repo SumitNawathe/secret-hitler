@@ -55,35 +55,102 @@ body {
 }
 .liberal-overlay1 {
     position: absolute;
-    top: 48px;
-    left: 95px;
+    top: -70px;
+    left: -100px;
 }
 .liberal-overlay2 {
     position: absolute;
-    top: 48px;
-    left: 189px;
+    top: -70px;
+    left: -100px;
 }
 .liberal-overlay3 {
     position: absolute;
-    top: 48px;
-    left: 283px;
+    top: -70px;
+    left: -100px;
 }
 .liberal-overlay4 {
     position: absolute;
-    top: 48px;
-    left: 377px;
+    top: -70px;
+    left: -100px;
 }
 .liberal-overlay5 {
     position: absolute;
-    top: 48px;
-    left: 471px;
+    top: -70px;
+    left: -100px;
+}
+.policy-rotate {
+    animation: rotate 1s ease 1.5s forwards;
+}
+.liberal1-placeandrotate {
+    animation: liberal1-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes liberal1-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 95px;
+    }
+}
+.liberal2-placeandrotate {
+    animation: liberal2-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes liberal2-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 189px;
+    }
+}
+.liberal3-placeandrotate {
+    animation: liberal3-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes liberal3-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 283px;
+    }
+}
+.liberal4-placeandrotate {
+    animation: liberal4-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes liberal4-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 377px;
+    }
+}
+.liberal5-placeandrotate {
+    animation: liberal5-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes liberal5-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 471px;
+    }
 }
 .fascist-overlay1 {
     position: absolute;
     top: -70px;
     left: -100px;
 }
-
 .fascist-overlay2 {
     position: absolute;
     top: -70px;
@@ -110,9 +177,6 @@ body {
     left: -100px;
 }
 
-.fascist1-rotate {
-    animation: rotate 1s ease 1.5s forwards;
-}
 .fascist1-placeandrotate {
     animation: fascist1-place 3s forwards, rotate 1s ease 1.5s forwards;
 }
@@ -125,9 +189,6 @@ body {
         top: 48px;
         left: 50px;
     }
-}
-.fascist2-rotate {
-    animation: rotate 1s ease 1.5s forwards;
 }
 .fascist2-placeandrotate {
     animation: fascist2-place 3s forwards, rotate 1s ease 1.5s forwards;
@@ -142,9 +203,6 @@ body {
         left: 143px;
     }
 }
-.fascist3-rotate {
-    animation: rotate 1s ease 1.5s forwards;
-}
 .fascist3-placeandrotate {
     animation: fascist3-place 3s forwards, rotate 1s ease 1.5s forwards;
 }
@@ -157,9 +215,6 @@ body {
         top: 48px;
         left: 236px;
     }
-}
-.fascist4-rotate {
-    animation: rotate 1s ease 1.5s forwards;
 }
 .fascist4-placeandrotate {
     animation: fascist4-place 3s forwards, rotate 1s ease 1.5s forwards;
@@ -174,9 +229,6 @@ body {
         left: 329px;
     }
 }
-.fascist5-rotate {
-    animation: rotate 1s ease 1.5s forwards;
-}
 .fascist5-placeandrotate {
     animation: fascist5-place 3s forwards, rotate 1s ease 1.5s forwards;
 }
@@ -189,9 +241,6 @@ body {
         top: 48px;
         left: 422px;
     }
-}
-.fascist6-rotate {
-    animation: rotate 1s ease 1.5s forwards;
 }
 .fascist6-placeandrotate {
     animation: fascist6-place 3s forwards, rotate 1s ease 1.5s forwards;
@@ -521,11 +570,56 @@ body {
 
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/lib_back.png">
-                <img class="liberal-overlay1 policy" src="img/liberal policy.png">
-                <img class="liberal-overlay2 policy" src="img/liberal policy.png">
-                <img class="liberal-overlay3 policy" src="img/liberal policy.png">
-                <img class="liberal-overlay4 policy" src="img/liberal policy.png">
-                <img class="liberal-overlay5 policy" src="img/liberal policy.png">
+                <div class="flip-card liberal-overlay1">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card liberal-overlay2">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card liberal-overlay3">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card liberal-overlay4">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card liberal-overlay5">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/liberal policy.png">
+                        </div>
+                    </div>
+                </div>
             </div>
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">

@@ -332,17 +332,6 @@ socket.on('vote finished', (voteFinishedString) => {
     }
 })
 
-socket.on('election passes', (electionPassString) => {
-    clearOverlayExcept(currentlabels)
-    clearSlide()
-    const passData = JSON.parse(electionPassString)
-    const president = passData.presidentUsername
-    const chancellor = passData.chancellorUsername
-    getDivFromUsername(participants, president).querySelector(".loader").classList.add("active")
-    $overlay = getDivFromUsername(overlays, chancellor)
-    $overlay.querySelector("img[src='img/chancellor_label.png']").classList.remove("blink")
-})
-
 const setVote = () => {
     for (let i=0; i<slidecards.length; i++) {
         slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
@@ -390,6 +379,24 @@ const clearVote = () => {
         neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
     }, 1000)
 }
+
+socket.on('election passes', (electionPassString) => {
+    clearOverlayExcept(currentlabels)
+    clearSlide()
+    const passData = JSON.parse(electionPassString)
+    const president = passData.presidentUsername
+    const chancellor = passData.chancellorUsername
+    getDivFromUsername(participants, president).querySelector(".loader").classList.add("active")
+    $overlay = getDivFromUsername(overlays, chancellor)
+    $overlay.querySelector("img[src='img/chancellor_label.png']").classList.remove("blink")
+})
+
+socket.on('election failed', (electionFailString) => {
+    clearOverlayExcept(previouslabels)
+    clearSlide()
+    const passData = JSON.parse(electionFailString)
+    //TODO: election tracker stuff
+})
 
 socket.on('get three cards', (threeCardsString) => {
     //TODO: add text about discarding if necessary
@@ -472,15 +479,18 @@ function cpolicyListener(e) {
 socket.on('place card', (placeCardString) => {
     const placeCardData = JSON.parse(placeCardString)
     const type = placeCardData.type
-    const liberalsPlaced = placeCardData.liberalsPlacedIncludingThisCard-1
-    const fascistsPlaced = placeCardData.fascistsPlacedIncludingThisCard-1
+    const liberalsPlaced = placeCardData.liberalsPlacedIncludingThisCard
+    const fascistsPlaced = placeCardData.fascistsPlacedIncludingThisCard
     if (type) {
-
+        document.querySelector('.liberal-overlay'+liberalsPlaced).classList
+            .add("liberal"+liberalsPlaced+"-placeandrotate")
+        document.querySelector('.liberal-overlay'+liberalsPlaced).children[0].classList
+            .add("policy-rotate")
     } else {
         document.querySelector('.fascist-overlay'+fascistsPlaced).classList
             .add("fascist"+fascistsPlaced+"-placeandrotate")
         document.querySelector('.fascist-overlay'+fascistsPlaced).children[0].classList
-            .add("fascist"+fascistsPlaced+"-rotate")
+            .add("policy-rotate")
             //this can be cleaned up a lot on html side
     }
 })

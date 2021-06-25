@@ -200,13 +200,15 @@ const registerVote = (room, username, vote, io) => {
             lobby.previousChancellor = lobby.chancellor;
             getUserFromUsername(room, lobby.president).status = STATUS_PRESDEC;
             setTimeout(function() {
-            io.to(room).emit('election passes', JSON.stringify({presidentUsername: lobby.president, chancellorUsername: lobby.chancellor}));
-            drawThreeCards(room);
-            io.to(getUserFromUsername(room, lobby.president).id).emit('get three cards', JSON.stringify({cards: lobby.policyCards}));
+                io.to(room).emit('election passes', JSON.stringify({presidentUsername: lobby.president, chancellorUsername: lobby.chancellor}));
+                drawThreeCards(room);
+                io.to(getUserFromUsername(room, lobby.president).id).emit('get three cards', JSON.stringify({cards: lobby.policyCards}));
             }, 4000)
         } else { //election fails
-            io.to(room).emit('election failed', JSON.stringify());
-            nextPresident(room, false, io);
+            setTimeout(function() {
+                io.to(room).emit('election failed', JSON.stringify());
+                nextPresident(room, false, io);
+            }, 4000)
         }
         for(let i=0; i<lobby.users.length; i++){
             lobby.users[i].lastVote = null;
