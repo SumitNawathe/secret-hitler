@@ -205,6 +205,7 @@ const registerVote = (room, username, vote, io) => {
             io.to(getUserFromUsername(room, lobby.president).id).emit('get three cards', JSON.stringify({cards: lobby.policyCards}));
             }, 4000)
         } else { //election fails
+            io.to(room).emit('election failed', JSON.stringify());
             nextPresident(room, false, io);
         }
         for(let i=0; i<lobby.users.length; i++){
