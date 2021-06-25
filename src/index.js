@@ -140,15 +140,21 @@ io.on('connection', (socket) => {
             if (person.type === TYPE_HITLER) { hitler = person.username; }
         });
 
+        let players = 0;
+        for(let i = 0; i<lobby.users.length; i++){
+            if(lobby.users[i].type !== TYPE_DEAD && lobby.users[i].type !== TYPE_DEAD_FAS && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_SPECTATOR){
+                players++;
+            }
+        }
         lobby.users.forEach((person) => {
             if (person.type === TYPE_LIBERAL) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_LIBERAL }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_LIBERAL, players: players }));
             } else if (person.type === TYPE_FASCIST) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler, players: players }));
             } else if (person.type === TYPE_HITLER) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  players: players }));
             } else if (person.type === TYPE_SPECTATOR) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler }));
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler,  players: players }));
             }
         });
         //TODO: emit first president
