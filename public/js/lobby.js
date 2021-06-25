@@ -47,7 +47,7 @@ const usernames = []
 const participants = []
 const slidecards = []
 const overlays = []
-const previouslabels = ["img[src='img/previous_president_label.png']", "img[src='img/previous_chancellor_label.png']"]
+const previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
 const currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
 const ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
 const cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
@@ -129,6 +129,7 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 socket.on('startGameData', (startGameDataString) => {
+    //TODO: clean up this terrible terrible mess
     let currentButton = $lobbyActions.querySelector('button');
     while(currentButton) {
         currentButton.remove();
@@ -139,7 +140,14 @@ socket.on('startGameData', (startGameDataString) => {
     //audio.play();
     console.log('start game')
     const startGameData = JSON.parse(startGameDataString)
-    const type = startGameData.type;
+    const type = startGameData.type
+    const players = startGameData.players
+    console.log('players '+players)
+    if (players<7) {
+        document.querySelector("img[src='img/fascist_back_78.png']").src = "img/fascist_back_56.png"
+    } else if (players>8) {
+        document.querySelector("img[src='img/fascist_back_78.png']").src = "img/fascist_back_910.png"
+    }
     try {
         for (let i=0; i<$participantList.children.length; i++) {
             $participantList.querySelector('.spectator').remove()
@@ -196,7 +204,16 @@ socket.on('startGameData', (startGameDataString) => {
         // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
         $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
         $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-
+        if (players<7) {
+            const fascists = startGameData.fascists
+            for (let username of fascists) {
+                getDivFromUsername(participants, username).children[0].classList.add("Fascist")
+                slideCardOneWithBack("party cardback.png", "fascist cardback.png", username)
+                let $slidecard = getDivFromUsername(slidecards, username)
+                $slidecard.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+                $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+            }
+        }
         // const $voteback = document.querySelector('#voteback'+username)
         // $voteback.classList.add("slideupanddown")
         //TODO: depending on player number see others
@@ -250,16 +267,16 @@ socket.on('new president', (newPresidentString) => {
     let $imageSelectOverlay = document.querySelector('#image-select-'+newPres);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
     if (oldPres) {
-        html = Mustache.render(imageSelectTemplate, {src: "previous_president_label.png"});
+        html = Mustache.render(imageSelectTemplate, {src: "previous president label.png"});
         $imageSelectOverlay = document.querySelector('#image-select-'+oldPres);
         $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-        $imageSelectOverlay.children[0].classList.add("previous")
+        $imageSelectOverlay.querySelector(previouslabels[0]).classList.add("previous")
     }
     if (oldChanc) {
         html = Mustache.render(imageSelectTemplate, {src: "previous_chancellor_label.png"});
         $imageSelectOverlay = document.querySelector('#image-select-'+oldChanc);
         $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-        $imageSelectOverlay.children[0].classList.add("previous")
+        $imageSelectOverlay.querySelector(previouslabels[1]).classList.add("previous")
     }
     let presParticipant = $participantList.querySelector("#participant"+newPres)
     console.log(presParticipant)
@@ -477,6 +494,7 @@ function cpolicyListener(e) {
 }
 
 socket.on('place card', (placeCardString) => {
+    removeLoaders() //might need to change this for veto stuff
     const placeCardData = JSON.parse(placeCardString)
     const type = placeCardData.type
     const liberalsPlaced = placeCardData.liberalsPlacedIncludingThisCard
@@ -535,16 +553,24 @@ const clearSlide = () => {
     }
 }
 
+const removeLoaders = () => {
+    for (let participant of participants) {
+        participant.div.querySelector('.loader').classList.remove("active")
+    }
+}
+
 const playerSelect = (eligible, eventType) => {
     let html=null; newButton=null;
+    console.log('eligible array '+eligible)
     for (let i = 0; i < eligible.length; i++) {
         // console.log('player select image: ' + lobbyData.users[i].username);
         if (eligible[i]) {
             let username = getUsername(i)
+            console.log('eligible '+username)
             let $imageSelectOverlay = document.querySelector('#image-select-'+username);
             html = Mustache.render(imageSelectTemplate, { src: "blank.png"}, (error) => { if (error) { console.log('error'); } })
             $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-            newButton = $imageSelectOverlay.children[0]
+            newButton = $imageSelectOverlay.querySelector("img[src='img/blank.png']")
             newButton.classList.add("glowing")
             // console.log('adding event listener');
             newButton.addEventListener('click', () => {

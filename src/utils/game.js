@@ -286,11 +286,15 @@ const placeCard = (room, type, io) => {
     const lobby = lobbies.get(room);
     if (type == LIBERAL){
         lobby.liberalCards++;
+        setTimeout(function() {
         nextPresident(room, true, io);
+        }, 3000)
     } else {
-        lobby.fascistCards++;
-        getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
-        getUserFromUsername(room, lobby.president).status = presidentAction(room);
+        try {
+            lobby.fascistCards++;
+            getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+            getUserFromUsername(room, lobby.president).status = presidentAction(room);
+        } catch (error) {}
     }
     if (lobby.fascistCards == 6) {
         endGame(room, FASCIST);
