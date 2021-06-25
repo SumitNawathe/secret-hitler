@@ -152,7 +152,11 @@ io.on('connection', (socket) => {
             } else if (person.type === TYPE_FASCIST) {
                 io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler, players: players }));
             } else if (person.type === TYPE_HITLER) {
-                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  players: players }));
+                if(players > 6){
+                    io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  players: players }));
+                } else {
+                    io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  fascists, players: players }));
+                }
             } else if (person.type === TYPE_SPECTATOR) {
                 io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler,  players: players }));
             }
