@@ -82,13 +82,34 @@ body {
     position: absolute;
     top: -70px;
     left: -100px;
+}
 
-    /*top: 48px;
-    left: 50px;*/
+.fascist-overlay2 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
 }
-.fascist1-place {
-    animation: fascist1-place 3s forwards;
+.fascist-overlay3 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
 }
+.fascist-overlay4 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
+}
+.fascist-overlay5 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
+}
+.fascist-overlay6 {
+    position: absolute;
+    top: -70px;
+    left: -100px;
+}
+
 .fascist1-rotate {
     animation: rotate 1s ease 1.5s forwards;
 }
@@ -105,31 +126,85 @@ body {
         left: 50px;
     }
 }
-
-.fascist-overlay2 {
-    position: absolute;
-    top: 48px;
-    left: 143px;
+.fascist2-rotate {
+    animation: rotate 1s ease 1.5s forwards;
 }
-.fascist-overlay3 {
-    position: absolute;
-    top: 48px;
-    left: 236px;
+.fascist2-placeandrotate {
+    animation: fascist2-place 3s forwards, rotate 1s ease 1.5s forwards;
 }
-.fascist-overlay4 {
-    position: absolute;
-    top: 48px;
-    left: 329px;
+@-webkit-keyframes fascist2-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 143px;
+    }
 }
-.fascist-overlay5 {
-    position: absolute;
-    top: 48px;
-    left: 422px;
+.fascist3-rotate {
+    animation: rotate 1s ease 1.5s forwards;
 }
-.fascist-overlay6 {
-    position: absolute;
-    top: 48px;
-    left: 515px;
+.fascist3-placeandrotate {
+    animation: fascist3-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes fascist3-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 236px;
+    }
+}
+.fascist4-rotate {
+    animation: rotate 1s ease 1.5s forwards;
+}
+.fascist4-placeandrotate {
+    animation: fascist4-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes fascist4-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 329px;
+    }
+}
+.fascist5-rotate {
+    animation: rotate 1s ease 1.5s forwards;
+}
+.fascist5-placeandrotate {
+    animation: fascist5-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes fascist5-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 422px;
+    }
+}
+.fascist6-rotate {
+    animation: rotate 1s ease 1.5s forwards;
+}
+.fascist6-placeandrotate {
+    animation: fascist6-place 3s forwards, rotate 1s ease 1.5s forwards;
+}
+@-webkit-keyframes fascist6-place {
+    50% {
+        left: 60px;
+        top: -70px;
+    }
+    100% {
+        top: 48px;
+        left: 515px;
+    }
 }
 
 .rotate-container {
@@ -455,8 +530,8 @@ body {
             <!--TODO: dynamic fascist board depending on player number-->
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/fascist_back_78.png">
-                <!--<div class="flip-card fascist-overlay1 fascist1-placeandrotate">
-                    <div class="flip-card-inner fascist1-rotate">
+                <div class="flip-card fascist-overlay1">
+                    <div class="flip-card-inner">
                         <div class="flip-card-front">
                             <img class="policy" src="img/policy.png">
                         </div>
@@ -464,12 +539,57 @@ body {
                             <img class="policy" src="img/fascist policy.png">
                         </div>
                     </div>
-                </div>-->
-                <img class="fascist-overlay2 policy" src="img/fascist policy.png">
-                <img class="fascist-overlay3 policy" src="img/fascist policy.png">
-                <img class="fascist-overlay4 policy" src="img/fascist policy.png">
-                <img class="fascist-overlay5 policy" src="img/fascist policy.png">
-                <img class="fascist-overlay6 policy" src="img/fascist policy.png">
+                </div>
+                <div class="flip-card fascist-overlay2">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/fascist policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card fascist-overlay3">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/fascist policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card fascist-overlay4">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/fascist policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card fascist-overlay5">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/fascist policy.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card fascist-overlay6">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="policy" src="img/policy.png">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="policy" src="img/fascist policy.png">
+                        </div>
+                    </div>
+                </div>
                 <img class="javote" src="img/yes cardback.png">
                 <img class="neinvote" src="img/no cardback.png">
                 <img class="ppolicy1" src="img/liberal policy.png">

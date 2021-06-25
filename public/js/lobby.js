@@ -392,6 +392,7 @@ const clearVote = () => {
 }
 
 socket.on('get three cards', (threeCardsString) => {
+    //TODO: add text about discarding if necessary
     const threeCardsData = JSON.parse(threeCardsString)
     const cards = threeCardsData.cards
     for (let i=0; i<cards.length; i++) {
@@ -467,6 +468,22 @@ function cpolicyListener(e) {
             (error) => { if (error) { console.log('error') } });
     }, 1500)
 }
+
+socket.on('place card', (placeCardString) => {
+    const placeCardData = JSON.parse(placeCardString)
+    const type = placeCardData.type
+    const liberalsPlaced = placeCardData.liberalsPlacedIncludingThisCard-1
+    const fascistsPlaced = placeCardData.fascistsPlacedIncludingThisCard-1
+    if (type) {
+
+    } else {
+        document.querySelector('.fascist-overlay'+fascistsPlaced).classList
+            .add("fascist"+fascistsPlaced+"-placeandrotate")
+        document.querySelector('.fascist-overlay'+fascistsPlaced).children[0].classList
+            .add("fascist"+fascistsPlaced+"-rotate")
+            //this can be cleaned up a lot on html side
+    }
+})
 
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
