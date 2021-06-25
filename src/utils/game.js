@@ -77,21 +77,17 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
 
     let eligibleChancellors = [];
     for(let i = 0; i<lobby.users.length; i++){
-        if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
-
-        } else {
-            if(lobby.users[i].username === lobby.president){
-
-            } else {
-                if(alive>5 && lobby.users[i].username === lobby.chancellor){
-
-                } else {
+        if(lobby.users[i].type !== TYPE_DEAD && lobby.users[i].type !== TYPE_DEAD_FAS && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_SPECTATOR){
+            // if user is playing the game
+            if(lobby.users[i].username !== lobby.president && lobby.users[i].username !== lobby.previousChancellor){
+                // if user is not the president and not the previous chancellor
+                if(alive > 5 || (alive <= 5 && lobby.users[i].username !== lobby.previousPresident)){
                     eligibleChancellors.push(lobby.users[i].username);
                 }
-                
             }
         }
     }
+    console.log("eligible chancellors: "+eligibleChancellors);
 
     setTimeout( function() {
     io.to(room).emit('new president', 
@@ -412,18 +408,13 @@ const nextPresident = (room, electionPassed, io) => {
     }
     let eligibleChancellors = [];
     for(let i = 0; i<lobby.users.length; i++){
-        if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
-
-        } else {
-            if(lobby.users[i].username === lobby.president){
-
-            } else {
-                if(alive>5 && lobby.users[i].username === lobby.chancellor){
-
-                } else {
+        if(lobby.users[i].type !== TYPE_DEAD && lobby.users[i].type !== TYPE_DEAD_FAS && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_SPECTATOR){
+            // if user is playing the game
+            if(lobby.users[i].username !== lobby.president && lobby.users[i].username !== lobby.previousChancellor){
+                // if user is not the president and not the previous chancellor
+                if(alive <= 5 || (alive > 5 && lobby.users[i].username !== lobby.previousPresident)){
                     eligibleChancellors.push(lobby.users[i].username);
                 }
-                
             }
         }
     }
