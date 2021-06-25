@@ -313,13 +313,16 @@ const presidentAction = (room, io) => {
 
     //TODO: Make it based on the number of players; this is only one case for a medium group
     if (lobby.fascistCards === 1) {
-
+        io.to(room).emit('president action 1', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT1;
     } else if (lobby.fascistCards === 2) {
+        io.to(room).emit('president action 2', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT2;
     } else if (lobby.fascistCards === 3) {
+        io.to(room).emit('president action 3', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT3;
     } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+        io.to(room).emit('president action 4', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT4;
     }
 }
