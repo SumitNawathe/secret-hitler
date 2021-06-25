@@ -395,12 +395,30 @@ const nextPresident = (room, electionPassed, io) => {
     lobby.nextPres.splice(0, 1);
     getUserFromUsername(room, lobby.president).status = STATUS_PRESCHOOSE;
     
+    let eligibleChancellors = [];
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
+
+        } else {
+            if(lobby.users[i].username === lobby.president){
+
+            } else {
+                if(alive>5 && lobby.users[i].username === lobby.chancellor){
+
+                } else {
+                    eligibleChancellors.push(lobby.users[i].username);
+                }
+                
+            }
+        }
+    }
     io.to(room).emit('new president', 
         JSON.stringify(
             {
                 newPres: lobby.president,
                 oldChanc: lobby.previousChancellor,
-                oldPres: lobby.previousPresident
+                oldPres: lobby.previousPresident,
+                eligibleChancellors: eligibleChancellors
 
             }       
         ));
