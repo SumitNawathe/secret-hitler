@@ -176,7 +176,7 @@ io.on('connection', (socket) => {
     socket.on('chancDecision', ({room, index}, callback) => {
         // console.log('chose card ' + index);
         chancellorChoose(room, index, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction1', ({room, choice}, callback) => {

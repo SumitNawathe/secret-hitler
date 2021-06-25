@@ -8,14 +8,24 @@
 
 <style>
 .center {
-    display: block;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
 }
+body {
+    position: relative;
+}
+.container {
+    position: relative;
+}
+.row {
+    position: relative;
+}
+.participant {
+    position: relative;
+}
 .layered-image {
     position: relative;
-    top: 0;
-    left: 0;
 }
 .pfpborder {
     position: relative;
@@ -27,13 +37,12 @@
 }
 .image-overlay1 {
     position: relative;
-    top: 0px;
-    left: 0px;
 }
 .image-overlay2 {
     position: absolute;
-    bottom: 111.56px;
-    left: 10px;
+    top: 0;
+    left: 0;
+    width: 80px; height: auto;
 }
 .board {
     width: 650px;
@@ -217,7 +226,7 @@
 }
 
 .previous {
-    opacity: .3;
+    opacity: .5;
 }
 
 @-webkit-keyframes fadein {
@@ -339,6 +348,67 @@
 .dark {
     filter: brightness(50%);
 }
+
+.ppolicy1 {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -500px;
+    left: 100px;
+}
+.ppolicy2 {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -500px;
+    left: 267px;
+}
+.ppolicy3 {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -500px;
+    left: 435px;
+}
+.cpolicy1 {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -500px;
+    left: 150px;
+}
+.cpolicy2 {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    top: -500px;
+    left: 385px;
+}
+.policy-slide {
+    animation: policy-slide 1s forwards;
+}
+.policy-slideup {
+    animation: policy-slideup 1.5s forwards;
+}
+@-webkit-keyframes policy-slide {
+    0% {
+        top: -500px
+    }
+    100% {
+        top: -100px;
+    }
+}
+@-webkit-keyframes policy-slideup {
+    0% {
+        top: -100px
+    }
+    33% {
+        top: -100px
+    }
+    100% {
+        top: -500px;
+    }
+}
 </style>
 
         <script
@@ -402,6 +472,11 @@
                 <img class="fascist-overlay6 policy" src="img/fascist policy.png">
                 <img class="javote" src="img/yes cardback.png">
                 <img class="neinvote" src="img/no cardback.png">
+                <img class="ppolicy1" src="img/liberal policy.png">
+                <img class="ppolicy2" src="img/liberal policy.png">
+                <img class="ppolicy3" src="img/liberal policy.png">
+                <img class="cpolicy1" src="img/liberal policy.png">
+                <img class="cpolicy2" src="img/liberal policy.png">
 
             </div>
             <div class="container">
@@ -414,13 +489,11 @@
                     position: relative; bottom: -10px;">
                     {{ username }}{{ status }}
                 </div>
-                <div class="layered-image">
+                <div class="layered-image center">
                     <div class="pfpborder center">
-                        <img class="ui tiny image image-overlay1" id={{ username_img }} src="img/default cardback.png">
+                        <img class="ui tiny image image-overlay2" id={{ username_img }} src="img/default cardback.png">
                         <div class="ui inverted small loader"></div>
                         <div id={{ slidecard_id }}></div>
-                        <!--<img class="ui tiny image centered hiddencard" id="voteback{{ voteback_id }}" src="img/voting cardback.png">
-                        <img class="ui tiny image centered hiddencard" id="party{{ party_id }}" src="img/fascist cardback.png">-->
                     </div>
                     <div id={{ image_select_id }}></div>
                 </div>
@@ -428,7 +501,7 @@
         </script>
 
         <script id="image-overlay" type="text/html">
-            <img class="ui tiny image image-overlay2" src= "img/{{ src }}">
+            <img class="image-overlay2" src= "img/{{ src }}">
         </script>
 
         <script id="slidecard-template" type="text/html">

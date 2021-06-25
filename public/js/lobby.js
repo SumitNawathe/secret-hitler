@@ -47,6 +47,10 @@ const usernames = []
 const participants = []
 const slidecards = []
 const overlays = []
+const previouslabels = ["img[src='img/previous_president_label.png']", "img[src='img/previous_chancellor_label.png']"]
+const currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
+const ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
+const cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
 
 const javote = document.querySelector(".javote")
 const neinvote = document.querySelector(".neinvote")
@@ -246,12 +250,13 @@ socket.on('new president', (newPresidentString) => {
     let $imageSelectOverlay = document.querySelector('#image-select-'+newPres);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
     if (oldPres) {
+        html = Mustache.render(imageSelectTemplate, {src: "previous_president_label.png"});
         $imageSelectOverlay = document.querySelector('#image-select-'+oldPres);
         $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
         $imageSelectOverlay.children[0].classList.add("previous")
     }
     if (oldChanc) {
-        html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
+        html = Mustache.render(imageSelectTemplate, {src: "previous_chancellor_label.png"});
         $imageSelectOverlay = document.querySelector('#image-select-'+oldChanc);
         $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
         $imageSelectOverlay.children[0].classList.add("previous")
@@ -276,7 +281,7 @@ socket.on('new president', (newPresidentString) => {
 })
 
 socket.on('chancellor chosen', (chancellorChosenString) => {
-    clearOverlay()
+    clearOverlayExcept(previouslabels)
     clearSlide()
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
@@ -290,7 +295,7 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     html = Mustache.render(imageSelectTemplate, {src: "chancellor_label.png"});
     $imageSelectOverlay = document.querySelector('#image-select-'+chancellor);
     $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
-    $imageSelectOverlay.children[0].classList.add("blink")
+    $imageSelectOverlay.querySelector("img[src='img/chancellor_label.png']").classList.add("blink")
     
     //TODO: maybe make loaders sync up
     setVote()
@@ -309,7 +314,8 @@ socket.on('rescind vote', (didVoteString) => {
 }) 
 
 socket.on('vote finished', (voteFinishedString) => {
-    clearVote()
+    if (!spectator)
+        clearVote()
     const voteData = JSON.parse(voteFinishedString)
     const votes = voteData.votes
     for (let i=0; i<votes.length; i++) {
@@ -324,6 +330,17 @@ socket.on('vote finished', (voteFinishedString) => {
         participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
         participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
     }
+})
+
+socket.on('election passes', (electionPassString) => {
+    clearOverlayExcept(currentlabels)
+    clearSlide()
+    const passData = JSON.parse(electionPassString)
+    const president = passData.presidentUsername
+    const chancellor = passData.chancellorUsername
+    getDivFromUsername(participants, president).querySelector(".loader").classList.add("active")
+    $overlay = getDivFromUsername(overlays, chancellor)
+    $overlay.querySelector("img[src='img/chancellor_label.png']").classList.remove("blink")
 })
 
 const setVote = () => {
@@ -374,11 +391,88 @@ const clearVote = () => {
     }, 1000)
 }
 
+socket.on('get three cards', (threeCardsString) => {
+    const threeCardsData = JSON.parse(threeCardsString)
+    const cards = threeCardsData.cards
+    for (let i=0; i<cards.length; i++) {
+        if (cards[i]) {
+            ppolicies[i].src = "img/liberal policy.png"
+        } else {
+            ppolicies[i].src = "img/fascist policy.png"
+        }
+    }
+    for (let policy of ppolicies) {
+        policy.classList.add("policy-slide")
+    }
+    setTimeout(function() {
+        for (let policy of ppolicies) {
+            policy.addEventListener('click', ppolicyListener)
+        }
+    }, 1000)
+
+})
+
+function ppolicyListener(e) {
+    e.target.classList.add("selectvote")
+    for (let policy of ppolicies) {
+        policy.classList.add("policy-slideup")
+    }
+    setTimeout(function() {
+        for (let policy of ppolicies) {
+            policy.classList.remove("policy-slide", "policy-slideup", "selectvote")
+        }
+        socket.emit('presDecision', { room: room, index: Number(e.target.classList[0].substring(7))-1}, 
+            (error) => { if (error) { console.log('error') } });
+    }, 1500)
+}
+
+socket.on('president discard', (presidentDiscardString) => {
+    const presidentDiscardData = JSON.parse(presidentDiscardString)
+    const president = presidentDiscardData.president
+    const chancellor = presidentDiscardData.chancellor
+    getDivFromUsername(participants, president).querySelector(".loader").classList.remove("active")
+    getDivFromUsername(participants, chancellor).querySelector(".loader").classList.add("active")
+})
+
+socket.on('chancellor get two cards', (twoCardsString) => {
+    const twoCardsData = JSON.parse(twoCardsString)
+    const cards = twoCardsData.policyCards
+    for (let i=0; i<cards.length; i++) {
+        if (cards[i]) {
+            cpolicies[i].src = "img/liberal policy.png"
+        } else {
+            cpolicies[i].src = "img/fascist policy.png"
+        }
+    }
+    for (let policy of cpolicies) {
+        policy.classList.add("policy-slide")
+    }
+    setTimeout(function() {
+        for (let policy of cpolicies) {
+            policy.addEventListener('click', cpolicyListener)
+        }
+    }, 1000)
+})
+
+function cpolicyListener(e) {
+    e.target.classList.add("selectvote")
+    for (let policy of cpolicies) {
+        policy.classList.add("policy-slideup")
+    }
+    setTimeout(function() {
+        for (let policy of cpolicies) {
+            policy.classList.remove("policy-slide", "policy-slideup", "selectvote")
+        }
+        socket.emit('chancDecision', { room: room, index: Number(e.target.classList[0].substring(7))-1}, 
+            (error) => { if (error) { console.log('error') } });
+    }, 1500)
+}
+
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
 }
 
-const getDivFromUsername = (arr, username ) => {
+const getDivFromUsername = (arr, username) => {
     return arr.find(o => o.username === username).div;
 }
 
@@ -388,12 +482,28 @@ const clearOverlay = () => {
     }
 }
 
+const clearOverlayExcept = (arr) => {
+    for (let i=0; i<overlays.length; i++) {
+        let div=overlays[i].div
+        let keep = []
+        for (let except of arr) {
+            if (div.querySelector(except)) {
+                keep.push(div.querySelector(except))
+            }
+        }
+        div.innerHTML = ''
+        for (let child of keep)
+            div.appendChild(child)
+    }
+}
+
 const clearSlide = () => {
     const list = $participantList.children
     for (let i=0; i<list.length; i++) {
         participantuser=list[i]
         let username = participantuser.id.substring(11)
         let $slidecard = participantuser.querySelector('#slidecard'+username)
+        console.log('slidecard '+username)
         $slidecard.innerHTML = ''
     }
 }

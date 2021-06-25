@@ -199,9 +199,11 @@ const registerVote = (room, username, vote, io) => {
             lobby.previousPresident = lobby.president;
             lobby.previousChancellor = lobby.chancellor;
             getUserFromUsername(room, lobby.president).status = STATUS_PRESDEC;
+            setTimeout(function() {
             io.to(room).emit('election passes', JSON.stringify({presidentUsername: lobby.president, chancellorUsername: lobby.chancellor}));
             drawThreeCards(room);
             io.to(getUserFromUsername(room, lobby.president).id).emit('get three cards', JSON.stringify({cards: lobby.policyCards}));
+            }, 4000)
         } else { //election fails
             nextPresident(room, false, io);
         }
