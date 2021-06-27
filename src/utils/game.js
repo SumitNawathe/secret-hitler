@@ -291,7 +291,7 @@ const placeCard = (room, type, io) => {
             lobby.fascistCards++;
             getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
             if(lobby.failedElectionTracker !== 3 ){
-                getUserFromUsername(room, lobby.president).status = presidentAction(room);
+                getUserFromUsername(room, lobby.president).status = presidentAction(room, io);
             }
         } catch (error) {}
     }
