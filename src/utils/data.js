@@ -19,6 +19,8 @@ const STATUS_PRESACT1 = 5;
 const STATUS_PRESACT2 = 6;
 const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
+const STATUS_PRESACT_NONE = -1;
+
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
 
@@ -111,7 +113,8 @@ const createLobby = (room, username, id) => {
         veto: false,
         nextPres : [], // array with the indices of the next few presidents
         postGameData: null,
-        failedElectionTracker: 0
+        failedElectionTracker: 0,
+        presidentActionList: []
     };
     lobbies.set(room, lobby);
 }
@@ -166,6 +169,7 @@ module.exports = {
     STATUS_PRESACT2,
     STATUS_PRESACT3,
     STATUS_PRESACT4,
+    STATUS_PRESACT_NONE,
     STATUS_PRESVETOCHOICE,
     STATUS_CHANCVETOCHOICE,
     FASCIST,
