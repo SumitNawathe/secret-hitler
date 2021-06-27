@@ -290,7 +290,9 @@ const placeCard = (room, type, io) => {
         try {
             lobby.fascistCards++;
             getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
-            getUserFromUsername(room, lobby.president).status = presidentAction(room);
+            if(lobby.failedElectionTracker !== 3 ){
+                getUserFromUsername(room, lobby.president).status = presidentAction(room);
+            }
         } catch (error) {}
     }
     if (lobby.fascistCards == 6) {
@@ -634,8 +636,8 @@ const incrementFailedElectionTracker = (room, io) => {
     lobby.failedElectionTracker++
     if(lobby.failedElectionTracker==3){
         
-        lobby.failedElectionTracker = 0;
         placeCard(room, lobby.policyCards[0], io);
+        lobby.failedElectionTracker = 0;
         lobby.policyCards.splice(0, 1);
         
         if(lobby.deck.length === 0){
