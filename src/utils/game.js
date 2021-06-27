@@ -408,6 +408,7 @@ const nextPresident = (room, electionPassed, io) => {
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
+        io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
         lobby.failedElectionTracker = 0;
     } else {
         incrementFailedElectionTracker(room, io);
@@ -650,7 +651,8 @@ const incrementFailedElectionTracker = (room, io) => {
     const lobby = lobbies.get(room);
     lobby.failedElectionTracker++
     if(lobby.failedElectionTracker==3){
-        
+        // if we do place a policy card
+
         placeCard(room, lobby.policyCards[0], io);
         lobby.failedElectionTracker = 0;
         lobby.policyCards.splice(0, 1);
@@ -686,8 +688,13 @@ const incrementFailedElectionTracker = (room, io) => {
         lobby.deck.splice(0, 1);
         lobby.previousPresident = null;
         lobby.previousChancellor= null;
+
+        io.to(room).emit('failed election tracker', JSON.stringify({start: 2, end: 3}));
+        io.to(room).emit('failed election tracker', JSON.stringify({start: 3, end: 0}));
+    } else {
+        // if we don't place a policy card
+        io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker-1, end: lobby.failedElectionTracker}));
     }
-    io.to(room).emit('failed election tracker', JSON.stringify({trackerIndex: lobby.failedElectionTracker}));
 }
 
 
