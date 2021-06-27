@@ -198,7 +198,7 @@ io.on('connection', (socket) => {
     socket.on('presAction2', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
         handlePresAction2(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction3', ({room, id}, callback) => {

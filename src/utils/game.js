@@ -313,22 +313,23 @@ const presidentAction = (room, io) => {
             numPlayers += 1;
         }
     });
-    console.log(io)
-    io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
-    //TODO: Make it based on the number of players; this is only one case for a medium group
-    if (lobby.fascistCards === 1) {
-        io.to(getUserFromUsername(lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
-        return STATUS_PRESACT1;
-    } else if (lobby.fascistCards === 2) {
-        io.to(getUserFromUsername(lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
-        return STATUS_PRESACT2;
-    } else if (lobby.fascistCards === 3) {
-        io.to(getUserFromUsername(lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
-        return STATUS_PRESACT3;
-    } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
-        io.to(getUserFromUsername(lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
-        return STATUS_PRESACT4;
-    }
+    setTimeout(function() {
+        io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+        //TODO: Make it based on the number of players; this is only one case for a medium group
+        if (lobby.fascistCards === 1) {
+            io.to(getUserFromUsername(room, lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
+            return STATUS_PRESACT1;
+        } else if (lobby.fascistCards === 2) {
+            io.to(getUserFromUsername(room, lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
+            return STATUS_PRESACT2;
+        } else if (lobby.fascistCards === 3) {
+            io.to(getUserFromUsername(room, lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
+            return STATUS_PRESACT3;
+        } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+            io.to(getUserFromUsername(room, lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
+            return STATUS_PRESACT4;
+        }
+    }, 3000)
 }
 
 const handlePresAction1 = (room, username, io) => {
@@ -608,14 +609,6 @@ const generatePostGameLobbyData = (room) => {
 
 const getUserFromUsername = (room, username) => {
     const lobby = lobbies.get(room);
-    // console.log('lobbies')
-    // console.log(lobbies);
-    // console.log('room');
-    // console.log(room);
-    // console.log('lobby');
-    // console.log(lobby);
-    // console.log('users');
-    // console.log(lobby.users);
     for (let i = 0; i < lobby.users.length; i++) {
         if (lobby.users[i].username === username) {
             return lobby.users[i];

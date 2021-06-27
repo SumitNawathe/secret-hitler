@@ -160,6 +160,7 @@ socket.on('startGameData', (startGameDataString) => {
         var newObject = new Object()
         newObject.username = username
         newObject.div = $participantList.querySelector('#participant'+username)
+        newObject.dead = false
         participants.push(newObject)
         newObject = new Object()
         newObject.username = username
@@ -261,6 +262,7 @@ socket.on('new president', (newPresidentString) => {
     const newPres = newPresidentData.newPres
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
+    removeLoaders()
     clearOverlay()
     clearSlide()
     let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
@@ -519,6 +521,22 @@ socket.on('president loading', (loadingString) => {
     const president = loadingData.president
     getDivFromUsername(participants, president).querySelector('.loader').classList.add("active")
 })
+
+socket.on('president action 1', (firstString) => {
+
+})
+
+socket.on('president action 2', (secondString) => {
+    const secondData = JSON.parse(secondString)
+    const president = secondData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction2')
+})
+
 
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
