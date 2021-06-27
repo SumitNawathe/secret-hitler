@@ -231,6 +231,7 @@ const chancellorVeto = (room, decision, io) => {
     if(decision){
         // if chancellor wants to veto
         nextPresident(room, true, io);
+        incrementFailedElectionTracker(room, io);
     } else {
         placeCard(room, lobby.policyCards[0], io);
     }
@@ -382,6 +383,8 @@ const nextPresident = (room, electionPassed, io) => {
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
+    } else {
+        incrementFailedElectionTracker(room, io);
     }
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
@@ -624,6 +627,49 @@ const getIndexFromUsername = (room, username) => {
         }
     }
 }
+
+const incrementFailedElectionTracker = (room, io) => {
+    const lobby = lobbies.get(room);
+    lobby.failedElectionTracker++
+    if(lobby.failedElectionTracker==3){
+        
+        lobby.failedElectionTracker = 0;
+        placeCard(room, lobby.policyCards[0], io);
+        lobby.policyCards.splice(0, 1);
+        
+        if(lobby.deck.length === 0){
+                lobby.deck = [];
+                for(let i=0; i<6-lobby.liberalCards; i++){
+                    lobby.deck.push(true);
+                }
+                
+                for(let i=0; i<11-lobby.fascistCards; i++){
+                    lobby.deck.push(false);
+                }        
+                if(lobby.policyCards[0] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+                if(lobby.policyCards[1] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+                if(lobby.policyCards[2] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+
+                lobby.deck = randomShuffle(lobby.deck);
+        }
+        lobby.policyCards.push(lobby.deck[0]);
+        lobby.deck.splice(0, 1);
+    }
+    io.to(room).emit('failed election tracker', JSON.stringify({trackerIndex: lobby.failedElectionTracker}));
+}
+
 
 module.exports = {
     startGame,
