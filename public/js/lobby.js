@@ -262,6 +262,7 @@ socket.on('new president', (newPresidentString) => {
     const newPres = newPresidentData.newPres
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
+    clearLobbyActions()
     removeLoaders()
     clearOverlay()
     clearSlide()
@@ -418,6 +419,7 @@ socket.on('election failed', (electionFailString) => {
 })
 
 socket.on('get three cards', (threeCardsString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a policy to discard")
     //TODO: add text about discarding if necessary
     const threeCardsData = JSON.parse(threeCardsString)
     const cards = threeCardsData.cards
@@ -454,6 +456,7 @@ function ppolicyListener(e) {
 }
 
 socket.on('president discard', (presidentDiscardString) => {
+    clearLobbyActions()
     const presidentDiscardData = JSON.parse(presidentDiscardString)
     const president = presidentDiscardData.president
     const chancellor = presidentDiscardData.chancellor
@@ -462,6 +465,7 @@ socket.on('president discard', (presidentDiscardString) => {
 })
 
 socket.on('chancellor get two cards', (twoCardsString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a policy to enact")
     const twoCardsData = JSON.parse(twoCardsString)
     const cards = twoCardsData.policyCards
     for (let i=0; i<cards.length; i++) {
@@ -496,6 +500,7 @@ function cpolicyListener(e) {
 }
 
 socket.on('place card', (placeCardString) => {
+    clearLobbyActions()
     removeLoaders() //might need to change this for veto stuff
     const placeCardData = JSON.parse(placeCardString)
     const type = placeCardData.type
@@ -527,6 +532,7 @@ socket.on('president action 1', (firstString) => {
 })
 
 socket.on('president action 2', (secondString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose the next president")
     const secondData = JSON.parse(secondString)
     const president = secondData.president
     const eligible = []
@@ -582,6 +588,10 @@ const removeLoaders = () => {
     for (let participant of participants) {
         participant.div.querySelector('.loader').classList.remove("active")
     }
+}
+
+const clearLobbyActions = () => {
+    $lobbyActions.innerHTML = ''
 }
 
 const playerSelect = (eligible, eventType) => {
