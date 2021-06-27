@@ -663,6 +663,8 @@ const incrementFailedElectionTracker = (room, io) => {
         }
         lobby.policyCards.push(lobby.deck[0]);
         lobby.deck.splice(0, 1);
+        lobby.previousPresident = null;
+        lobby.previousChancellor= null;
     }
     io.to(room).emit('failed election tracker', JSON.stringify({trackerIndex: lobby.failedElectionTracker}));
 }
