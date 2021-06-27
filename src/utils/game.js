@@ -327,6 +327,7 @@ const presidentAction = (room, io) => {
         }
     });
     io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+    console.log('presloading')
     //TODO: Make it based on the number of players; this is only one case for a medium group
     if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT1) {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
@@ -690,7 +691,9 @@ const incrementFailedElectionTracker = (room, io) => {
         lobby.previousChancellor= null;
 
         io.to(room).emit('failed election tracker', JSON.stringify({start: 2, end: 3}));
-        io.to(room).emit('failed election tracker', JSON.stringify({start: 3, end: 0}));
+        setTimeout(() => {
+            io.to(room).emit('failed election tracker', JSON.stringify({start: 3, end: 0}));
+        }, 1501); //might not need the extra ms
     } else {
         // if we don't place a policy card
         io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker-1, end: lobby.failedElectionTracker}));

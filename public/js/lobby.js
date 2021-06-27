@@ -56,6 +56,8 @@ const cpolicies = [document.querySelector(".cpolicy1"), document.querySelector("
 const javote = document.querySelector(".javote")
 const neinvote = document.querySelector(".neinvote")
 
+const $tracker = document.querySelector('.tracker')
+
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 socket.on('joinLobbyData', (playerJoiningString) => {
@@ -648,6 +650,21 @@ socket.on('next three cards', (cardsString) => {
         setTimeout(() => {
             policy.classList.remove("policy-slidedownandup")
         }, 5000);
+    }
+})
+
+socket.on('failed election tracker', (trackerString) => {
+    const trackerData = JSON.parse(trackerString)
+    const start = trackerData.start
+    const end = trackerData.end
+    if (end !== 0) {
+        $tracker.classList.add("tracker"+end)
+    } else {
+        $tracker.classList.add("backtracker"+start)
+        setTimeout(() => {
+            $tracker.classList.remove("tracker1", "tracker2", "tracker3",
+                "backtracker1", "backtracker2", "backtracker3")
+        }, 1500);
     }
 })
 

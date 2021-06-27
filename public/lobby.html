@@ -573,16 +573,13 @@ body {
     animation: tracker3 1.5s forwards;
 }
 .backtracker1 {
-    animation: tracker1 1.5s forwards;
-    animation-direction: reverse;
+    animation: backtracker1 1.5s forwards;
 }
 .backtracker2 {
-    animation: tracker2 1.5s forwards;
-    animation-direction: reverse;
+    animation: backtracker2 1.5s forwards;
 }
 .backtracker3 {
-    animation: tracker3 1.5s forwards;
-    animation-direction: reverse;
+    animation: backtracker3 1.5s forwards;
 }
 
 @-webkit-keyframes tracker1 {
@@ -610,6 +607,33 @@ body {
     } to {
         top: 181.5px;
         left: 403.5px;
+    }
+}
+@-webkit-keyframes backtracker1 {
+    from {
+        top: 181.5px;
+        left: 275.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
+    }
+}
+@-webkit-keyframes backtracker2 {
+    from {
+        top: 181.5px;
+        left: 339.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
+    }
+}
+@-webkit-keyframes backtracker3 {
+    from {
+        top: 181.5px;
+        left: 403.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
     }
 }
 
@@ -650,7 +674,7 @@ body {
 
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/lib_back.png">
-                <img class="tracker tracker2" src="img/electiontracker.png">
+                <img class="tracker" src="img/electiontracker.png">
                 <div class="flip-card liberal-overlay1">
                     <div class="flip-card-inner">
                         <div class="flip-card-front">
