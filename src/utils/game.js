@@ -388,6 +388,8 @@ const nextPresident = (room, electionPassed, io) => {
         lobby.failedElectionTracker = 0;
     } else {
         incrementFailedElectionTracker(room, io);
+        lobby.previousPresident = null;
+        lobby.previousChancellor= null;
     }
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
@@ -669,8 +671,6 @@ const incrementFailedElectionTracker = (room, io) => {
         }
         lobby.policyCards.push(lobby.deck[0]);
         lobby.deck.splice(0, 1);
-        lobby.previousPresident = null;
-        lobby.previousChancellor= null;
     }
     io.to(room).emit('failed election tracker', JSON.stringify({trackerIndex: lobby.failedElectionTracker}));
 }
