@@ -340,6 +340,9 @@ const presidentAction = (room, io) => {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT4;
     } else {
+        setTimeout(function() {
+            nextPresident(room, true, io);
+            }, 3000)
         return STATUS_NONE;
     }
 }
