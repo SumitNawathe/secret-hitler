@@ -110,7 +110,8 @@ const createLobby = (room, username, id) => {
         investigations: null,
         veto: false,
         nextPres : [], // array with the indices of the next few presidents
-        postGameData: null
+        postGameData: null,
+        failedElectionTracker: 0
     };
     lobbies.set(room, lobby);
 }

@@ -202,10 +202,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('presAction3', ({room, id}, callback) => {
-        const cards = handlePresAction3(room, io);
-        io.to(id).emit('policyPeek', JSON.stringify(cards));
-        setTimeout(emitMidgameLobbyData, 5000, room);
-        //emitMidgameLobbyData(room);
+        handlePresAction3(room, io);
+        emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {

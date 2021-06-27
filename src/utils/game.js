@@ -231,6 +231,7 @@ const chancellorVeto = (room, decision, io) => {
     if(decision){
         // if chancellor wants to veto
         nextPresident(room, true, io);
+        incrementFailedElectionTracker(room, io);
     } else {
         placeCard(room, lobby.policyCards[0], io);
     }
@@ -289,7 +290,9 @@ const placeCard = (room, type, io) => {
         try {
             lobby.fascistCards++;
             getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
-            getUserFromUsername(room, lobby.president).status = presidentAction(room);
+            if(lobby.failedElectionTracker !== 3 ){
+                getUserFromUsername(room, lobby.president).status = presidentAction(room);
+            }
         } catch (error) {}
     }
     if (lobby.fascistCards == 6) {
@@ -310,16 +313,19 @@ const presidentAction = (room, io) => {
             numPlayers += 1;
         }
     });
-
+    io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
     //TODO: Make it based on the number of players; this is only one case for a medium group
     if (lobby.fascistCards === 1) {
-
+        io.to(getUserFromUsername(lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT1;
     } else if (lobby.fascistCards === 2) {
+        io.to(getUserFromUsername(lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT2;
     } else if (lobby.fascistCards === 3) {
+        io.to(getUserFromUsername(lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT3;
     } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+        io.to(getUserFromUsername(lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT4;
     }
 }
@@ -328,6 +334,8 @@ const handlePresAction1 = (room, username, io) => {
     console.log('recieved presAction1');
     const lobby = lobbies.get(room);
     lobby.investigations.push([lobby.president, username]);
+    io.to(room).emit('investigation results', JSON.stringify({president: lobby.president, investigated: username, type: !(getUserFromUsername(username).type === TYPE_FASCIST || getUserFromUsername(username).type === TYPE_HITLER)}));
+
     nextPresident(room, true, io);
 }
 
@@ -339,6 +347,7 @@ const handlePresAction2 = (room, specialPres, io) => {
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === specialPres); index++){}
     // console.log("special election index "+index);
     lobby.nextPres.unshift(lobby.users[index].username);
+    io.to(room).emit('special election', JSON.stringify({specialPresident: lobby.nextPres[0]}));
     nextPresident(room, true, io);
 }
 
@@ -348,10 +357,9 @@ const handlePresAction3 = (room, io) => {
     drawThreeCards(room);
     const cards = lobby.policyCards;
     lobby.deck.unshift(cards[0]);
-    lobby.deck.unshift(cards[0]);
-    lobby.deck.unshift(cards[0]);
-    nextPresident(room, true, io);
-    return cards;
+    lobby.deck.unshift(cards[1]);
+    lobby.deck.unshift(cards[2]);
+    setTimeout(nextPresident(room, true, io), 5000, room);
 }
 
 const handlePresAction4 = (room, killUser, io) => {
@@ -365,6 +373,9 @@ const handlePresAction4 = (room, killUser, io) => {
     }
     if (lobby.users[index].type === TYPE_LIBERAL) { lobby.users[index].type = TYPE_DEAD_LIB; }
     else { lobby.users[index].type = TYPE_DEAD_FAS; }
+
+    io.to(room).emit('user killed', JSON.stringify({killedUser: killUser}));
+
     nextPresident(room, true, io);
 }
 
@@ -374,6 +385,9 @@ const nextPresident = (room, electionPassed, io) => {
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
+        lobby.failedElectionTracker = 0;
+    } else {
+        incrementFailedElectionTracker(room, io);
     }
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
@@ -616,6 +630,49 @@ const getIndexFromUsername = (room, username) => {
         }
     }
 }
+
+const incrementFailedElectionTracker = (room, io) => {
+    const lobby = lobbies.get(room);
+    lobby.failedElectionTracker++
+    if(lobby.failedElectionTracker==3){
+        
+        placeCard(room, lobby.policyCards[0], io);
+        lobby.failedElectionTracker = 0;
+        lobby.policyCards.splice(0, 1);
+        
+        if(lobby.deck.length === 0){
+                lobby.deck = [];
+                for(let i=0; i<6-lobby.liberalCards; i++){
+                    lobby.deck.push(true);
+                }
+                
+                for(let i=0; i<11-lobby.fascistCards; i++){
+                    lobby.deck.push(false);
+                }        
+                if(lobby.policyCards[0] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+                if(lobby.policyCards[1] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+                if(lobby.policyCards[2] === true){
+                    lobby.deck.splice(0, 1);
+                } else {
+                    lobby.deck.splice(lobby.deck.length-1, 1);
+                }
+
+                lobby.deck = randomShuffle(lobby.deck);
+        }
+        lobby.policyCards.push(lobby.deck[0]);
+        lobby.deck.splice(0, 1);
+    }
+    io.to(room).emit('failed election tracker', JSON.stringify({trackerIndex: lobby.failedElectionTracker}));
+}
+
 
 module.exports = {
     startGame,
