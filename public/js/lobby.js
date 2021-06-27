@@ -621,6 +621,13 @@ socket.on('user killed', (killedString) => {
     let div = getDivFromUsername(slidecards, killedUser)
     div.querySelector('.flip-card').classList.add("slideup")
     div.querySelector('.flip-card-inner').classList.add("slideup")
+    for (let participant of participants) {
+        if (participant.username === killedUser) {
+            participant.dead = true
+            break
+        }
+    }
+    if (username === killedUser) dead = true
     setTimeout(() => {
         document.querySelector('#'+killedUser+'_img').src = "img/dead.png"
     }, 1000);
@@ -639,7 +646,7 @@ socket.on('next three cards', (cardsString) => {
     for (let policy of ppolicies) {
         policy.classList.add("policy-slidedownandup")
         setTimeout(() => {
-            policy.classList.remove("polyc-slidedownandup")
+            policy.classList.remove("policy-slidedownandup")
         }, 5000);
     }
 })
