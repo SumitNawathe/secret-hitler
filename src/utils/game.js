@@ -392,7 +392,9 @@ const nextPresident = (room, electionPassed, io) => {
         incrementFailedElectionTracker(room, io);
     }
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
-    getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+    if(lobby.chancellor !== null){
+        getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+    }
     
     lobby.president = lobby.nextPres[0];
     lobby.chancellor = null;
