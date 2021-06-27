@@ -42,6 +42,7 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 
 let spectator = false
+let dead = false
 
 const usernames = []
 const participants = []
@@ -337,7 +338,7 @@ socket.on('rescind vote', (didVoteString) => {
 }) 
 
 socket.on('vote finished', (voteFinishedString) => {
-    if (!spectator)
+    if (!spectator && !dead)
         clearVote()
     const voteData = JSON.parse(voteFinishedString)
     const votes = voteData.votes
@@ -350,20 +351,24 @@ socket.on('vote finished', (voteFinishedString) => {
         }
     }
     for (let i=0; i<participants.length; i++) {
-        participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
-        participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
+        if (!participants[i].dead) {
+            participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
+            participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
+        }
     }
 })
 
 const setVote = () => {
     for (let i=0; i<slidecards.length; i++) {
-        slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
-        slidecards[i].div.children[0].classList.add("slideup")
-        slidecards[i].div.children[0].children[0].classList.add("slideup")
+        if (!participants[i].dead) {
+            slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
+            slidecards[i].div.children[0].classList.add("slideup")
+            slidecards[i].div.children[0].children[0].classList.add("slideup")
 
-        participants[i].div.querySelector(".loader").classList.add("active")
+            participants[i].div.querySelector(".loader").classList.add("active")
+        }
     }
-    if (!spectator) {
+    if (!spectator && !dead) {
         javote.classList.add("vote-place")
         neinvote.classList.add("vote-place")
         //might have to be more specific for veto stuff later
@@ -594,6 +599,31 @@ socket.on('president action 3', (thirdString) => {
         clearLobbyActions()
         socket.emit('presAction3', { room }, (error) => { if (error) { console.log('error'); } })
     })
+})
+
+socket.on('president action 4', (fourthString) => {
+    //TODO: add confirmation on execute
+    $lobbyActions.insertAdjacentHTML('beforeend', "WARNING: Choose a player to execute")
+    const fourthData = JSON.parse(fourthString)
+    const president = fourthData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction4')
+})
+
+socket.on('user killed', (killedString) => {
+    const killedData = JSON.parse(killedString)
+    const killedUser = killedData.killedUser
+    slideCardOne("dead.png", killedUser)
+    let div = getDivFromUsername(slidecards, killedUser)
+    div.querySelector('.flip-card').classList.add("slideup")
+    div.querySelector('.flip-card-inner').classList.add("slideup")
+    setTimeout(() => {
+        document.querySelector('#'+killedUser+'_img').src = "img/dead.png"
+    }, 1000);
 })
 
 socket.on('next three cards', (cardsString) => {

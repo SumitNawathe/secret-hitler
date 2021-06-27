@@ -323,10 +323,10 @@ const presidentAction = (room, io) => {
         } else if (lobby.fascistCards === 4) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT2;
-        } else if (lobby.fascistCards === 2) {
+        } else if (lobby.fascistCards === 3) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT3;
-        } else if (lobby.fascistCards === 5 || lobby.fascistCards === 5) {
+        } else if (lobby.fascistCards === 2 || lobby.fascistCards === 5) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT4;
         }
@@ -385,7 +385,9 @@ const handlePresAction4 = (room, killUser, io) => {
 
     io.to(room).emit('user killed', JSON.stringify({killedUser: killUser}));
 
-    nextPresident(room, true, io);
+    setTimeout(() => {
+        nextPresident(room, true, io);
+    }, 1000);
 }
 
 const nextPresident = (room, electionPassed, io) => {
