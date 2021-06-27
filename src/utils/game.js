@@ -383,6 +383,7 @@ const nextPresident = (room, electionPassed, io) => {
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
+        lobby.failedElectionTracker = 0;
     } else {
         incrementFailedElectionTracker(room, io);
     }
