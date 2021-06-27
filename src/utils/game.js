@@ -224,24 +224,24 @@ const registerVote = (room, username, vote, io) => {
     console.log(lobby.users);
 }
 
-const presidentVeto = (room, decision, io) => {
+const chancellorVeto = (room, decision, io) => {
     const lobby = lobbies.get(room);
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
-    io.to(room).emit('president veto decide', JSON.stringify({choice: decision}));
+    io.to(room).emit('chancellor veto decide', JSON.stringify({choice: decision}));
     if(decision){
-        // if pres wants to veto
-        getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCVETOCHOICE;
+        // if chancellor wants to veto
+        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify());
     } else {
         placeCard(room, lobby.policyCards[0], io);
     }
 }
 
-const chancellorVeto = (room, decision, io) => {
+const presidentVeto = (room, decision, io) => {
     const lobby = lobbies.get(room);
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
-    io.to(room).emit('chancellor veto decide', JSON.stringify({choice: decision}));
+    io.to(room).emit('president veto decide', JSON.stringify({choice: decision}));
     if(decision){
-        // if chancellor wants to veto
+        // if president wants to veto
         nextPresident(room, true, io);
         incrementFailedElectionTracker(room, io);
     } else {
@@ -287,7 +287,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
         getUserFromUsername(room, lobby.president).status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
-        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify());
+        io.to(getUserFromUsername(room, lobby.chancellor)).emit('chancellor veto choice', JSON.stringify());
     }
 }
 
