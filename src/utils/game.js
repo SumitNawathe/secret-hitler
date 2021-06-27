@@ -313,6 +313,7 @@ const presidentAction = (room, io) => {
             numPlayers += 1;
         }
     });
+    console.log(io)
     io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
     //TODO: Make it based on the number of players; this is only one case for a medium group
     if (lobby.fascistCards === 1) {

@@ -513,6 +513,13 @@ socket.on('place card', (placeCardString) => {
     }
 })
 
+socket.on('president loading', (loadingString) => {
+    console.log('presLoading')
+    loadingData = JSON.parse(loadingString)
+    const president = loadingData.president
+    getDivFromUsername(participants, president).querySelector('.loader').classList.add("active")
+})
+
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
 }
