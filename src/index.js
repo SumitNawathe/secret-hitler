@@ -203,7 +203,7 @@ io.on('connection', (socket) => {
 
     socket.on('presAction3', ({room, id}, callback) => {
         handlePresAction3(room, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {

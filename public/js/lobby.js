@@ -262,6 +262,8 @@ socket.on('new president', (newPresidentString) => {
     const newPres = newPresidentData.newPres
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
+    console.log('oldChanc '+oldChanc)
+    console.log('oldPres '+oldPres)
     clearLobbyActions()
     removeLoaders()
     clearOverlay()
@@ -528,7 +530,15 @@ socket.on('president loading', (loadingString) => {
 })
 
 socket.on('president action 1', (firstString) => {
-
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a player to investigate")
+    const firstData = JSON.parse(firstString)
+    const president = firstData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction3')
 })
 
 socket.on('president action 2', (secondString) => {
@@ -579,7 +589,6 @@ const clearSlide = () => {
         participantuser=list[i]
         let username = participantuser.id.substring(11)
         let $slidecard = participantuser.querySelector('#slidecard'+username)
-        console.log('slidecard '+username)
         $slidecard.innerHTML = ''
     }
 }
@@ -610,7 +619,8 @@ const playerSelect = (eligible, eventType) => {
             // console.log('adding event listener');
             newButton.addEventListener('click', () => {
                 // console.log('chosen');
-                socket.emit(eventType, { room, choice: username }, (error) => { if (error) { console.log('error'); } })
+                //ID isnt used rn so just in case i put the username as the ID
+                socket.emit(eventType, { room, id: username }, (error) => { if (error) { console.log('error'); } })
             });
         }
     }
