@@ -192,7 +192,7 @@ io.on('connection', (socket) => {
     socket.on('presAction1', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
         handlePresAction1(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction2', ({room, choice}, callback) => {
@@ -201,26 +201,26 @@ io.on('connection', (socket) => {
         //emitMidgameLobbyData(room);
     });
 
-    socket.on('presAction3', ({room, id}, callback) => {
+    socket.on('presAction3', ({room}, callback) => {
         handlePresAction3(room, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {
         handlePresAction4(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
         presidentVeto(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('chancellorVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
         chancellorVeto(room, choice, io);
-        emitMidgameLobbyData(room);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('remakeLobby', ({ room }, callback) => {

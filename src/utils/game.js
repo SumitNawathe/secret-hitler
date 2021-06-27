@@ -120,6 +120,7 @@ const setUpVote = (room, chancellorChoice, io) => {
             // if (lobby.users[i].username === chancellorChoice) { lobby.chancellor = i }
         }
     }
+    console.log('chancellor '+lobby.chancellor)
     lobby.chancellor = chancellorChoice;
 
     io.to(room).emit('chancellor chosen', JSON.stringify({president: lobby.president, chancellor: chancellorChoice}));
@@ -316,16 +317,16 @@ const presidentAction = (room, io) => {
     setTimeout(function() {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
         //TODO: Make it based on the number of players; this is only one case for a medium group
-        if (lobby.fascistCards === 1) {
+        if (lobby.fascistCards === 3) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT1;
-        } else if (lobby.fascistCards === 2) {
+        } else if (lobby.fascistCards === 4) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT2;
-        } else if (lobby.fascistCards === 3) {
+        } else if (lobby.fascistCards === 2) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT3;
-        } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+        } else if (lobby.fascistCards === 5 || lobby.fascistCards === 5) {
             io.to(getUserFromUsername(room, lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
             return STATUS_PRESACT4;
         }
@@ -336,9 +337,12 @@ const handlePresAction1 = (room, username, io) => {
     console.log('recieved presAction1');
     const lobby = lobbies.get(room);
     lobby.investigations.push([lobby.president, username]);
-    io.to(room).emit('investigation results', JSON.stringify({president: lobby.president, investigated: username, type: !(getUserFromUsername(username).type === TYPE_FASCIST || getUserFromUsername(username).type === TYPE_HITLER)}));
-
-    nextPresident(room, true, io);
+    io.to(room).emit('investigation results', JSON.stringify({president: lobby.president, investigated: username,
+        type: !(getUserFromUsername(room, username).type === TYPE_FASCIST || getUserFromUsername(room, username).type === TYPE_HITLER)}));
+    
+    setTimeout(() => {
+        nextPresident(room, true, io);
+    }, 4000);
 }
 
 const handlePresAction2 = (room, specialPres, io) => {
@@ -361,7 +365,10 @@ const handlePresAction3 = (room, io) => {
     lobby.deck.unshift(cards[0]);
     lobby.deck.unshift(cards[1]);
     lobby.deck.unshift(cards[2]);
-    setTimeout(nextPresident(room, true, io), 5000, room);
+    io.to(getUserFromUsername(room, lobby.president).id).emit('next three cards', JSON.stringify({cards}));
+    setTimeout(() => {
+        nextPresident(room, true, io)
+    }, 5000);
 }
 
 const handlePresAction4 = (room, killUser, io) => {

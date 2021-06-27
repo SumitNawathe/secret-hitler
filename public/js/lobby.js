@@ -308,6 +308,7 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
     const chancellor = chancellorChosenData.chancellor
+    console.log('chancellor '+chancellor)
 
     let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
     $imageSelectOverlay = getDivFromUsername(overlays, president)
@@ -446,6 +447,7 @@ socket.on('get three cards', (threeCardsString) => {
 function ppolicyListener(e) {
     e.target.classList.add("selectvote")
     for (let policy of ppolicies) {
+        policy.removeEventListener('click', ppolicyListener)
         policy.classList.add("policy-slideup")
     }
     setTimeout(function() {
@@ -490,6 +492,7 @@ socket.on('chancellor get two cards', (twoCardsString) => {
 function cpolicyListener(e) {
     e.target.classList.add("selectvote")
     for (let policy of cpolicies) {
+        policy.removeEventListener('click', cpolicyListener)
         policy.classList.add("policy-slideup")
     }
     setTimeout(function() {
@@ -530,6 +533,7 @@ socket.on('president loading', (loadingString) => {
 })
 
 socket.on('president action 1', (firstString) => {
+    console.log('presAction1')
     $lobbyActions.insertAdjacentHTML('beforeend', "Choose a player to investigate")
     const firstData = JSON.parse(firstString)
     const president = firstData.president
@@ -538,7 +542,36 @@ socket.on('president action 1', (firstString) => {
         if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
         else { eligible.push(false) }
     }
-    playerSelect(eligible, 'presAction3')
+    playerSelect(eligible, 'presAction1')
+})
+
+socket.on('investigation results', (investString) => {
+    const investData = JSON.parse(investString)
+    const president = investData.president
+    const investigated = investData.investigated
+    const type = investData.type
+    if (username !== president) {
+        slideCardOne("party cardback.png", investigated)
+        let div = getDivFromUsername(slidecards, investigated)
+        div.querySelector('.flip-card').classList.add("slideupanddown")
+        div.querySelector('.flip-card-inner').classList.add("slideupanddown")
+    } else {
+        //TODO: add separate lib and fas party membership specific cards
+        if (type) {
+            slideCardOneWithBack("party cardback.png", "liberal cardback.png", investigated)
+            setTimeout(() => {
+                getDivFromUsername(participants, investigated).children[0].classList.add("Liberal")
+            }, 4000);
+        } else {
+            slideCardOneWithBack("party cardback.png", "fascist cardback.png", investigated)
+            setTimeout(() => {
+                getDivFromUsername(participants, investigated).children[0].classList.add("Fascist")
+            }, 4000);
+        }
+        let div = getDivFromUsername(slidecards, investigated)
+        div.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        div.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+    }
 })
 
 socket.on('president action 2', (secondString) => {
@@ -553,6 +586,33 @@ socket.on('president action 2', (secondString) => {
     playerSelect(eligible, 'presAction2')
 })
 
+socket.on('president action 3', (thirdString) => {
+    let html = Mustache.render(actionButtonTemplate, { text: "View next three cards" });
+    $lobbyActions.insertAdjacentHTML('beforeend', html)
+    let button = $lobbyActions.querySelector('.button')
+    button.addEventListener('click', () => {
+        clearLobbyActions()
+        socket.emit('presAction3', { room }, (error) => { if (error) { console.log('error'); } })
+    })
+})
+
+socket.on('next three cards', (cardsString) => {
+    const cardsData = JSON.parse(cardsString)
+    const cards = cardsData.cards
+    for (let i=0; i<cards.length; i++) {
+        if (cards[i]) {
+            ppolicies[i].src = "img/liberal policy.png"
+        } else {
+            ppolicies[i].src = "img/fascist policy.png"
+        }
+    }
+    for (let policy of ppolicies) {
+        policy.classList.add("policy-slidedownandup")
+        setTimeout(() => {
+            policy.classList.remove("polyc-slidedownandup")
+        }, 5000);
+    }
+})
 
 const getUsername = (i) => {
     return $participantList.children[i].id.substring(11)
@@ -620,7 +680,7 @@ const playerSelect = (eligible, eventType) => {
             newButton.addEventListener('click', () => {
                 // console.log('chosen');
                 //ID isnt used rn so just in case i put the username as the ID
-                socket.emit(eventType, { room, id: username }, (error) => { if (error) { console.log('error'); } })
+                socket.emit(eventType, { room, choice: username }, (error) => { if (error) { console.log('error'); } })
             });
         }
     }
