@@ -26,6 +26,7 @@ const {
     STATUS_PRESACT2,
     STATUS_PRESACT3,
     STATUS_PRESACT4,
+    STATUS_PRESACT_NONE,
     LIBERAL,
     FASCIST,
     STATUS_CHANCVETOCHOICE,
@@ -88,6 +89,17 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
         }
     }
     console.log("eligible chancellors: "+eligibleChancellors);
+
+    if(alive == 5 || alive == 6){
+        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
+    }
+    if(alive == 7 || alive == 8){
+        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
+    }
+    if(alive == 9 || alive == 10){
+        lobby.presidentActionList = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
+
+    }
 
     setTimeout( function() {
     io.to(room).emit('new president', 
@@ -315,18 +327,20 @@ const presidentAction = (room, io) => {
     });
     io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
     //TODO: Make it based on the number of players; this is only one case for a medium group
-    if (lobby.fascistCards === 1) {
+    if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT1) {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT1;
-    } else if (lobby.fascistCards === 2) {
+    } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT2) {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT2;
-    } else if (lobby.fascistCards === 3) {
+    } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT3) {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT3;
-    } else if (lobby.fascistCards === 4 || lobby.fascistCards === 5) {
+    } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT4) {
         io.to(getUserFromUsername(lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
         return STATUS_PRESACT4;
+    } else {
+        return STATUS_NONE;
     }
 }
 
