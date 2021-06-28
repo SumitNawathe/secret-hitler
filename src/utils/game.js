@@ -60,6 +60,8 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
         placeCard(room, false, io);
     }
 
+    lobby.veto = false;
+
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     drawThreeCards(room);
     lobby.users[0].status = STATUS_PRESCHOOSE;
@@ -306,6 +308,9 @@ const placeCard = (room, type, io) => {
                 getUserFromUsername(room, lobby.president).status = presidentAction(room, io);
             }
         } catch (error) {}
+    }
+    if(lobby.fascistCards === 5){
+        lobby.veto = true;
     }
     if (lobby.fascistCards == 6) {
         endGame(room, FASCIST);
