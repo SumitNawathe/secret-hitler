@@ -265,7 +265,7 @@ socket.on('new president', (newPresidentString) => {
     console.log('new president')
     const newPresidentData = JSON.parse(newPresidentString)
     const newPres = newPresidentData.newPres
-    console.log('new pres '+newpres)
+    console.log('new pres '+newPres)
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
     console.log('oldChanc '+oldChanc)
@@ -922,6 +922,7 @@ socket.on('policyPeek', (cardDataString) => {
 });
 
 socket.on('lobbyData', (lobbyDataString) => {
+    //spectator image problem but nobody cares
     $participantList = document.querySelector('#participant-list');
  participantTemplate = document.querySelector('#participant-template').innerHTML;
  $lobbyActions = document.querySelector('#actions');
