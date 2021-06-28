@@ -60,6 +60,8 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
         placeCard(room, false, io);
     }
 
+    lobby.veto = false;
+
     lobby.deck = []; // technically does not need to be initialized because it will be when drawThreeCards is
     drawThreeCards(room);
     lobby.users[0].status = STATUS_PRESCHOOSE;
@@ -201,7 +203,7 @@ const registerVote = (room, username, vote, io) => {
             console.log('numOfFascists: ' + lobby.numOfFascists);
             console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
             if (lobby.fascistCards >= 3 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
-                endGame(room, FASCIST);
+                endGame(room, FASCIST, io);
                 return;
             }
             lobby.previousPresident = lobby.president;
@@ -231,7 +233,7 @@ const chancellorVeto = (room, decision, io) => {
     io.to(room).emit('chancellor veto decide', JSON.stringify({choice: decision}));
     if(decision){
         // if chancellor wants to veto
-        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify());
+        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify({president: lobby.president}));
     } else {
         placeCard(room, lobby.policyCards[0], io);
     }
@@ -288,7 +290,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
         getUserFromUsername(room, lobby.president).status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
-        io.to(getUserFromUsername(room, lobby.chancellor)).emit('chancellor veto choice', JSON.stringify());
+        io.to(getUserFromUsername(room, lobby.chancellor)).emit('chancellor veto choice', JSON.stringify({chancellor: lobby.chancellor, president: lobby.president}));
     }
 }
 
@@ -308,10 +310,13 @@ const placeCard = (room, type, io) => {
             }
         } catch (error) {}
     }
+    if(lobby.fascistCards === 5){
+        lobby.veto = true;
+    }
     if (lobby.fascistCards == 6) {
-        endGame(room, FASCIST);
+        endGame(room, FASCIST, io);
     } else if (lobby.liberalCards == 5) {
-        endGame(room, LIBERAL);
+        endGame(room, LIBERAL, io);
     }
     console.log("fascists"+lobby.fascistCards);
     console.log("liberal"+lobby.liberalCards);
@@ -393,7 +398,7 @@ const handlePresAction4 = (room, killUser, io) => {
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
     if (lobby.users[index].type === TYPE_HITLER) {
-        endGame(room, LIBERAL);
+        endGame(room, LIBERAL, io);
         return;
     }
     if (lobby.users[index].type === TYPE_LIBERAL) { lobby.users[index].type = TYPE_DEAD_LIB; }
@@ -476,7 +481,7 @@ const nextPresident = (room, electionPassed, io) => {
 }
 
 
-const endGame = (room, winningTeam) => {
+const endGame = (room, winningTeam, io) => {
     const lobby = lobbies.get(room);
     lobby.postGameData = [winningTeam, lobby.users[0].username];
     lobby.gameState = GAMESTATE_FINISHED;
@@ -485,6 +490,12 @@ const endGame = (room, winningTeam) => {
         if (person.type === TYPE_DEAD_LIB) { person.type = TYPE_LIBERAL}
         else if (person.type === TYPE_DEAD_FAS) { person.type = TYPE_FASCIST }
     });
+
+    let users = [];
+    lobby.users.forEach((person) => {
+        if (person.type === TYPE_LIBERAL || person.type === TYPE_FASCIST || person.type === TYPE_HITLER) {users.push(person)}
+    });
+    io.to(room).emit('end game', JSON.stringify({winningTeam, users}))
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
