@@ -671,20 +671,24 @@ socket.on('failed election tracker', (trackerString) => {
 })
 
 socket.on('chancellor veto choice', () => {
+    clearLobbyActions()
     $lobbyActions.insertAdjacentHTML('beforeend', "Would you like to veto?")
     javote.classList.add("vote-place")
     neinvote.classList.add("vote-place")
-    javote.addEventListener('click', cjaEventListenerVeto)
-    neinvote.addEventListener('click', cneinEventListenerVeto)
+    setTimeout(() => {
+        javote.addEventListener('click', cjaEventListenerVeto)
+        neinvote.addEventListener('click', cneinEventListenerVeto)
+    }, 1000);
 })
 
 function cjaEventListenerVeto() {
     javote.removeEventListener('click', cjaEventListenerVeto)
     neinvote.removeEventListener('click', cneinEventListenerVeto)
+    javote.classList.add("selectvote")
     javote.classList.add("vote-remove")
     neinvote.classList.add("vote-remove")
     setTimeout(function() {
-        removeLoaders()
+        clearLobbyActions()
         javote.classList.remove("vote-place", "vote-remove", "selectvote")
         neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
     }, 1000)
@@ -694,10 +698,11 @@ function cjaEventListenerVeto() {
 function cneinEventListenerVeto() {
     javote.removeEventListener('click', cjaEventListenerVeto)
     neinvote.removeEventListener('click', cneinEventListenerVeto)
+    neinvote.classList.add("selectvote")
     javote.classList.add("vote-remove")
     neinvote.classList.add("vote-remove")
     setTimeout(function() {
-        removeLoaders()
+        clearLobbyActions()
         javote.classList.remove("vote-place", "vote-remove", "selectvote")
         neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
     }, 1000)
@@ -706,11 +711,76 @@ function cneinEventListenerVeto() {
 }
 
 socket.on('chancellor veto decide', (cDecideString) => {
+    removeLoaders()
+    clearSlide()
     const cDecideData = JSON.parse(cDecideString)
     const choice = cDecideData.choice
+    const chancellor = cDecideData.chancellor
+    const president = cDecideData.president
     if (choice) {
-        slideCardOneWithBack("voting cardback.png", "yes cardback.png", )
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", chancellor)
+    } else {
+        slideCardOneWithBack("voting cardback.png", "no cardback.png", chancellor)
     }
+    let $slidecard = getDivFromUsername(slidecards, chancellor)
+    $slidecard.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+    $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+})
+
+socket.on('president veto choice', () => {
+    clearLobbyActions()
+    $lobbyActions.insertAdjacentHTML('beforeend', "Would you like to veto?")
+    javote.classList.add("vote-place")
+    neinvote.classList.add("vote-place")
+    setTimeout(() => {
+        javote.addEventListener('click', pjaEventListenerVeto)
+        neinvote.addEventListener('click', pneinEventListenerVeto)
+    }, 1000);
+})
+
+function pjaEventListenerVeto() {
+    javote.removeEventListener('click', pjaEventListenerVeto)
+    neinvote.removeEventListener('click', pneinEventListenerVeto)
+    javote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('presVetoVoting', { room, choice: true },
+        (error) => { if (error) { console.log('error'); } })
+}
+function pneinEventListenerVeto() {
+    javote.removeEventListener('click', pjaEventListenerVeto)
+    neinvote.removeEventListener('click', pneinEventListenerVeto)
+    neinvote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('presVetoVoting', { room, choice: false },
+        (error) => { if (error) { console.log('error'); } })
+}
+
+socket.on('president veto decide', (pVetoString) => {
+    const pVetoData = JSON.parse(pVetoString)
+    const choice = pVetoData.choice
+    const president = pVetoData.president
+    removeLoaders()
+    clearSlide()
+    if (choice) {
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", president)
+    } else {
+        slideCardOneWithBack("voting cardback.png", "no cardback.png", president)
+    }
+    let $slidecard = getDivFromUsername(slidecards, president)
+    $slidecard.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+    $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
 })
 
 const getUsername = (i) => {
