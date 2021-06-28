@@ -133,12 +133,12 @@ const resetLobby = (room) => {
     lobby.voteCountNo = 0;
     lobby.policyCards = null;
     lobby.investigations = null;
-    lobby.veto = null;
+    lobby.veto = false;
     lobby.nextPres = [];
     lobby.postGameData = null;
     lobby.users.forEach((person) => {
         person.status = STATUS_NONE;
-        person.lastVote = false;
+        person.lastVote = null;
     });
 }
 
