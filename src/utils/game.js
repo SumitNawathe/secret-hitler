@@ -251,8 +251,7 @@ const presidentVeto = (room, decision, io) => {
     setTimeout(() => {
         if(decision){
             // if president wants to veto
-            nextPresident(room, true, io);
-            incrementFailedElectionTracker(room, io);  
+            nextPresidentVeto(room, io);
         } else {
             placeCard(room, lobby.policyCards[0], io);
         }
@@ -426,11 +425,77 @@ const nextPresident = (room, electionPassed, io) => {
     if(electionPassed){
         lobby.previousPresident = lobby.president;
         lobby.previousChancellor = lobby.chancellor;
-        io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
+        if(lobby.failedElectionTracker !== 0){
+            io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
+        }
         lobby.failedElectionTracker = 0;
     } else {
         incrementFailedElectionTracker(room, io);
     }
+    getUserFromUsername(room, lobby.president).status = STATUS_NONE;
+    if(lobby.chancellor !== null){
+        getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
+    }
+    
+    lobby.president = lobby.nextPres[0];
+    lobby.chancellor = null;
+    console.log('nextPres array:');
+    console.log(lobby.nextPres);
+
+    if (lobby.nextPres.length === 1) {
+        let index = getIndexFromUsername(room, lobby.nextPres[0]) % lobby.users.length;
+        while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
+            index = (index+1) % lobby.users.length;
+        }
+        lobby.president = lobby.users[index].username;
+        console.log('lobby.president');
+        console.log(lobby.president);
+        index = (index+1) % lobby.users.length;
+        while(lobby.users[index].type === TYPE_DEAD_LIB || lobby.users[index].type === TYPE_DEAD_FAS || lobby.users[index].type === TYPE_SPECTATOR){
+            index = (index+1) % lobby.users.length;
+        }
+        lobby.nextPres.push(lobby.users[index].username);
+    }
+    lobby.nextPres.splice(0, 1);
+    getUserFromUsername(room, lobby.president).status = STATUS_PRESCHOOSE;
+    let alive = 0;
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type===TYPE_DEAD || lobby.users[i].type===TYPE_DEAD_FAS || lobby.users[i].type===TYPE_DEAD_LIB || lobby.users[i].type === TYPE_SPECTATOR){
+
+        } else {
+            alive++;
+        }
+    }
+    let eligibleChancellors = [];
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type !== TYPE_DEAD && lobby.users[i].type !== TYPE_DEAD_FAS && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_SPECTATOR){
+            // if user is playing the game
+            if(lobby.users[i].username !== lobby.president && lobby.users[i].username !== lobby.previousChancellor){
+                // if user is not the president and not the previous chancellor
+                if(alive <= 5 || (alive > 5 && lobby.users[i].username !== lobby.previousPresident)){
+                    eligibleChancellors.push(lobby.users[i].username);
+                }
+            }
+        }
+    }
+    io.to(room).emit('new president', 
+        JSON.stringify(
+            {
+                newPres: lobby.president,
+                oldChanc: lobby.previousChancellor,
+                oldPres: lobby.previousPresident,
+                eligibleChancellors: eligibleChancellors
+
+            }       
+        ));
+}
+
+const nextPresidentVeto = (room, io) => {
+    const lobby = lobbies.get(room);
+    // console.log(lobby.nextPres);
+    lobby.previousPresident = lobby.president;
+    lobby.previousChancellor = lobby.chancellor;
+    incrementFailedElectionTracker(room, io);
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     if(lobby.chancellor !== null){
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
