@@ -658,6 +658,8 @@ socket.on('failed election tracker', (trackerString) => {
     const start = trackerData.start
     const end = trackerData.end
     if (end !== 0) {
+        $tracker.classList.remove("tracker1", "tracker2", "tracker3",
+                "backtracker1", "backtracker2", "backtracker3")
         $tracker.classList.add("tracker"+end)
     } else {
         $tracker.classList.add("backtracker"+start)
@@ -665,6 +667,49 @@ socket.on('failed election tracker', (trackerString) => {
             $tracker.classList.remove("tracker1", "tracker2", "tracker3",
                 "backtracker1", "backtracker2", "backtracker3")
         }, 1500);
+    }
+})
+
+socket.on('chancellor veto choice', () => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Would you like to veto?")
+    javote.classList.add("vote-place")
+    neinvote.classList.add("vote-place")
+    javote.addEventListener('click', cjaEventListenerVeto)
+    neinvote.addEventListener('click', cneinEventListenerVeto)
+})
+
+function cjaEventListenerVeto() {
+    javote.removeEventListener('click', cjaEventListenerVeto)
+    neinvote.removeEventListener('click', cneinEventListenerVeto)
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        removeLoaders()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('chancellorVetoVoting', { room, choice: true },
+        (error) => { if (error) { console.log('error'); } })
+}
+function cneinEventListenerVeto() {
+    javote.removeEventListener('click', cjaEventListenerVeto)
+    neinvote.removeEventListener('click', cneinEventListenerVeto)
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        removeLoaders()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('chancellorVetoVoting', { room, choice: false },
+        (error) => { if (error) { console.log('error'); } })
+}
+
+socket.on('chancellor veto decide', (cDecideString) => {
+    const cDecideData = JSON.parse(cDecideString)
+    const choice = cDecideData.choice
+    if (choice) {
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", )
     }
 })
 
@@ -830,7 +875,7 @@ socket.on('lobbyData', (lobbyDataString) => {
                 console.log('TYPE: ' + person.type);
                 console.log('STATUS: ' + person.status);
                 return false;
-            }
+            } 
             return true;
         });
         createLobbyButtons(type);
