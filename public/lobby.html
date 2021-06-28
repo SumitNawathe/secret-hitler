@@ -486,6 +486,7 @@ body {
     height: auto;
     top: -500px;
     left: 100px;
+    z-index: 99;
 }
 .ppolicy2 {
     position: absolute;
@@ -493,6 +494,7 @@ body {
     height: auto;
     top: -500px;
     left: 267px;
+    z-index: 99;
 }
 .ppolicy3 {
     position: absolute;
@@ -500,6 +502,7 @@ body {
     height: auto;
     top: -500px;
     left: 435px;
+    z-index: 99;
 }
 .cpolicy1 {
     position: absolute;
@@ -507,6 +510,7 @@ body {
     height: auto;
     top: -500px;
     left: 150px;
+    z-index: 99;
 }
 .cpolicy2 {
     position: absolute;
@@ -514,12 +518,18 @@ body {
     height: auto;
     top: -500px;
     left: 385px;
+    z-index: 99;
 }
 .policy-slide {
     animation: policy-slide 1s forwards;
 }
+
 .policy-slideup {
     animation: policy-slideup 1.5s forwards;
+}
+
+.policy-slidedownandup {
+    animation: policy-slidedownandup 5s forwards;
 }
 @-webkit-keyframes policy-slide {
     0% {
@@ -540,6 +550,93 @@ body {
         top: -500px;
     }
 }
+@-webkit-keyframes policy-slidedownandup {
+    0% { top: -500px }
+    30% { top: -100px }
+    70% { top: -100px }
+    100% { top: -500px }
+}
+.tracker {
+    position: absolute;
+    width: 26px;
+    height: auto;
+    top: 181.5px;
+    left: 211.5px;
+}
+.tracker1 {
+    animation: tracker1 1.5s forwards;
+}
+.tracker2 {
+    animation: tracker2 1.5s forwards;
+}
+.tracker3 {
+    animation: tracker3 1.5s forwards;
+}
+.backtracker1 {
+    animation: backtracker1 1.5s forwards;
+}
+.backtracker2 {
+    animation: backtracker2 1.5s forwards;
+}
+.backtracker3 {
+    animation: backtracker3 1.5s forwards;
+}
+
+@-webkit-keyframes tracker1 {
+    from {
+        top: 181.5px;
+        left: 211.5px;
+    } to {
+        top: 181.5px;
+        left: 275.5px;
+    }
+}
+@-webkit-keyframes tracker2 {
+    from {
+        top: 181.5px;
+        left: 275.5px;
+    } to {
+        top: 181.5px;
+        left: 339.5px;
+    }
+}
+@-webkit-keyframes tracker3 {
+    from {
+        top: 181.5px;
+        left: 339.5px;
+    } to {
+        top: 181.5px;
+        left: 403.5px;
+    }
+}
+@-webkit-keyframes backtracker1 {
+    from {
+        top: 181.5px;
+        left: 275.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
+    }
+}
+@-webkit-keyframes backtracker2 {
+    from {
+        top: 181.5px;
+        left: 339.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
+    }
+}
+@-webkit-keyframes backtracker3 {
+    from {
+        top: 181.5px;
+        left: 403.5px;
+    } to {
+        top: 181.5px;
+        left: 211.5px;
+    }
+}
+
 </style>
 
         <script
@@ -570,13 +667,14 @@ body {
             </script>
 
             <script id="action-button-template" type="text/html">
-                <button class="ui primary button" id={{ id }}>{{ text }}</button>
+                <button class="ui primary button">{{ text }}</button>
             </script>
 
             <br>
 
             <div class="layered-image">
                 <img class="image image-overlay1 board" src="img/lib_back.png">
+                <img class="tracker" src="img/electiontracker.png">
                 <div class="flip-card liberal-overlay1">
                     <div class="flip-card-inner">
                         <div class="flip-card-front">

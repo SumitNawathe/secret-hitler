@@ -42,6 +42,7 @@ const headingHtml = Mustache.render(headingTemplate, {
 });
 
 let spectator = false
+let dead = false
 
 const usernames = []
 const participants = []
@@ -54,6 +55,8 @@ const cpolicies = [document.querySelector(".cpolicy1"), document.querySelector("
 
 const javote = document.querySelector(".javote")
 const neinvote = document.querySelector(".neinvote")
+
+const $tracker = document.querySelector('.tracker')
 
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
@@ -160,6 +163,7 @@ socket.on('startGameData', (startGameDataString) => {
         var newObject = new Object()
         newObject.username = username
         newObject.div = $participantList.querySelector('#participant'+username)
+        newObject.dead = false
         participants.push(newObject)
         newObject = new Object()
         newObject.username = username
@@ -261,6 +265,10 @@ socket.on('new president', (newPresidentString) => {
     const newPres = newPresidentData.newPres
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
+    console.log('oldChanc '+oldChanc)
+    console.log('oldPres '+oldPres)
+    clearLobbyActions()
+    removeLoaders()
     clearOverlay()
     clearSlide()
     let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
@@ -303,6 +311,7 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     const chancellorChosenData = JSON.parse(chancellorChosenString)
     const president = chancellorChosenData.president
     const chancellor = chancellorChosenData.chancellor
+    console.log('chancellor '+chancellor)
 
     let html = Mustache.render(imageSelectTemplate, {src: "president_label.png"});
     $imageSelectOverlay = getDivFromUsername(overlays, president)
@@ -331,7 +340,7 @@ socket.on('rescind vote', (didVoteString) => {
 }) 
 
 socket.on('vote finished', (voteFinishedString) => {
-    if (!spectator)
+    if (!spectator && !dead)
         clearVote()
     const voteData = JSON.parse(voteFinishedString)
     const votes = voteData.votes
@@ -344,20 +353,24 @@ socket.on('vote finished', (voteFinishedString) => {
         }
     }
     for (let i=0; i<participants.length; i++) {
-        participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
-        participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
+        if (!participants[i].dead) {
+            participants[i].div.querySelector(".flip-card").classList.add("rotateandslidedown")
+            participants[i].div.querySelector(".flip-card-inner").classList.add("rotateandslidedown")
+        }
     }
 })
 
 const setVote = () => {
     for (let i=0; i<slidecards.length; i++) {
-        slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
-        slidecards[i].div.children[0].classList.add("slideup")
-        slidecards[i].div.children[0].children[0].classList.add("slideup")
+        if (!participants[i].dead) {
+            slideCardOneWithBack("voting cardback.png", "yes cardback.png", usernames[i])
+            slidecards[i].div.children[0].classList.add("slideup")
+            slidecards[i].div.children[0].children[0].classList.add("slideup")
 
-        participants[i].div.querySelector(".loader").classList.add("active")
+            participants[i].div.querySelector(".loader").classList.add("active")
+        }
     }
-    if (!spectator) {
+    if (!spectator && !dead) {
         javote.classList.add("vote-place")
         neinvote.classList.add("vote-place")
         //might have to be more specific for veto stuff later
@@ -416,6 +429,7 @@ socket.on('election failed', (electionFailString) => {
 })
 
 socket.on('get three cards', (threeCardsString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a policy to discard")
     //TODO: add text about discarding if necessary
     const threeCardsData = JSON.parse(threeCardsString)
     const cards = threeCardsData.cards
@@ -440,6 +454,7 @@ socket.on('get three cards', (threeCardsString) => {
 function ppolicyListener(e) {
     e.target.classList.add("selectvote")
     for (let policy of ppolicies) {
+        policy.removeEventListener('click', ppolicyListener)
         policy.classList.add("policy-slideup")
     }
     setTimeout(function() {
@@ -452,6 +467,7 @@ function ppolicyListener(e) {
 }
 
 socket.on('president discard', (presidentDiscardString) => {
+    clearLobbyActions()
     const presidentDiscardData = JSON.parse(presidentDiscardString)
     const president = presidentDiscardData.president
     const chancellor = presidentDiscardData.chancellor
@@ -460,6 +476,7 @@ socket.on('president discard', (presidentDiscardString) => {
 })
 
 socket.on('chancellor get two cards', (twoCardsString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a policy to enact")
     const twoCardsData = JSON.parse(twoCardsString)
     const cards = twoCardsData.policyCards
     for (let i=0; i<cards.length; i++) {
@@ -482,6 +499,7 @@ socket.on('chancellor get two cards', (twoCardsString) => {
 function cpolicyListener(e) {
     e.target.classList.add("selectvote")
     for (let policy of cpolicies) {
+        policy.removeEventListener('click', cpolicyListener)
         policy.classList.add("policy-slideup")
     }
     setTimeout(function() {
@@ -494,6 +512,7 @@ function cpolicyListener(e) {
 }
 
 socket.on('place card', (placeCardString) => {
+    clearLobbyActions()
     removeLoaders() //might need to change this for veto stuff
     const placeCardData = JSON.parse(placeCardString)
     const type = placeCardData.type
@@ -511,6 +530,257 @@ socket.on('place card', (placeCardString) => {
             .add("policy-rotate")
             //this can be cleaned up a lot on html side
     }
+})
+
+socket.on('president loading', (loadingString) => {
+    console.log('presLoading')
+    loadingData = JSON.parse(loadingString)
+    const president = loadingData.president
+    getDivFromUsername(participants, president).querySelector('.loader').classList.add("active")
+})
+
+socket.on('president action 1', (firstString) => {
+    console.log('presAction1')
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a player to investigate")
+    const firstData = JSON.parse(firstString)
+    const president = firstData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction1')
+})
+
+socket.on('investigation results', (investString) => {
+    const investData = JSON.parse(investString)
+    const president = investData.president
+    const investigated = investData.investigated
+    const type = investData.type
+    if (username !== president) {
+        slideCardOne("party cardback.png", investigated)
+        let div = getDivFromUsername(slidecards, investigated)
+        div.querySelector('.flip-card').classList.add("slideupanddown")
+        div.querySelector('.flip-card-inner').classList.add("slideupanddown")
+    } else {
+        //TODO: add separate lib and fas party membership specific cards
+        if (type) {
+            slideCardOneWithBack("party cardback.png", "liberal cardback.png", investigated)
+            setTimeout(() => {
+                getDivFromUsername(participants, investigated).children[0].classList.add("Liberal")
+            }, 4000);
+        } else {
+            slideCardOneWithBack("party cardback.png", "fascist cardback.png", investigated)
+            setTimeout(() => {
+                getDivFromUsername(participants, investigated).children[0].classList.add("Fascist")
+            }, 4000);
+        }
+        let div = getDivFromUsername(slidecards, investigated)
+        div.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        div.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+    }
+})
+
+socket.on('president action 2', (secondString) => {
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose the next president")
+    const secondData = JSON.parse(secondString)
+    const president = secondData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction2')
+})
+
+socket.on('president action 3', (thirdString) => {
+    let html = Mustache.render(actionButtonTemplate, { text: "View next three cards" });
+    $lobbyActions.insertAdjacentHTML('beforeend', html)
+    let button = $lobbyActions.querySelector('.button')
+    button.addEventListener('click', () => {
+        clearLobbyActions()
+        socket.emit('presAction3', { room }, (error) => { if (error) { console.log('error'); } })
+    })
+})
+
+socket.on('president action 4', (fourthString) => {
+    //TODO: add confirmation on execute
+    $lobbyActions.insertAdjacentHTML('beforeend', "WARNING: Choose a player to execute")
+    const fourthData = JSON.parse(fourthString)
+    const president = fourthData.president
+    const eligible = []
+    for (let i=0; i<participants.length; i++) {
+        if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
+        else { eligible.push(false) }
+    }
+    playerSelect(eligible, 'presAction4')
+})
+
+socket.on('user killed', (killedString) => {
+    const killedData = JSON.parse(killedString)
+    const killedUser = killedData.killedUser
+    slideCardOne("dead.png", killedUser)
+    let div = getDivFromUsername(slidecards, killedUser)
+    div.querySelector('.flip-card').classList.add("slideup")
+    div.querySelector('.flip-card-inner').classList.add("slideup")
+    for (let participant of participants) {
+        if (participant.username === killedUser) {
+            participant.dead = true
+            break
+        }
+    }
+    if (username === killedUser) dead = true
+    setTimeout(() => {
+        document.querySelector('#'+killedUser+'_img').src = "img/dead.png"
+    }, 1000);
+})
+
+socket.on('next three cards', (cardsString) => {
+    const cardsData = JSON.parse(cardsString)
+    const cards = cardsData.cards
+    for (let i=0; i<cards.length; i++) {
+        if (cards[i]) {
+            ppolicies[i].src = "img/liberal policy.png"
+        } else {
+            ppolicies[i].src = "img/fascist policy.png"
+        }
+    }
+    for (let policy of ppolicies) {
+        policy.classList.add("policy-slidedownandup")
+        setTimeout(() => {
+            policy.classList.remove("policy-slidedownandup")
+        }, 5000);
+    }
+})
+
+socket.on('failed election tracker', (trackerString) => {
+    const trackerData = JSON.parse(trackerString)
+    const start = trackerData.start
+    const end = trackerData.end
+    if (end !== 0) {
+        $tracker.classList.remove("tracker1", "tracker2", "tracker3",
+                "backtracker1", "backtracker2", "backtracker3")
+        $tracker.classList.add("tracker"+end)
+    } else {
+        $tracker.classList.add("backtracker"+start)
+        setTimeout(() => {
+            $tracker.classList.remove("tracker1", "tracker2", "tracker3",
+                "backtracker1", "backtracker2", "backtracker3")
+        }, 1500);
+    }
+})
+
+socket.on('chancellor veto choice', () => {
+    clearLobbyActions()
+    $lobbyActions.insertAdjacentHTML('beforeend', "Would you like to veto?")
+    javote.classList.add("vote-place")
+    neinvote.classList.add("vote-place")
+    setTimeout(() => {
+        javote.addEventListener('click', cjaEventListenerVeto)
+        neinvote.addEventListener('click', cneinEventListenerVeto)
+    }, 1000);
+})
+
+function cjaEventListenerVeto() {
+    javote.removeEventListener('click', cjaEventListenerVeto)
+    neinvote.removeEventListener('click', cneinEventListenerVeto)
+    javote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('chancellorVetoVoting', { room, choice: true },
+        (error) => { if (error) { console.log('error'); } })
+}
+function cneinEventListenerVeto() {
+    javote.removeEventListener('click', cjaEventListenerVeto)
+    neinvote.removeEventListener('click', cneinEventListenerVeto)
+    neinvote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('chancellorVetoVoting', { room, choice: false },
+        (error) => { if (error) { console.log('error'); } })
+}
+
+socket.on('chancellor veto decide', (cDecideString) => {
+    removeLoaders()
+    clearSlide()
+    const cDecideData = JSON.parse(cDecideString)
+    const choice = cDecideData.choice
+    const chancellor = cDecideData.chancellor
+    const president = cDecideData.president
+    if (choice) {
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", chancellor)
+    } else {
+        slideCardOneWithBack("voting cardback.png", "no cardback.png", chancellor)
+    }
+    let $slidecard = getDivFromUsername(slidecards, chancellor)
+    $slidecard.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+    $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+})
+
+socket.on('president veto choice', () => {
+    clearLobbyActions()
+    $lobbyActions.insertAdjacentHTML('beforeend', "Would you like to veto?")
+    javote.classList.add("vote-place")
+    neinvote.classList.add("vote-place")
+    setTimeout(() => {
+        javote.addEventListener('click', pjaEventListenerVeto)
+        neinvote.addEventListener('click', pneinEventListenerVeto)
+    }, 1000);
+})
+
+function pjaEventListenerVeto() {
+    javote.removeEventListener('click', pjaEventListenerVeto)
+    neinvote.removeEventListener('click', pneinEventListenerVeto)
+    javote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('presVetoVoting', { room, choice: true },
+        (error) => { if (error) { console.log('error'); } })
+}
+function pneinEventListenerVeto() {
+    javote.removeEventListener('click', pjaEventListenerVeto)
+    neinvote.removeEventListener('click', pneinEventListenerVeto)
+    neinvote.classList.add("selectvote")
+    javote.classList.add("vote-remove")
+    neinvote.classList.add("vote-remove")
+    setTimeout(function() {
+        clearLobbyActions()
+        javote.classList.remove("vote-place", "vote-remove", "selectvote")
+        neinvote.classList.remove("vote-place", "vote-remove", "selectvote")
+    }, 1000)
+    socket.emit('presVetoVoting', { room, choice: false },
+        (error) => { if (error) { console.log('error'); } })
+}
+
+socket.on('president veto decide', (pVetoString) => {
+    const pVetoData = JSON.parse(pVetoString)
+    const choice = pVetoData.choice
+    const president = pVetoData.president
+    removeLoaders()
+    clearSlide()
+    if (choice) {
+        slideCardOneWithBack("voting cardback.png", "yes cardback.png", president)
+    } else {
+        slideCardOneWithBack("voting cardback.png", "no cardback.png", president)
+    }
+    let $slidecard = getDivFromUsername(slidecards, president)
+    $slidecard.querySelector('.flip-card').classList.add("rotateandslideupanddown")
+    $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
 })
 
 const getUsername = (i) => {
@@ -548,7 +818,6 @@ const clearSlide = () => {
         participantuser=list[i]
         let username = participantuser.id.substring(11)
         let $slidecard = participantuser.querySelector('#slidecard'+username)
-        console.log('slidecard '+username)
         $slidecard.innerHTML = ''
     }
 }
@@ -557,6 +826,10 @@ const removeLoaders = () => {
     for (let participant of participants) {
         participant.div.querySelector('.loader').classList.remove("active")
     }
+}
+
+const clearLobbyActions = () => {
+    $lobbyActions.innerHTML = ''
 }
 
 const playerSelect = (eligible, eventType) => {
@@ -575,6 +848,7 @@ const playerSelect = (eligible, eventType) => {
             // console.log('adding event listener');
             newButton.addEventListener('click', () => {
                 // console.log('chosen');
+                //ID isnt used rn so just in case i put the username as the ID
                 socket.emit(eventType, { room, choice: username }, (error) => { if (error) { console.log('error'); } })
             });
         }
@@ -671,7 +945,7 @@ socket.on('lobbyData', (lobbyDataString) => {
                 console.log('TYPE: ' + person.type);
                 console.log('STATUS: ' + person.status);
                 return false;
-            }
+            } 
             return true;
         });
         createLobbyButtons(type);
