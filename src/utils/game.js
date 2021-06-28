@@ -202,7 +202,7 @@ const registerVote = (room, username, vote, io) => {
             console.log('numOfFascists: ' + lobby.numOfFascists);
             console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
             if (lobby.fascistCards >= 3 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
-                endGame(room, FASCIST);
+                endGame(room, FASCIST, io);
                 return;
             }
             lobby.previousPresident = lobby.president;
@@ -313,9 +313,9 @@ const placeCard = (room, type, io) => {
         lobby.veto = true;
     }
     if (lobby.fascistCards == 6) {
-        endGame(room, FASCIST);
+        endGame(room, FASCIST, io);
     } else if (lobby.liberalCards == 5) {
-        endGame(room, LIBERAL);
+        endGame(room, LIBERAL, io);
     }
     console.log("fascists"+lobby.fascistCards);
     console.log("liberal"+lobby.liberalCards);
@@ -390,7 +390,7 @@ const handlePresAction4 = (room, killUser, io) => {
     let index = 0;
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
     if (lobby.users[index].type === TYPE_HITLER) {
-        endGame(room, LIBERAL);
+        endGame(room, LIBERAL, io);
         return;
     }
     if (lobby.users[index].type === TYPE_LIBERAL) { lobby.users[index].type = TYPE_DEAD_LIB; }
@@ -471,7 +471,7 @@ const nextPresident = (room, electionPassed, io) => {
 }
 
 
-const endGame = (room, winningTeam) => {
+const endGame = (room, winningTeam, io) => {
     const lobby = lobbies.get(room);
     lobby.postGameData = [winningTeam, lobby.users[0].username];
     lobby.gameState = GAMESTATE_FINISHED;
@@ -480,6 +480,12 @@ const endGame = (room, winningTeam) => {
         if (person.type === TYPE_DEAD_LIB) { person.type = TYPE_LIBERAL}
         else if (person.type === TYPE_DEAD_FAS) { person.type = TYPE_FASCIST }
     });
+
+    let users = [];
+    lobby.users.forEach((person) => {
+        if (person.type === TYPE_LIBERAL || person.type === TYPE_FASCIST || person.type === TYPE_HITLER) {users.push(person)}
+    });
+    io.to(room).emit('end game', JSON.stringify({winningTeam, users}))
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
