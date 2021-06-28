@@ -232,7 +232,7 @@ const chancellorVeto = (room, decision, io) => {
     io.to(room).emit('chancellor veto decide', JSON.stringify({choice: decision}));
     if(decision){
         // if chancellor wants to veto
-        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify());
+        io.to(getUserFromUsername(room, lobby.president)).emit('president veto choice', JSON.stringify({president: lobby.president}));
     } else {
         placeCard(room, lobby.policyCards[0], io);
     }
@@ -289,7 +289,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
         getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
         getUserFromUsername(room, lobby.president).status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
-        io.to(getUserFromUsername(room, lobby.chancellor)).emit('chancellor veto choice', JSON.stringify());
+        io.to(getUserFromUsername(room, lobby.chancellor)).emit('chancellor veto choice', JSON.stringify({chancellor: lobby.chancellor, president: lobby.president}));
     }
 }
 
