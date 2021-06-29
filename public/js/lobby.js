@@ -897,11 +897,6 @@ const playerSelect = (eligible, eventType) => {
 }
 
 
-
-
-
-
-
 socket.on('policyPeek', (cardDataString) => {
     console.log('recieved policyPeek');
     console.log(cardDataString);
@@ -990,7 +985,6 @@ removeLoaders()
         else { statusString = '' }
 
         const html = Mustache.render(participantTemplate, {
-            participant_id: "participant"+person.username,
             username: person.username,
             username_img: person.username+"_img",
             type: typeString,
@@ -1071,11 +1065,11 @@ removeLoaders()
         let otherUsersVoting = false;
         lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
         if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
-            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING || otherUsersVoting) {
-            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!slideup) {
                 // console.log('cha cha real smooth')
@@ -1327,6 +1321,7 @@ const slideCardOneWithBack = (src1, src2, username) => {
     console.log($slidecard)
     html = Mustache.render(slideCardWithBackTemplate, {src1: src1, src2: src2}, (error) => { if (error) { console.log('error'); } })
         $slidecard.insertAdjacentHTML('beforeend', html);
+
 }
 
 // const slidecard = (id, src) => {

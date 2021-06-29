@@ -190,6 +190,7 @@ const registerVote = (room, username, vote, io) => {
     console.log("vote yes: "+ lobby.voteCountYes);
     console.log("vote no: "+ lobby.voteCountNo);
     
+
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         let votes = [];
         for(let i = 0; i<lobby.users.length; i++){
