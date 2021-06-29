@@ -19,6 +19,8 @@ const STATUS_PRESACT1 = 5;
 const STATUS_PRESACT2 = 6;
 const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
+const STATUS_PRESACT_NONE = -1;
+
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
 
@@ -32,6 +34,7 @@ const STATUS_CHANCVETOCHOICE = 10;
 const lobbies = new Map();
 const idToUsername = new Map();
 const usernameToLobby = new Map();
+const roomToHTML = new Map();
 
 const FASCIST = false;
 const LIBERAL = true;
@@ -110,7 +113,9 @@ const createLobby = (room, username, id) => {
         investigations: null,
         veto: false,
         nextPres : [], // array with the indices of the next few presidents
-        postGameData: null
+        postGameData: null,
+        failedElectionTracker: 0,
+        presidentActionList: []
     };
     lobbies.set(room, lobby);
 }
@@ -129,12 +134,12 @@ const resetLobby = (room) => {
     lobby.voteCountNo = 0;
     lobby.policyCards = null;
     lobby.investigations = null;
-    lobby.veto = null;
+    lobby.veto = false;
     lobby.nextPres = [];
     lobby.postGameData = null;
     lobby.users.forEach((person) => {
         person.status = STATUS_NONE;
-        person.lastVote = false;
+        person.lastVote = null;
     });
 }
 
@@ -165,8 +170,10 @@ module.exports = {
     STATUS_PRESACT2,
     STATUS_PRESACT3,
     STATUS_PRESACT4,
+    STATUS_PRESACT_NONE,
     STATUS_PRESVETOCHOICE,
     STATUS_CHANCVETOCHOICE,
     FASCIST,
-    LIBERAL
+    LIBERAL,
+    roomToHTML
 };

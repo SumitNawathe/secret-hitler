@@ -31,7 +31,8 @@ const {
     STATUS_PRESACT3,
     STATUS_PRESACT4,
     FASCIST,
-    LIBERAL
+    LIBERAL,
+    roomToHTML
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser, remakeLobby } = require('./utils/lobby');
 const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
@@ -106,75 +107,114 @@ io.on('connection', (socket) => {
     });
 
     socket.on('startGame', ({ room }, callback) => {
-        startGame(room);
-        emitMidgameLobbyData(room);
+        console.log('receive startGame')
+        startGame(room, io);
+        // emitMidgameLobbyData(room);
+        const lobby = lobbies.get(room);
+        let fascists = [];
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_FASCIST) { fascists.push(person.username); }
+        });
+        let hitler = null;
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_HITLER) { hitler = person.username; }
+        });
+
+        let players = 0;
+        for(let i = 0; i<lobby.users.length; i++){
+            if(lobby.users[i].type !== TYPE_DEAD && lobby.users[i].type !== TYPE_DEAD_FAS && lobby.users[i].type !== TYPE_DEAD_LIB && lobby.users[i].type !== TYPE_SPECTATOR){
+                players++;
+            }
+        }
+        lobby.users.forEach((person) => {
+            if (person.type === TYPE_LIBERAL) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_LIBERAL, players: players }));
+            } else if (person.type === TYPE_FASCIST) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_FASCIST, fascists, hitler, players: players }));
+            } else if (person.type === TYPE_HITLER) {
+                if(players > 6){
+                    io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  players: players }));
+                } else {
+                    io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_HITLER,  fascists, players: players }));
+                }
+            } else if (person.type === TYPE_SPECTATOR) {
+                io.to(person.id).emit('startGameData', JSON.stringify({ type: TYPE_SPECTATOR, fascists, hitler,  players: players }));
+            }
+        });
+        //TODO: emit first president
     });
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
         // console.log('chose chancellor: ' + choice);
         // console.log('room: ' + room);
-        setUpVote(room, choice);
-        emitMidgameLobbyData(room);
+        setUpVote(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
         // console.log('received vote: ' + choice);
-        registerVote(room, username, choice);
-        emitMidgameLobbyData(room);
+        registerVote(room, username, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presDecision', ({ room, index }, callback) => {
         // console.log('chose card ' + index);
-        presidentDiscard(room, index);
-        emitMidgameLobbyData(room);
+        presidentDiscard(room, index, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('chancDecision', ({room, index}, callback) => {
         // console.log('chose card ' + index);
-        chancellorChoose(room, index);
-        emitMidgameLobbyData(room);
+        chancellorChoose(room, index, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction1', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
-        handlePresAction1(room, choice);
-        emitMidgameLobbyData(room);
+        handlePresAction1(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction2', ({room, choice}, callback) => {
         // console.log('chose to investigate ' + choice);
-        handlePresAction2(room, choice);
-        emitMidgameLobbyData(room);
+        handlePresAction2(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
-    socket.on('presAction3', ({room, id}, callback) => {
-        const cards = handlePresAction3(room);
-        io.to(id).emit('policyPeek', JSON.stringify(cards));
-        setTimeout(emitMidgameLobbyData, 5000, room);
+    socket.on('presAction3', ({room}, callback) => {
+        handlePresAction3(room, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {
-        handlePresAction4(room, choice);
-        emitMidgameLobbyData(room);
+        handlePresAction4(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('presVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
-        presidentVeto(room, choice);
-        emitMidgameLobbyData(room);
+        presidentVeto(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('chancellorVetoVoting', ({ room, choice }, callback) => {
         // console.log('recieved veto vote: ' + choice);
-        chancellorVeto(room, choice);
-        emitMidgameLobbyData(room);
+        chancellorVeto(room, choice, io);
+        //emitMidgameLobbyData(room);
     });
 
     socket.on('remakeLobby', ({ room }, callback) => {
         console.log('recieved remakeLobby');
         remakeLobby(room);
         io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+    });
+
+    socket.on('save html', ({room, html}, callback) => {
+        roomToHTML.set(room, html);
+    });
+
+    socket.on('get html', ({room}, callback) => {
+        io.to(room).emit('html', roomToHTML.get(room));
     });
 });
 
