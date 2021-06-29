@@ -31,7 +31,8 @@ const {
     STATUS_PRESACT3,
     STATUS_PRESACT4,
     FASCIST,
-    LIBERAL
+    LIBERAL,
+    roomToHTML
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser, remakeLobby } = require('./utils/lobby');
 const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
@@ -227,6 +228,14 @@ io.on('connection', (socket) => {
         console.log('recieved remakeLobby');
         remakeLobby(room);
         io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+    });
+
+    socket.on('save html', ({room, html}, callback) => {
+        roomToHTML.set(room, html);
+    });
+
+    socket.on('get html', ({room}, callback) => {
+        io.to(room).emit('html', html);
     });
 });
 

@@ -34,6 +34,7 @@ const STATUS_CHANCVETOCHOICE = 10;
 const lobbies = new Map();
 const idToUsername = new Map();
 const usernameToLobby = new Map();
+const roomToHTML = new Map();
 
 const FASCIST = false;
 const LIBERAL = true;
@@ -173,5 +174,6 @@ module.exports = {
     STATUS_PRESVETOCHOICE,
     STATUS_CHANCVETOCHOICE,
     FASCIST,
-    LIBERAL
+    LIBERAL,
+    roomToHTML
 };
