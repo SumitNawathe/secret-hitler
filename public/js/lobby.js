@@ -1,13 +1,13 @@
 const socket = io();
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
-const $participantList = document.querySelector('#participant-list');
-const participantTemplate = document.querySelector('#participant-template').innerHTML;
-const $lobbyActions = document.querySelector('#actions');
-const actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
-const imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
-const slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
-const slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+let $participantList = document.querySelector('#participant-list');
+let participantTemplate = document.querySelector('#participant-template').innerHTML;
+let $lobbyActions = document.querySelector('#actions');
+let actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
+let imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
+let slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
+let slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -44,19 +44,19 @@ const headingHtml = Mustache.render(headingTemplate, {
 let spectator = false
 let dead = false
 
-const usernames = []
-const participants = []
-const slidecards = []
-const overlays = []
-const previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
-const currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
-const ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
-const cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
+let usernames = []
+let participants = []
+let slidecards = []
+let overlays = []
+let previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
+let currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
+let ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
+let cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
 
-const javote = document.querySelector(".javote")
-const neinvote = document.querySelector(".neinvote")
+let javote = document.querySelector(".javote")
+let neinvote = document.querySelector(".neinvote")
 
-const $tracker = document.querySelector('.tracker')
+let $tracker = document.querySelector('.tracker')
 
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
@@ -147,9 +147,11 @@ socket.on('startGameData', (startGameDataString) => {
     const players = startGameData.players
     console.log('players '+players)
     if (players<7) {
-        document.querySelector("img[src='img/fascist_back_78.png']").src = "img/fascist_back_56.png"
+        document.querySelector(".fasboard").src = "img/fascist_back_56.png"
     } else if (players>8) {
-        document.querySelector("img[src='img/fascist_back_78.png']").src = "img/fascist_back_910.png"
+        document.querySelector(".fasboard").src = "img/fascist_back_910.png"
+    } else {
+        document.querySelector(".fasboard").src = "img/fascist_back_78.png"
     }
     try {
         for (let i=0; i<$participantList.children.length; i++) {
@@ -263,6 +265,7 @@ socket.on('new president', (newPresidentString) => {
     console.log('new president')
     const newPresidentData = JSON.parse(newPresidentString)
     const newPres = newPresidentData.newPres
+    console.log('new pres '+newPres)
     const oldChanc = newPresidentData.oldChanc
     const oldPres = newPresidentData.oldPres
     console.log('oldChanc '+oldChanc)
@@ -566,14 +569,10 @@ socket.on('investigation results', (investString) => {
         //TODO: add separate lib and fas party membership specific cards
         if (type) {
             slideCardOneWithBack("party cardback.png", "liberal cardback.png", investigated)
-            setTimeout(() => {
-                getDivFromUsername(participants, investigated).children[0].classList.add("Liberal")
-            }, 4000);
+            getDivFromUsername(participants, investigated).children[0].classList.add("Liberal")
         } else {
             slideCardOneWithBack("party cardback.png", "fascist cardback.png", investigated)
-            setTimeout(() => {
-                getDivFromUsername(participants, investigated).children[0].classList.add("Fascist")
-            }, 4000);
+            getDivFromUsername(participants, investigated).children[0].classList.add("Fascist")
         }
         let div = getDivFromUsername(slidecards, investigated)
         div.querySelector('.flip-card').classList.add("rotateandslideupanddown")
@@ -783,7 +782,48 @@ socket.on('president veto decide', (pVetoString) => {
     $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
 })
 
+socket.on('end game', (endGameString) => {
+    removeLoaders()
+    clearOverlay()
+    clearSlide()
+    clearLobbyActions()
+    const endGameData = JSON.parse(endGameString)
+    const winningTeam = endGameData.winningTeam
+    const users = endGameData.users
+    for (let person of users) {
+        getDivFromUsername(participants, person.username).children[0]
+                .classList.remove("Liberal", "Fascist", "Hitler")
+        //might cause flash of white names depending on computer speed
+        if (person.type === TYPE_LIBERAL) {
+            slideCardOneWithBack("party cardback.png", "liberal cardback.png", person.username)
+            getDivFromUsername(participants, person.username).children[0]
+                .classList.add("Liberal")
+        } else if (person.type === TYPE_FASCIST) {
+            slideCardOneWithBack("party cardback.png", "fascist cardback.png", person.username)
+            getDivFromUsername(participants, person.username).children[0]
+                .classList.add("Fascist")
+        } else {
+            slideCardOneWithBack("party cardback.png", "hitler cardback.png", person.username)
+            getDivFromUsername(participants, person.username).children[0]
+                .classList.add("Hitler")
+        }
+        let $slidecard = getDivFromUsername(slidecards, person.username)
+        $slidecard.querySelector('.flip-card').classList.add("rotateandslideup")
+        $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideup")
+    }
+    setTimeout(() => {
+        const remakeLobbyHtml = Mustache.render(actionButtonTemplate, { text: 'Remake Lobby'});
+        $lobbyActions.insertAdjacentHTML('beforeend', remakeLobbyHtml);
+        //this is bad but i dont care
+        $lobbyActions.children[0].addEventListener('click', () => {
+            console.log('request remake lobby');
+            socket.emit('remakeLobby', { room }, (error) => { if (error) { console.log('error'); } });
+        });
+    }, 4000);
+})
+
 const getUsername = (i) => {
+    console.log('getusername '+i)
     return $participantList.children[i].id.substring(11)
 }
 
@@ -847,6 +887,7 @@ const playerSelect = (eligible, eventType) => {
             newButton.classList.add("glowing")
             // console.log('adding event listener');
             newButton.addEventListener('click', () => {
+                clearOverlayExcept(previouslabels.concat(currentlabels))
                 // console.log('chosen');
                 //ID isnt used rn so just in case i put the username as the ID
                 socket.emit(eventType, { room, choice: username }, (error) => { if (error) { console.log('error'); } })
@@ -881,6 +922,38 @@ socket.on('policyPeek', (cardDataString) => {
 });
 
 socket.on('lobbyData', (lobbyDataString) => {
+    //spectator image problem but nobody cares
+    $participantList = document.querySelector('#participant-list');
+ participantTemplate = document.querySelector('#participant-template').innerHTML;
+ $lobbyActions = document.querySelector('#actions');
+ actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
+ imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
+ slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
+ slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+
+ spectator = false
+ dead = false
+ 
+usernames = []
+  participants = []
+  slidecards = []
+  overlays = []
+ previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
+  currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
+  ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
+ cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
+ 
+  javote = document.querySelector(".javote")
+  neinvote = document.querySelector(".neinvote")
+ 
+  $tracker = document.querySelector('.tracker')
+
+clearOverlay()
+clearSlide()
+clearLobbyActions()
+removeLoaders()
+
+
     // console.log('lobbyDataString:');
     // console.log(lobbyDataString);
     lobbyData = JSON.parse(lobbyDataString);
