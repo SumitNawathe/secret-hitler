@@ -235,7 +235,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('get html', ({room}, callback) => {
-        io.to(room).emit('html', html);
+        io.to(room).emit('html', roomToHTML.get(room));
     });
 });
 
