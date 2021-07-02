@@ -109,16 +109,14 @@ const removeUser = (id) => {
         return true;
     });
     if (hostLeft) {
-        console.log('anything')
         if (lobbies.get(room).users.length === 0) {
             lobbies.delete(room);
         } else {
-            console.log(lobbies.get(room).users);
+            // console.log(lobbies.get(room).users);
             lobbies.get(room).users[0].type = TYPE_HOST;
-            return { room, newHost: lobbies.get(room).users[0] };
         }
     }
-    return { room };
+    return room;
 }
 
 const remakeLobby = (room) => {

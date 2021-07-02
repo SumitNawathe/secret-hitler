@@ -190,6 +190,7 @@ const registerVote = (room, username, vote, io) => {
     console.log("vote yes: "+ lobby.voteCountYes);
     console.log("vote no: "+ lobby.voteCountNo);
     
+
     if (lobby.voteCountYes + lobby.voteCountNo >= countPlayers) {
         let votes = [];
         for(let i = 0; i<lobby.users.length; i++){
@@ -202,8 +203,8 @@ const registerVote = (room, username, vote, io) => {
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
             console.log('numOfFascists: ' + lobby.numOfFascists);
             console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
-            if (lobby.fascistCards >= 1 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
-                setTimeout(() => { 
+            if (lobby.fascistCards >= 3 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
+                setTimeout(() => {
                     endGame(room, FASCIST, io);
                     return;
                 }, 4000);
