@@ -203,7 +203,7 @@ const registerVote = (room, username, vote, io) => {
             console.log('numOfFascists: ' + lobby.numOfFascists);
             console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
             if (lobby.fascistCards >= 1 && getUserFromUsername(room, lobby.chancellor).type === TYPE_HITLER) {
-                setTimeout(() => {
+                setTimeout(() => { 
                     endGame(room, FASCIST, io);
                     return;
                 }, 4000);
