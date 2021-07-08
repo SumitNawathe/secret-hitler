@@ -926,8 +926,24 @@ socket.on('policyPeek', (cardDataString) => {
     }
 });
 
+const clearCards = () => {
+    for (let i=1; i<6; i++) {
+        document.querySelector('.liberal-overlay'+i).classList
+            .remove("liberal"+i+"-placeandrotate")
+        document.querySelector('.liberal-overlay'+i).children[0].classList
+            .remove("policy-rotate")
+    }
+    for (let i=1; i<7; i++) {
+        document.querySelector('.fascist-overlay'+i).classList
+            .remove("fascist"+i+"-placeandrotate")
+        document.querySelector('.fascist-overlay'+i).children[0].classList
+            .remove("policy-rotate")
+    }
+}
+
 socket.on('lobbyData', (lobbyDataString) => {
     //spectator image problem but nobody cares
+    clearCards()
     $participantList = document.querySelector('#participant-list');
  participantTemplate = document.querySelector('#participant-template').innerHTML;
  $lobbyActions = document.querySelector('#actions');
