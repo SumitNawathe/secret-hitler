@@ -37,6 +37,7 @@ const {
 const { addToLobby, updateLobbyUserType, removeUser, remakeLobby } = require('./utils/lobby');
 const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
 const { timeLog } = require('console');
+const DEBUG_MODE = true;
 
 const app = express();
 const server = http.createServer(app);
@@ -65,10 +66,10 @@ io.on('connection', (socket) => {
     // console.log('New WebSocket connection');
     
     socket.on('join', ({ username, room }, callback) => {
-        // console.log('join recieved');
-        // console.log('username: ' + username);
-        // console.log('room: ' + room);
-
+        if (DEBUG_MODE) {
+            console.log('recieved join: username = '+ username + ", room = " + room);
+            console.log('calling addToLobby');
+        }
         const valid = addToLobby(room, username, socket.id);
         if (!valid) {
             // console.log('invalid');
@@ -82,32 +83,67 @@ io.on('connection', (socket) => {
         // console.log(lobbies.get(room));
         // console.log('json string:');
         // console.log(JSON.stringify(lobbies.get(room)));
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+
+        //TODO: only works for lobby mode? maybe?
+        io.to(socket.id).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+
+        lobbies.get(room).users.forEach((person) => {
+            if (person.id !== socket.id) {
+                io.to(person.id).emit('joinLobbyData', JSON.stringify({ player: username }));
+            }
+        });
+
         callback();
     });
 
     socket.on('changeLobbyInfo', ({ username, room, newType }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved changeLobbyInfo: username = ' + username + ", room = " + room + ", newType = " + newType);
+            console.log('calling updateLobbyUserType');
+        }
         // console.log('recieved newType: ' + newType);
         const success = updateLobbyUserType(room, username, newType);
         if (!success) {
             // console.log('failed type change');
-            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+            // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
             callback('Failed to change type.');
+            console.log('Failed to change type');
             return;
         }
-        io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        io.to(room).emit('updateLobbyData', JSON.stringify({ username, state: newType }));
         callback();
     })
 
     socket.on('disconnect', () => {
-        const room = removeUser(socket.id);
-        if (room !== null) {
-            io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+        console.log('recieved disconnect');
+        const username = idToUsername.get(socket.id);
+        console.log(username);
+        console.log('calling removeUser');
+        const result = removeUser(socket.id);
+        if (result !== null) {
+            try {
+                const room = result.room;
+                // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+                if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
+                    io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
+                    console.log(result)
+                    if (result.newHost) {
+                        io.to(result.newHost.id).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+                    }
+                }
+            } catch (e) {
+                console.log('error in disconnect');
+            }
         }
     });
 
     socket.on('startGame', ({ room }, callback) => {
-        console.log('receive startGame')
+        if (DEBUG_MODE) {
+            console.log('received startGame: room = ' + room);
+            console.log('calling startGame');
+        }
         startGame(room, io);
         // emitMidgameLobbyData(room);
         const lobby = lobbies.get(room);
@@ -145,6 +181,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved chooseChancellor: room = ' + room + ', choice = ' + choice);
+            console.log('calling setUpVote');
+        }
         // console.log('chose chancellor: ' + choice);
         // console.log('room: ' + room);
         setUpVote(room, choice, io);
@@ -152,52 +192,88 @@ io.on('connection', (socket) => {
     });
 
     socket.on('voting', ({ room, username, choice }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved voting: room = ' + room + ', username = ' + username);
+            console.log('calling registerVote');
+        }
         // console.log('received vote: ' + choice);
         registerVote(room, username, choice, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presDecision', ({ room, index }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presDecision: room = ' + room + ', index = ' + index);
+            console.log('calling presidentDiscard');
+        }
         // console.log('chose card ' + index);
         presidentDiscard(room, index, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('chancDecision', ({room, index}, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved chancDecision: room = ' + room + ', index = ' + index);
+            console.log('calling chancellorChoose');
+        }
         // console.log('chose card ' + index);
         chancellorChoose(room, index, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction1', ({room, choice}, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presAction1: room = ' + room + ', choice = ' + choice);
+            console.log('calling handlePresAction1');
+        }
         // console.log('chose to investigate ' + choice);
         handlePresAction1(room, choice, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction2', ({room, choice}, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presAction2: room = ' + room + ', choice = ' + choice);
+            console.log('calling handlePresAction2');
+        }
         // console.log('chose to investigate ' + choice);
         handlePresAction2(room, choice, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction3', ({room}, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presAction3: room = ' + room);
+            console.log('calling handlePresAction3');
+        }
         handlePresAction3(room, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presAction4', ({room, choice}, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presAction4: room = ' + room + ', choice = ' + choice);
+            console.log('calling handlePresAction4');
+        }
         handlePresAction4(room, choice, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('presVetoVoting', ({ room, choice }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved presVetoVoting: room = ' + room + ', choice = ' + choice);
+            console.log('calling presidentVeto');
+        }
         // console.log('recieved veto vote: ' + choice);
         presidentVeto(room, choice, io);
         //emitMidgameLobbyData(room);
     });
 
     socket.on('chancellorVetoVoting', ({ room, choice }, callback) => {
+        if (DEBUG_MODE) {
+            console.log('recieved chancellorVetoVoting: room = ' + room + ', choice = ' + choice);
+            console.log('calling chancellorVeto');
+        }
         // console.log('recieved veto vote: ' + choice);
         chancellorVeto(room, choice, io);
         //emitMidgameLobbyData(room);
