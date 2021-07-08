@@ -67,7 +67,7 @@ socket.on('joinLobbyData', (playerJoiningString) => {
         participant_id: "participant"+joinUsername,
         username: joinUsername,
         username_img: joinUsername+"_img",
-        type: 'Player',
+        type: '',
         status: '',
         slidecard_id: "slidecard"+joinUsername,
         image_select_id: "image-select-"+joinUsername,
@@ -115,10 +115,14 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
             oldButton.parentNode.replaceChild(newButton, oldButton);
         }
     }
-    if (newState === TYPE_HOST)
+    if (newState === TYPE_HOST) {
     document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
-    else if (newState === TYPE_PLAYER)
+    $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
+    }
+    else if (newState === TYPE_PLAYER) {
         document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
+        $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
+    }
     else if (newState === TYPE_SPECTATOR) {
         $participantList.querySelector('#participant'+updateUsername).classList.add("spectator")
         document.querySelector('#'+updateUsername+'_img').src = "img/test carback.png"
@@ -828,7 +832,6 @@ const getUsername = (i) => {
 }
 
 const getDivFromUsername = (arr, username) => {
-    console.log('arr '+arr)
     console.log('username '+username)
     for (let o of arr) {
         console.log(o.username)
@@ -1014,7 +1017,7 @@ removeLoaders()
             participant_id: "participant"+person.username,
             username: person.username,
             username_img: person.username+"_img",
-            type: typeString,
+            type: '',
             status: statusString,
             slidecard_id: "slidecard"+person.username,
             image_select_id: "image-select-"+person.username,
