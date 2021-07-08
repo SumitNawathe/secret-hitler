@@ -109,7 +109,7 @@ const removeUser = (id) => {
         return true;
     });
     if (hostLeft) {
-        console.log('anything')
+        console.log('hostLeft')
         if (lobbies.get(room).users.length === 0) {
             lobbies.delete(room);
         } else {
