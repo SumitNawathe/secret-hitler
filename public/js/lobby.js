@@ -828,6 +828,7 @@ const getUsername = (i) => {
 }
 
 const getDivFromUsername = (arr, username) => {
+    console.log(arr)
     return arr.find(o => o.username === username).div;
 }
 
