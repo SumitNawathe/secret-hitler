@@ -123,14 +123,18 @@ io.on('connection', (socket) => {
         console.log('calling removeUser');
         const result = removeUser(socket.id);
         if (result !== null) {
-            const room = result.room;
-            // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
-            if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
-                io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
-                console.log(result)
-                if (result.newHost) {
-                    io.to(result.newHost.id).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+            try {
+                const room = result.room;
+                // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+                if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
+                    io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
+                    console.log(result)
+                    if (result.newHost) {
+                        io.to(result.newHost.id).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+                    }
                 }
+            } catch (e) {
+                console.log('error in disconnect');
             }
         }
     });
