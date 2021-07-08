@@ -1032,13 +1032,17 @@ removeLoaders()
     }
 
     if (lobbyData.gameState === GAMESTATE_LOBBY) {
+        console.log('gamestate')
         let type = -1;
         lobbyData.users.every((person) => {
+            if (person.type === -1) {
+                $participantList.querySelector('#participant'+person.username).classList.add("spectator")
+                document.querySelector('#'+person.username+'_img').src = "img/test carback.png"
+            }
             if (person.username === username) {
                 type = person.type;
                 console.log('TYPE: ' + person.type);
                 console.log('STATUS: ' + person.status);
-                return false;
             } 
             return true;
         });

@@ -115,6 +115,10 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
             }       
         ))
         }, 4000)
+
+    setTimeout(() => {
+        endGame(room, LIBERAL, io)
+    }, 5000);
 }
 
 const setUpVote = (room, chancellorChoice, io) => {
