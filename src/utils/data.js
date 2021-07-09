@@ -115,8 +115,7 @@ const createLobby = (room, username, id) => {
         nextPres : [], // array with the indices of the next few presidents
         postGameData: null,
         failedElectionTracker: 0,
-        presidentActionList: [],
-        pastEmits: new Map()
+        presidentActionList: []
     };
     lobbies.set(room, lobby);
 }
