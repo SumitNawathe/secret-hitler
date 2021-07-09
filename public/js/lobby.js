@@ -60,6 +60,10 @@ let $tracker = document.querySelector('.tracker')
 
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+window.onbeforeunload = function() {
+    return 'lol'
+}
+
 socket.on('joinLobbyData', (playerJoiningString) => {
     const joinLobbyData = JSON.parse(playerJoiningString);
     const joinUsername = joinLobbyData.player;
