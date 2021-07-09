@@ -37,7 +37,7 @@ const addToLobby = (room, username, id) => {
         // console.log(lobby);
 
         //check if that username is taken
-        for (user in lobby.users) {
+        for (user of lobby.users) {
             if (user.username === username) {
                 return false;
             }
