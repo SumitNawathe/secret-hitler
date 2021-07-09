@@ -839,5 +839,6 @@ module.exports = {
     handlePresAction4,
     generateMaskedLobby,
     chancellorVeto,
-    presidentVeto
+    presidentVeto,
+    getUserFromUsername
 }

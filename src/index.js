@@ -35,7 +35,7 @@ const {
     roomToHTML
 } = require('./utils/data');
 const { addToLobby, updateLobbyUserType, removeUser, remakeLobby } = require('./utils/lobby');
-const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto } = require('./utils/game');
+const { startGame, setUpVote, registerVote, presidentDiscard, chancellorChoose, handlePresAction1, handlePresAction2, handlePresAction3, handlePresAction4, generateMaskedLobby, chancellorVeto, presidentVeto, getUserFromUsername } = require('./utils/game');
 const { timeLog } = require('console');
 const DEBUG_MODE = true;
 
@@ -285,12 +285,16 @@ io.on('connection', (socket) => {
         io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
     });
 
-    socket.on('save html', ({room, html}, callback) => {
-        roomToHTML.set(room, html);
-    });
-
-    socket.on('get html', ({room}, callback) => {
-        io.to(room).emit('html', roomToHTML.get(room));
+    socket.on('get next emit', ({room, username}, callback)=>{
+        let lobby = lobbies.get(room);
+        if(!(lobby.pastEmits.get(username)[0][0] === "no more emits")){
+            io.to(getUserFromUsername(room, username).id).emit(lobby.pastEmits.get(username)[0][0] +"  remake", lobby.pastEmits.get(username)[0][1]);
+        } else {
+            io.to(getUserFromUsername(room, username).id).emit('no more emits', "");
+        }
+        let emitPair = lobby.pastEmits.get(username)[0];
+        lobby.pastEmits.get(username).splice(0, 1);
+        lobby.pastEmits.get(username).push(emitPair);
     });
 });
 
