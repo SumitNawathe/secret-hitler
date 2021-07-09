@@ -129,7 +129,10 @@ io.on('connection', (socket) => {
                 if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
                     io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
                     console.log(result)
-                    io.to(room).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+                    if (result.newHost) {
+                        console.log('host changed, emitting');
+                        io.to(room).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
+                    }
                 }
             } catch (e) {
                 console.log('error in disconnect');
@@ -289,6 +292,48 @@ io.on('connection', (socket) => {
 
     socket.on('get html', ({room}, callback) => {
         io.to(room).emit('html', roomToHTML.get(room));
+    });
+});
+
+app.get('/checkLobbyAccess', (req, res) => {
+    console.log('recieved checkLobbyAccess');
+    console.log(req.query);
+    const checkRoom = req.query.room;
+    // console.log('checkRoom: ' + checkRoom);
+    const checkUsername = req.query.username;
+    // console.log('checkUsername: ' + checkUsername);
+    if (!lobbies.has(checkRoom)) {
+        console.log('no room exists, allowing')
+        res.send({
+            valid: true,
+            error: null
+        });
+        return;
+    }
+    const lobby = lobbies.get(checkRoom);
+    let valid = true;
+    // console.log('lobby.users:');
+    // console.log(lobby.users);
+    for (user of lobby.users) {
+        // console.log(user);
+        // console.log(checkUsername);
+        // console.log(user.username === checkUsername)
+        if (user.username === checkUsername) {
+            console.log('found name match');
+            valid = false;
+            break;
+        }
+    }
+    if (valid) {
+        res.send({
+            valid: true,
+            error: null
+        });
+        return;
+    }
+    res.send({
+        valid: false,
+        error: 'Username already taken'
     });
 });
 
