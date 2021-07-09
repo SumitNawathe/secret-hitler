@@ -137,16 +137,6 @@ socket.on('removeLobbyData', (playerRemovedString) => {
 });
 
 socket.on('startGameData', (startGameDataString) => {
-    console.log('start game')
-    startGameData(startGameDataString)
-})
-
-socket.on('startGameData remake', (startGameDataString) => {
-    console.log('start game remake')
-    startGameData(startGameDataString)
-})
-
-const startGameData = (startGameDataString) => {
     clearLobbyActions()
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type
@@ -243,7 +233,7 @@ const startGameData = (startGameDataString) => {
             }
         }
     }
-}
+})
 
 socket.on('new president', (newPresidentString) => {
     console.log('new president')
