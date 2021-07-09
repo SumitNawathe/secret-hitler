@@ -287,11 +287,7 @@ io.on('connection', (socket) => {
 
     socket.on('get next emit', ({room, username}, callback)=>{
         let lobby = lobbies.get(room);
-        if(!(lobby.pastEmits.get(username)[0][0] === "no more emits")){
-            io.to(getUserFromUsername(room, username).id).emit(lobby.pastEmits.get(username)[0][0] +"  remake", lobby.pastEmits.get(username)[0][1]);
-        } else {
-            io.to(getUserFromUsername(room, username).id).emit('no more emits', "");
-        }
+        io.to(getUserFromUsername(room, username).id).emit(lobby.pastEmits.get(username)[0][0] +"  remake", lobby.pastEmits.get(username)[0][1]);
         let emitPair = lobby.pastEmits.get(username)[0];
         lobby.pastEmits.get(username).splice(0, 1);
         lobby.pastEmits.get(username).push(emitPair);
