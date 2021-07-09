@@ -135,17 +135,19 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     const deleteUsername = playerRemovedData.person;
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
-socket.on('startGameData', (startGameDataString) => {
-    //TODO: clean up this terrible terrible mess
-    let currentButton = $lobbyActions.querySelector('button');
-    while(currentButton) {
-        currentButton.remove();
-        currentButton = $lobbyActions.querySelector('button');
-    }
 
-    var audio = new Audio('audio/CardPlacingSound.mp3');
-    //audio.play();
+socket.on('startGameData', (startGameDataString) => {
     console.log('start game')
+    startGameData(startGameDataString)
+})
+
+socket.on('startGameData remake', (startGameDataString) => {
+    console.log('start game remake')
+    startGameData(startGameDataString)
+})
+
+const startGameData = (startGameDataString) => {
+    clearLobbyActions()
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type
     const players = startGameData.players
@@ -161,9 +163,8 @@ socket.on('startGameData', (startGameDataString) => {
         for (let i=0; i<$participantList.children.length; i++) {
             $participantList.querySelector('.spectator').remove()
         }
-    } catch (error) {}
-    const list = $participantList.children
-    for (let i=0; i<list.length; i++) {
+    } catch (error) {console.log(error)}
+    for (let i=0; i<$participantList.children.length; i++) {
         let username = getUsername(i)
         usernames.push(username)
         var newObject = new Object()
@@ -182,38 +183,29 @@ socket.on('startGameData', (startGameDataString) => {
     }
     if (type === TYPE_LIBERAL) {
         console.log('liberal')
-        $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
+        getDivFromUsername(participants, username).children[0].classList.add("Liberal")
         slideCardOneWithBack("party cardback.png", "liberal cardback.png", username)
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-        // const $voteback = document.querySelector('#voteback'+username)
-        // $voteback.classList.add("slideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
     } else if (type === TYPE_FASCIST) {
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
         const fascists = startGameData.fascists
         for (let i=0; i<fascists.length; i++) {
             let username=fascists[i]
-            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            getDivFromUsername(participants, username).children[0].classList.add("Fascist")
             slideCardOneWithBack("party cardback.png", "fascist cardback.png", username)
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-            // const $voteback = document.querySelector('#voteback'+username)
-            // $voteback.classList.add("slideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         }
         const hitler = startGameData.hitler
-        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        getDivFromUsername(participants, hitler).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", hitler)
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // const $voteback = document.querySelector('#voteback'+hitler)
-        // $voteback.classList.add("slideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
     } else if (type === TYPE_HITLER) {
-        $participantList.querySelector('#participant'+username).children[0].classList.add("Hitler")
+        getDivFromUsername(participants, username).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", username)
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         if (players<7) {
             const fascists = startGameData.fascists
             for (let username of fascists) {
@@ -224,46 +216,34 @@ socket.on('startGameData', (startGameDataString) => {
                 $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
             }
         }
-        // const $voteback = document.querySelector('#voteback'+username)
-        // $voteback.classList.add("slideupanddown")
-        //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
         spectator = true
         const fascists = startGameData.fascists
         for (let username of fascists) {
-            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            getDivFromUsername(participants, username).children[0].classList.add("Fascist")
             slideCardOneWithBack("party cardback.png", "fascist cardback.png", username)
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-            // const $voteback = document.querySelector('#voteback'+username)
-            // $voteback.classList.add("slideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         }
         const hitler = startGameData.hitler
         $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", hitler)
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // const $voteback = document.querySelector('#voteback'+hitler)
-        // $voteback.classList.add("slideupanddown")
-        for (let i=0; i<$participantList.children.length; i++) {
-            let participantuser = $participantList.children[i]
-            console.log('children '+participantuser.children[0].classList)
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown") 
+        for (let i=0; i<participants.length; i++) {
+            let participantuser = participants[i].div
             if (!participantuser.children[0].classList.contains("Fascist") && !participantuser.children[0].classList.contains("Hitler")) {
                 participantuser.children[0].classList.add("Liberal")
-                let username = participantuser.id.substring(11)
+                let username = participants[i].username
                 console.log('first '+participantuser.id)
                 console.log('username '+username)
                 slideCardOneWithBack("party cardback.png", "liberal cardback.png", username)
-                $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-                $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")        
-                // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-                // const $voteback = document.querySelector('#voteback'+username)
-                // $voteback.classList.add("slideupanddown")
+                getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+                getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
             }
         }
     }
-    
-})
+}
 
 socket.on('new president', (newPresidentString) => {
     console.log('new president')
