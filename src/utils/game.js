@@ -743,7 +743,9 @@ const generateMaskedLobby = (room, username) => {
         previousPresident: lobby.previousPresident,
         previousChancellor: lobby.previousChancellor,
         policyCards: shouldBeGivenPolicyCards ? lobby.policyCards : null,
-        investigations: lobby.investigations
+        investigations: lobby.investigations,
+        failedElectionTracker: lobby.failedElectionTracker,
+        presidentActionList: lobby.presidentActionList
     }
 }
 
