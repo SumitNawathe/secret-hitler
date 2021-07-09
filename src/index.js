@@ -129,9 +129,7 @@ io.on('connection', (socket) => {
                 if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
                     io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
                     console.log(result)
-                    if (result.newHost) {
-                        io.to(result.newHost.id).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
-                    }
+                    io.to(room).emit('updateLobbyData', JSON.stringify({ username: result.newHost.username, state: TYPE_HOST }));
                 }
             } catch (e) {
                 console.log('error in disconnect');

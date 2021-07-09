@@ -116,8 +116,8 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
         }
     }
     if (newState === TYPE_HOST) {
-    document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
-    $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
+        $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
+        document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
     }
     else if (newState === TYPE_PLAYER) {
         document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
