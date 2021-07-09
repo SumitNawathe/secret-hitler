@@ -37,6 +37,14 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     console.log('inside game.startGame');
     console.log(lobbies);
     const lobby = lobbies.get(room);
+
+    // resets the emit tracking system
+    lobby.pastEmits = new Map();
+    lobby.users.forEach((person) => {
+        lobby.pastEmits.set(person.username, [["no more emits", ""]]);
+    })
+
+
     // console.log('SETTING GAMESTATE TO ONGOING');
     //lobby.nextPres.push(lobby.users[1].username); //could cause crash if only 1 user
     lobby.nextPres = [lobby.users[1].username];
@@ -116,6 +124,14 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
             }       
         ))
         }, 4000)
+    logEmitRoom(room, 'new president', JSON.stringify(
+        {
+            newPres: lobby.president,
+            oldChanc: lobby.previousChancellor,
+            oldPres: lobby.previousPresident,
+            eligibleChancellors: eligibleChancellors
+        }    )
+    )
 }
 
 const setUpVote = (room, chancellorChoice, io) => {
@@ -142,6 +158,7 @@ const setUpVote = (room, chancellorChoice, io) => {
     console.log('chancellor ' + lobby.chancellor)
 
     io.to(room).emit('chancellor chosen', JSON.stringify({president: lobby.president, chancellor: chancellorChoice}));
+    logEmitRoom(room, 'chancellor chosen', JSON.stringify({president: lobby.president, chancellor: chancellorChoice}))
 }
 
 const registerVote = (room, username, vote, io) => {
@@ -166,6 +183,7 @@ const registerVote = (room, username, vote, io) => {
                         lobby.voteCountNo--; 
                     }
                     io.to(room).emit('rescind vote', JSON.stringify({username: username}));
+                    logEmitRoom(room, 'rescind vote', JSON.stringify({username: username}))
                 } else {
                     if (vote) {
                         lobby.voteCountYes += 1; 
@@ -187,6 +205,7 @@ const registerVote = (room, username, vote, io) => {
                     lobby.users[i].lastVote = false;
                 }
                 io.to(room).emit('did vote', JSON.stringify({username: username}));
+                logEmitRoom(room, 'did vote', JSON.stringify({username: username}))
             }
                 
         }
@@ -205,6 +224,7 @@ const registerVote = (room, username, vote, io) => {
             }
         }
         io.to(room).emit('vote finished', JSON.stringify({votes: votes}));
+        logEmitRoom(room, 'vote finished', JSON.stringify({votes: votes}));
         if (lobby.voteCountYes > lobby.voteCountNo) { //election passes
             console.log('numOfFascists: ' + lobby.numOfFascists);
             console.log('chancellor type: ' + getUserFromUsername(room, lobby.chancellor).type);
@@ -219,13 +239,16 @@ const registerVote = (room, username, vote, io) => {
                 getUserFromUsername(room, lobby.president).status = STATUS_PRESDEC;
                 setTimeout(function() {
                     io.to(room).emit('election passes', JSON.stringify({presidentUsername: lobby.president, chancellorUsername: lobby.chancellor}));
+                    logEmitRoom(room, 'election passes', JSON.stringify({presidentUsername: lobby.president, chancellorUsername: lobby.chancellor}))
                     drawThreeCards(room);
                     io.to(getUserFromUsername(room, lobby.president).id).emit('get three cards', JSON.stringify({cards: lobby.policyCards}));
+                    logEmit(room, lobby.president, 'get three cards', JSON.stringify({cards: lobby.policyCards}))
                 }, 4000)
             }
         } else { //election fails
             setTimeout(function() {
                 io.to(room).emit('election failed', JSON.stringify());
+                logEmitRoom(room, 'election failed', JSON.stringify());
                 nextPresident(room, false, io);
             }, 4000)
         }
@@ -243,11 +266,15 @@ const chancellorVeto = (room, decision, io) => {
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     io.to(room).emit('chancellor veto decide',
         JSON.stringify({choice: decision, chancellor: lobby.chancellor, president: lobby.president}));
+    logEmitRoom(room, 'chancellor veto decide',
+    JSON.stringify({choice: decision, chancellor: lobby.chancellor, president: lobby.president}));
     setTimeout(() => {
         if(decision) {
             // if chancellor wants to veto
             io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+            logEmitRoom(room, 'president loading', JSON.stringify({president: lobby.president}))
             io.to(getUserFromUsername(room, lobby.president).id).emit('president veto choice');
+            logEmit(room, lobby.president, 'president veto choice', JSON.stringify());
         } else {
             placeCard(room, lobby.policyCards[0], io);
         }
@@ -261,6 +288,7 @@ const presidentVeto = (room, decision, io) => {
     const lobby = lobbies.get(room);
     getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
     io.to(room).emit('president veto decide', JSON.stringify({choice: decision, president: lobby.president}))
+    logEmitRoom(room, 'president veto decide', JSON.stringify({choice: decision, president: lobby.president}))
     setTimeout(() => {
         if(decision){
             // if president wants to veto
@@ -301,7 +329,9 @@ const presidentDiscard = (room, index /* starting from 0 and ending at 2 inclusi
     getUserFromUsername(room, lobby.president).status = STATUS_NONE;
     getUserFromUsername(room, lobby.chancellor).status = STATUS_CHANCDEC;
     io.to(room).emit('president discard', JSON.stringify({president: lobby.president, chancellor: lobby.chancellor}));
+    logEmitRoom(room, 'president discard', JSON.stringify({president: lobby.president, chancellor: lobby.chancellor}))
     io.to(getUserFromUsername(room, lobby.chancellor).id).emit('chancellor get two cards', JSON.stringify({policyCards: lobby.policyCards}));
+    logEmit(room, lobby.chancellor, 'chancellor get two cards', JSON.stringify({policyCards: lobby.policyCards}))
 }
 
 const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
@@ -316,6 +346,7 @@ const chancellorChoose = (room, index /*either 0 or 1 */, io) => {
         getUserFromUsername(room, lobby.president).status = STATUS_PRESVETOCHOICE;
         lobby.policyCards = [lobby.policyCards[index]];
         io.to(getUserFromUsername(room, lobby.chancellor).id).emit('chancellor veto choice');
+        logEmit(room, lobby.chancellor, 'chancellor veto choice', "");
     }
 }
 
@@ -358,6 +389,7 @@ const placeCard = (room, type, io) => {
     console.log("lobby.fascistCards = " + lobby.fascistCards);
     console.log("lobby.liberalCards = "+lobby.liberalCards);
     io.to(room).emit('place card', JSON.stringify({type: type, liberalsPlacedIncludingThisCard: lobby.liberalCards, fascistsPlacedIncludingThisCard: lobby.fascistCards}));
+    logEmitRoom(room, 'place card', JSON.stringify({type: type, liberalsPlacedIncludingThisCard: lobby.liberalCards, fascistsPlacedIncludingThisCard: lobby.fascistCards}));
 }
 
 const presidentAction = (room, io) => {
@@ -372,19 +404,27 @@ const presidentAction = (room, io) => {
     });
     if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT1) {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+        logEmitRoom(room, 'president loading', JSON.stringify({president: lobby.president}));
         io.to(getUserFromUsername(room, lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
+        logEmit(lobby.president, 'president action 1', JSON.stringify({president: lobby.president}))
         return STATUS_PRESACT1;
     } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT2) {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+        logEmitRoom(room, 'president loading', JSON.stringify({president: lobby.president}))
         io.to(getUserFromUsername(room, lobby.president).id).emit('president action 2', JSON.stringify({president: lobby.president}));
+        logEmit(room, lobby.president, 'president action 2', JSON.stringify({president: lobby.president}))
         return STATUS_PRESACT2;
     } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT3) {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+        logEmitRoom(room, 'president loading', JSON.stringify({president: lobby.president}));
         io.to(getUserFromUsername(room, lobby.president).id).emit('president action 3', JSON.stringify({president: lobby.president}));
+        logEmit(room, lobby.president, 'president action 3', JSON.stringify({president: lobby.president}))
         return STATUS_PRESACT3;
     } else if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT4) {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
+        logEmitRoom(room, 'president loading', JSON.stringify({president: lobby.president}))
         io.to(getUserFromUsername(room, lobby.president).id).emit('president action 4', JSON.stringify({president: lobby.president}));
+        logEmit(room, lobby.president, 'president action 4', JSON.stringify({president: lobby.president}))
         return STATUS_PRESACT4;
     } else {
         setTimeout(function() {
@@ -401,7 +441,8 @@ const handlePresAction1 = (room, username, io) => {
     lobby.investigations.push([lobby.president, username]);
     io.to(room).emit('investigation results', JSON.stringify({president: lobby.president, investigated: username,
         type: !(getUserFromUsername(room, username).type === TYPE_FASCIST || getUserFromUsername(room, username).type === TYPE_HITLER)}));
-    
+    logEmitRoom(room, 'investigation results', JSON.stringify({president: lobby.president, investigated: username,
+        type: !(getUserFromUsername(room, username).type === TYPE_FASCIST || getUserFromUsername(room, username).type === TYPE_HITLER)}))
     setTimeout(() => {
         nextPresident(room, true, io);
     }, 4000);
@@ -417,6 +458,7 @@ const handlePresAction2 = (room, specialPres, io) => {
     // console.log("special election index "+index);
     lobby.nextPres.unshift(lobby.users[index].username);
     io.to(room).emit('special election', JSON.stringify({specialPresident: lobby.nextPres[0]}));
+    logEmitRoom(room, 'special election', JSON.stringify({specialPresident: lobby.nextPres[0]}));
     nextPresident(room, true, io);
 }
 
@@ -430,6 +472,7 @@ const handlePresAction3 = (room, io) => {
     lobby.deck.unshift(cards[1]);
     lobby.deck.unshift(cards[2]);
     io.to(getUserFromUsername(room, lobby.president).id).emit('next three cards', JSON.stringify({cards}));
+    logEmit(room, lobby.president, 'next three cards', JSON.stringify({cards}))
     setTimeout(() => {
         nextPresident(room, true, io)
     }, 5000);
@@ -443,6 +486,7 @@ const handlePresAction4 = (room, killUser, io) => {
     for( index = 0; index<lobby.users.length && !(lobby.users[index].username === killUser); index++){}
     if (lobby.users[index].type === TYPE_HITLER) {
         io.to(room).emit('user killed', JSON.stringify({killedUser: killUser}));
+        logEmitRoom(room, 'user killed', JSON.stringify({killedUser: killUser}))
         setTimeout(() => {
             endGame(room, LIBERAL, io);
             return;
@@ -452,7 +496,7 @@ const handlePresAction4 = (room, killUser, io) => {
         else { lobby.users[index].type = TYPE_DEAD_FAS; }
 
         io.to(room).emit('user killed', JSON.stringify({killedUser: killUser}));
-
+        logEmitRoom(room, 'user killed', JSON.stringify({killedUser: killUser}))
         setTimeout(() => {
             nextPresident(room, true, io);
         }, 1000);
@@ -468,6 +512,7 @@ const nextPresident = (room, electionPassed, io) => {
         lobby.previousChancellor = lobby.chancellor;
         if(lobby.failedElectionTracker !== 0){
             io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
+            logEmitRoom(room, 'failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
         }
         lobby.failedElectionTracker = 0;
     } else {
@@ -529,6 +574,16 @@ const nextPresident = (room, electionPassed, io) => {
 
             }       
         ));
+    logEmitRoom(room, 'new president', 
+    JSON.stringify(
+        {
+            newPres: lobby.president,
+            oldChanc: lobby.previousChancellor,
+            oldPres: lobby.previousPresident,
+            eligibleChancellors: eligibleChancellors
+
+        }       
+    ))
 }
 
 const nextPresidentVeto = (room, io) => {
@@ -595,6 +650,16 @@ const nextPresidentVeto = (room, io) => {
 
             }       
         ));
+    logEmitRoom(room, 'new president', 
+    JSON.stringify(
+        {
+            newPres: lobby.president,
+            oldChanc: lobby.previousChancellor,
+            oldPres: lobby.previousPresident,
+            eligibleChancellors: eligibleChancellors
+
+        }       
+    ))
 }
 
 
@@ -614,6 +679,7 @@ const endGame = (room, winningTeam, io) => {
         if (person.type === TYPE_LIBERAL || person.type === TYPE_FASCIST || person.type === TYPE_HITLER) {users.push(person)}
     });
     io.to(room).emit('end game', JSON.stringify({winningTeam, users}))
+    logEmitRoom(room,'end game', JSON.stringify({winningTeam, users}))
 }
 
 const randomAssign = (room, numOfFascists /*not including hilter*/) => {
@@ -829,15 +895,32 @@ const incrementFailedElectionTracker = (room, io) => {
         lobby.previousChancellor= null;
 
         io.to(room).emit('failed election tracker', JSON.stringify({start: 2, end: 3}));
+        logEmitRoom(room, 'failed election tracker', JSON.stringify({start: 2, end: 3}))
         setTimeout(() => {
             io.to(room).emit('failed election tracker', JSON.stringify({start: 3, end: 0}));
+            logEmitRoom(room, 'failed election tracker', JSON.stringify({start: 3, end: 0}))
         }, 1501); //might not need the extra ms
     } else {
         // if we don't place a policy card
         console.log('start '+(lobby.failedElectionTracker-1))
         console.log('end '+lobby.failedElectionTracker)
         io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker-1, end: lobby.failedElectionTracker}));
+        logEmitRoom(room, 'failed election tracker', JSON.stringify({start: lobby.failedElectionTracker-1, end: lobby.failedElectionTracker}))
     }
+}
+
+const logEmit = (room, username, message, jasonInfo) => {
+    const lobby = lobbies.get(room);
+    let emitArray = lobby.pastEmits.get(username)
+    emitArray.splice(emitArray.length-1, 0, [message, jasonInfo]);
+    console.log(emitArray);
+}
+
+const logEmitRoom = (room, message, jasonInfo) => {
+    const lobby = lobbies.get(room);
+    lobby.users.forEach((user) => {
+        logEmit(room, user.username, message, jasonInfo);
+    })
 }
 
 
@@ -854,5 +937,6 @@ module.exports = {
     handlePresAction4,
     generateMaskedLobby,
     chancellorVeto,
-    presidentVeto
+    presidentVeto,
+    getUserFromUsername
 }
