@@ -283,29 +283,18 @@ body {
     position: absolute;
 }
 
-.ui.inverted.centered.tiny.header.Host.Fascist {
+.ui.inverted.centered.tiny.header.Fascist {
     color: red;
 }
 
-.ui.inverted.centered.tiny.header.Host.Liberal {
+.ui.inverted.centered.tiny.header.Liberal {
     color: turquoise;
 }
 
-.ui.inverted.centered.tiny.header.Host.Hitler {
+.ui.inverted.centered.tiny.header.Hitler {
     color: brown;
 }
 
-.ui.inverted.centered.tiny.header.Player.Fascist {
-    color: red;
-}
-
-.ui.inverted.centered.tiny.header.Player.Liberal {
-    color: turquoise;
-}
-
-.ui.inverted.centered.tiny.header.Player.Hitler {
-    color: brown;
-}
 
 .glowing {
     animation: glowing 1s ease-in-out infinite alternate;
@@ -806,7 +795,7 @@ body {
             </div>
 
         <script id="participant-template" type="text/html">
-            <div class="col participant">
+            <div class="col participant" id={{ participant_id }}>
                 <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
                     position: relative; bottom: -10px;">
                     {{ username }}{{ status }}
@@ -848,7 +837,6 @@ body {
                     </div>
                 </div>
             </div>
-
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
