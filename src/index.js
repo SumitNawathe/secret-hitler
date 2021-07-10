@@ -86,13 +86,17 @@ io.on('connection', (socket) => {
         // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
 
         //TODO: only works for lobby mode? maybe?
-        io.to(socket.id).emit('lobbyData', JSON.stringify(lobbies.get(room)));
-
-        lobbies.get(room).users.forEach((person) => {
-            if (person.id !== socket.id) {
-                io.to(person.id).emit('joinLobbyData', JSON.stringify({ player: username }));
-            }
-        });
+        const lobby = lobbies.get(room);
+        if (lobby.gameState == GAMESTATE_LOBBY) {
+            io.to(socket.id).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+            lobbies.get(room).users.forEach((person) => {
+                if (person.id !== socket.id) {
+                    io.to(person.id).emit('joinLobbyData', JSON.stringify({ player: username }));
+                }
+            });
+        } else {
+            io.to(socket.id).emit('spectatorMidgameLobbyData', JSON.stringify(generateMaskedLobby(room, username)));
+        }
 
         callback();
     });
