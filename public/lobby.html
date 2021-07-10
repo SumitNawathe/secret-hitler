@@ -856,8 +856,14 @@ body {
         </div>
 
         <script id="message-template" type="text/html">
-            <div class="message" style="position:relative; bottom: 0px;">
+            <div class="message" style="position:relative; bottom: 0px; margin-top: 4px; margin-bottom: 4px; font-size: 5;">
                 <p style="color: white">{{ username }}: {{message}}</p>
+            </div>
+        </script>
+
+        <script id="color-message-template" type="text/html">
+            <div class="message" style="position:relative; bottom: 0px; margin-top: 4px; margin-bottom: 4px; font-size: 5;">
+                <p style="color: {{ color }}">{{ content }}</p>
             </div>
         </script>
 
