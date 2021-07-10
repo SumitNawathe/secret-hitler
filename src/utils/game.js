@@ -38,7 +38,7 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     console.log(lobbies);
     const lobby = lobbies.get(room);
 
-    randomizePlayerOrder(room);
+    // randomizePlayerOrder(room);
     io.to(room).emit('new order', JSON.stringify({usersAndSpectators: lobby.users}));
     // console.log('SETTING GAMESTATE TO ONGOING');
     //lobby.nextPres.push(lobby.users[1].username); //could cause crash if only 1 user
