@@ -1036,7 +1036,10 @@ socket.on('chat', (chatDataString) => {
     if (chatData.type === 'chat') {
         let html = Mustache.render(chatMessageTemplate, { username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
         $messagesList.insertAdjacentHTML('beforeend', html);
-        $messagesList.scrollTop = $messagesList.scrollHeight;
+        //kinda sus but it works so who cares
+        const isScrolled = $messagesList.scrollHeight - $messagesList.clientHeight <= $messagesList.scrollTop + 25
+        if (isScrolled)
+            $messagesList.scrollTop = $messagesList.scrollHeight;
     }
 });
 
