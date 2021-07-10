@@ -3,634 +3,9 @@
     <head>
         <title>Secret Hitler</title>
         <link rel="icon" href="/img/favicon.png">
-        <link rel="stylesheet" href="/css/styles.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
-
-<style>
-.center {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-}
-body {
-    position: relative;
-}
-.container {
-    position: relative;
-}
-.row {
-    position: relative;
-}
-.participant {
-    position: relative;
-}
-.layered-image {
-    position: relative;
-}
-.pfpborder {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 80px;
-    height: 111.56px;
-    overflow: hidden;
-}
-.image-overlay1 {
-    position: relative;
-}
-.image-overlay2 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 80px; height: auto;
-}
-.board {
-    width: 650px;
-    height: auto;
-}
-.policy {
-    width: 85px;
-    height: auto;
-    box-shadow: 0 0 5px 2px #fff;
-}
-.liberal-overlay1 {
-    position: absolute;
-    top: 150px;
-    left: -100px;
-    z-index: 9;
-}
-.liberal-overlay2 {
-    position: absolute;
-    top: 150px;
-    left: -100px;
-    z-index: 9;
-}
-.liberal-overlay3 {
-    position: absolute;
-    top: 150px;
-    left: -100px;
-    z-index: 9;
-}
-.liberal-overlay4 {
-    position: absolute;
-    top: 150px;
-    left: -100px;
-    z-index: 9;
-}
-.liberal-overlay5 {
-    position: absolute;
-    top: 150px;
-    left: -100px;
-    z-index: 9;
-}
-.policy-rotate {
-    animation: rotate 1s ease 1.5s forwards;
-}
-.liberal1-placeandrotate {
-    animation: liberal1-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes liberal1-place {
-    50% {
-        top: 150px;
-        left: 60px;
-    }
-    100% {
-        top: 48px;
-        left: 95px;
-    }
-}
-.liberal2-placeandrotate {
-    animation: liberal2-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes liberal2-place {
-    50% {
-        top: 150px;
-        left: 60px;
-    }
-    100% {
-        top: 48px;
-        left: 189px;
-    }
-}
-.liberal3-placeandrotate {
-    animation: liberal3-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes liberal3-place {
-    50% {
-        top: 150px;
-        left: 60px;
-    }
-    100% {
-        top: 48px;
-        left: 283px;
-    }
-}
-.liberal4-placeandrotate {
-    animation: liberal4-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes liberal4-place {
-    50% {
-        top: 150px;
-        left: 60px;
-    }
-    100% {
-        top: 48px;
-        left: 377px;
-    }
-}
-.liberal5-placeandrotate {
-    animation: liberal5-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes liberal5-place {
-    50% {
-        top: 150px;
-        left: 60px;
-    }
-    100% {
-        top: 48px;
-        left: 471px;
-    }
-}
-.fascist-overlay1 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-.fascist-overlay2 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-.fascist-overlay3 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-.fascist-overlay4 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-.fascist-overlay5 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-.fascist-overlay6 {
-    position: absolute;
-    top: -70px;
-    left: -100px;
-}
-
-.fascist1-placeandrotate {
-    animation: fascist1-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist1-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 50px;
-    }
-}
-.fascist2-placeandrotate {
-    animation: fascist2-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist2-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 143px;
-    }
-}
-.fascist3-placeandrotate {
-    animation: fascist3-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist3-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 236px;
-    }
-}
-.fascist4-placeandrotate {
-    animation: fascist4-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist4-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 329px;
-    }
-}
-.fascist5-placeandrotate {
-    animation: fascist5-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist5-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 422px;
-    }
-}
-.fascist6-placeandrotate {
-    animation: fascist6-place 3s forwards, rotate 1s ease 1.5s forwards;
-}
-@-webkit-keyframes fascist6-place {
-    50% {
-        left: 60px;
-        top: -70px;
-    }
-    100% {
-        top: 48px;
-        left: 515px;
-    }
-}
-
-.rotate-container {
-    position: absolute;
-    perspective: 500px;
-    top: 0px;
-    left: 0px;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.col {
-    min-width: 0;
-    flex: 0 0 100px;
-}
-
-.hiddencard {
-    position: absolute;
-}
-
-.ui.inverted.centered.tiny.header.Fascist {
-    color: red;
-}
-
-.ui.inverted.centered.tiny.header.Liberal {
-    color: turquoise;
-}
-
-.ui.inverted.centered.tiny.header.Hitler {
-    color: brown;
-}
-
-
-.glowing {
-    animation: glowing 1s ease-in-out infinite alternate;
-}
-
-.fadein {
-    animation: fadein 2s;
-}
-
-.slideup {
-    animation: slideup 1s forwards;
-}
-
-.slidedown {
-    animation: slidedown 1s forwards;
-}
-
-.slideupanddown {
-    animation: slideupanddown 4s;
-}
-.rotateandslideupanddown {
-    animation: slideupanddown 4s, rotate 1s forwards;
-}
-.rotateandslideup {
-    animation: slideup 4s forwards, rotate 1s forwards;
-}
-.rotateandslidedown {
-    animation: rotateandslidedown 4s forwards;
-}
-@-webkit-keyframes rotateandslidedown {
-    0% {
-        transform: rotateY(0deg);
-        bottom: 111.56px;
-    } 30% {
-        transform: rotateY(180deg);
-        bottom: 111.56px;
-    } 70% {
-        transform: rotateY(180deg);
-        bottom: 111.56px; 
-    } 100% {
-        transform: rotateY(180deg);
-        bottom: 0px;
-    }
-}
-.vote-rotate {
-    animation: rotate 1s forwards;
-}
-.blink {
-    animation: blink 1s ease-in-out infinite alternate;
-}
-
-.previous {
-    opacity: .5;
-}
-
-@-webkit-keyframes fadein {
-    from {opacity: 0;}
-    to {opacity: 1;}
-}
-
-@-webkit-keyframes glowing {
-    from {
-        box-shadow: 0px 0px 0px 0px yellow;
-    } to {
-        box-shadow: 0px 0px 5px 5px yellow;
-    }
-}
-
-@-webkit-keyframes blink {
-    from {
-        opacity: 0;
-    } to {
-        opacity: .8;
-    }
-}
-
-@-webkit-keyframes slideup {
-    from { bottom: 0px; }
-    to { bottom: 111.56px; }
-}
-@-webkit-keyframes slidedown {
-    from { bottom: 111.56px; }
-    to { bottom: 0px; }
-}
-
-@-webkit-keyframes slideupanddown {
-    0% { bottom: 0px; }
-    30% { bottom: 111.56px }
-    70% { bottom: 111.56px; }
-    100% { bottom: 0px; }
-}
-@-webkit-keyframes rotate {
-    from {
-        transform: rotateY(0deg);
-    } to {
-        transform: rotateY(180deg);
-    }
-}
-
-.flip-card {
-  background-color: transparent;
-  width: 85px;
-  height: 123.58px;
-}
-
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-}
-
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
-
-.flip-card-back {
-  transform: rotateY(180deg) scaleX(-1);
-}
-.test-overlay {
-    position: absolute;
-                top: 48px;
-                left: 50px;
-}
-.standard-overlay {
-                top: 0px;
-                left: 0px;
-}
-
-.javote {
-    position: absolute;
-    width: 180px;
-    height: auto;
-    top: -500px;
-    left: 100px;
-    z-index: 99;
-}
-.neinvote {
-    position: absolute;
-    width: 180px;
-    height: auto;
-    top: -500px;
-    left: 360px;
-    z-index: 99;
-}
-.vote-place {
-    animation: vote-place 1s forwards;
-}
-.vote-remove {
-    animation: vote-remove 1s forwards;
-}
-.selectvote {
-    box-shadow: 0px 0px 5px 5px green;
-}
-@-webkit-keyframes vote-place {
-    0% {
-        top: -500px
-    }
-    100% {
-        top: -130px;
-    }
-}
-@-webkit-keyframes vote-remove {
-    0% {
-        top: -130px
-    }
-    100% {
-        top: -500px;
-    }
-}
-.dark {
-    filter: brightness(50%);
-}
-
-.ppolicy1 {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -500px;
-    left: 100px;
-    z-index: 99;
-}
-.ppolicy2 {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -500px;
-    left: 267px;
-    z-index: 99;
-}
-.ppolicy3 {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -500px;
-    left: 435px;
-    z-index: 99;
-}
-.cpolicy1 {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -500px;
-    left: 150px;
-    z-index: 99;
-}
-.cpolicy2 {
-    position: absolute;
-    width: 120px;
-    height: auto;
-    top: -500px;
-    left: 385px;
-    z-index: 99;
-}
-.policy-slide {
-    animation: policy-slide 1s forwards;
-}
-
-.policy-slideup {
-    animation: policy-slideup 1.5s forwards;
-}
-
-.policy-slidedownandup {
-    animation: policy-slidedownandup 5s forwards;
-}
-@-webkit-keyframes policy-slide {
-    0% {
-        top: -500px
-    }
-    100% {
-        top: -100px;
-    }
-}
-@-webkit-keyframes policy-slideup {
-    0% {
-        top: -100px
-    }
-    33% {
-        top: -100px
-    }
-    100% {
-        top: -500px;
-    }
-}
-@-webkit-keyframes policy-slidedownandup {
-    0% { top: -500px }
-    30% { top: -100px }
-    70% { top: -100px }
-    100% { top: -500px }
-}
-.tracker {
-    position: absolute;
-    width: 26px;
-    height: auto;
-    top: 181.5px;
-    left: 211.5px;
-}
-.tracker1 {
-    animation: tracker1 1.5s forwards;
-}
-.tracker2 {
-    animation: tracker2 1.5s forwards;
-}
-.tracker3 {
-    animation: tracker3 1.5s forwards;
-}
-.backtracker1 {
-    animation: backtracker1 1.5s forwards;
-}
-.backtracker2 {
-    animation: backtracker2 1.5s forwards;
-}
-.backtracker3 {
-    animation: backtracker3 1.5s forwards;
-}
-
-@-webkit-keyframes tracker1 {
-    from {
-        top: 181.5px;
-        left: 211.5px;
-    } to {
-        top: 181.5px;
-        left: 275.5px;
-    }
-}
-@-webkit-keyframes tracker2 {
-    from {
-        top: 181.5px;
-        left: 275.5px;
-    } to {
-        top: 181.5px;
-        left: 339.5px;
-    }
-}
-@-webkit-keyframes tracker3 {
-    from {
-        top: 181.5px;
-        left: 339.5px;
-    } to {
-        top: 181.5px;
-        left: 403.5px;
-    }
-}
-@-webkit-keyframes backtracker1 {
-    from {
-        top: 181.5px;
-        left: 275.5px;
-    } to {
-        top: 181.5px;
-        left: 211.5px;
-    }
-}
-@-webkit-keyframes backtracker2 {
-    from {
-        top: 181.5px;
-        left: 339.5px;
-    } to {
-        top: 181.5px;
-        left: 211.5px;
-    }
-}
-@-webkit-keyframes backtracker3 {
-    from {
-        top: 181.5px;
-        left: 403.5px;
-    } to {
-        top: 181.5px;
-        left: 211.5px;
-    }
-}
-
-</style>
-
+        <link rel="stylesheet" href="styles.css">
+        <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
     <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
@@ -663,135 +38,154 @@ body {
         </script>
 
         <br>
+        <div class="grid" style="display: flex;">
+            <div class="column" style="flex: 1;">
+                    <div class="layered-image">
+                        <img class="image image-overlay1 board libboard" src="img/lib_back.png">
+                        <img class="tracker" src="img/electiontracker.png">
+                        <div class="flip-card liberal-overlay1">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/liberal policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card liberal-overlay2">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/liberal policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card liberal-overlay3">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/liberal policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card liberal-overlay4">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/liberal policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card liberal-overlay5">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/liberal policy.png">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layered-image">
+                        <img class="image image-overlay1 board fasboard" src="img/fascist_back_78.png">
+                        <div class="flip-card fascist-overlay1">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card fascist-overlay2">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card fascist-overlay3">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card fascist-overlay4">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card fascist-overlay5">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card fascist-overlay6">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img class="policy" src="img/policy.png">
+                                </div>
+                                <div class="flip-card-back">
+                                    <img class="policy" src="img/fascist policy.png">
+                                </div>
+                            </div>
+                        </div>
+                        <img class="javote" src="img/yes cardback.png">
+                        <img class="neinvote" src="img/no cardback.png">
+                        <img class="ppolicy1" src="img/liberal policy.png">
+                        <img class="ppolicy2" src="img/liberal policy.png">
+                        <img class="ppolicy3" src="img/liberal policy.png">
+                        <img class="cpolicy1" src="img/liberal policy.png">
+                        <img class="cpolicy2" src="img/liberal policy.png">
 
-        <div id="left" style="float: left; width: 650px">
+                    </div>
+            </div>
+            <div class="column" style="flex: 2;">
+                    <div id="chat-window">
+                        <div style="display: flex; flex-direction: column; border: 5px solid transparent;">
+                            <!-- this is really bad again (fixed height) but whath you gonna do about it -->
+                            <div id="messages-list" class="chat-messages" style="flex-grow: 1; height: 393px;
+                            overflow-y: scroll;"></div>
             
-            <div class="layered-image">
-                <img class="image image-overlay1 board libboard" src="img/lib_back.png">
-                <img class="tracker" src="img/electiontracker.png">
-                <div class="flip-card liberal-overlay1">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/liberal policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card liberal-overlay2">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/liberal policy.png">
+                            <div id="message-form" style="display: flex; border: 3px solid black; background-color: black;">
+                                <input id ="message-input" name="message" placeholder="Message" required autocomplete="off"
+                                    style="flex-grow: 1; margin-right: 0px; height: 40px; border: none; border-radius: 5px 0 0 5px;
+                                    padding-left: 10px; background-color: #303030; font-family: 'Lato'; color: white;">
+                                <button
+                                    style="width: 60px; height: 40px; border: none; border-radius: 0 5px 5px 0;
+                                    background-color: #0E6EB8;
+                                    color: white; font-weight: bold; font-size: 17px; font-family: 'Lato';">Send</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="flip-card liberal-overlay3">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/liberal policy.png">
-                        </div>
                     </div>
-                </div>
-                <div class="flip-card liberal-overlay4">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/liberal policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card liberal-overlay5">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/liberal policy.png">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--TODO: dynamic fascist board depending on player number-->
-            <div class="layered-image">
-                <img class="image image-overlay1 board fasboard" src="img/fascist_back_78.png">
-                <div class="flip-card fascist-overlay1">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card fascist-overlay2">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card fascist-overlay3">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card fascist-overlay4">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card fascist-overlay5">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <div class="flip-card fascist-overlay6">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img class="policy" src="img/policy.png">
-                        </div>
-                        <div class="flip-card-back">
-                            <img class="policy" src="img/fascist policy.png">
-                        </div>
-                    </div>
-                </div>
-                <img class="javote" src="img/yes cardback.png">
-                <img class="neinvote" src="img/no cardback.png">
-                <img class="ppolicy1" src="img/liberal policy.png">
-                <img class="ppolicy2" src="img/liberal policy.png">
-                <img class="ppolicy3" src="img/liberal policy.png">
-                <img class="cpolicy1" src="img/liberal policy.png">
-                <img class="cpolicy2" src="img/liberal policy.png">
-
-            </div>
+        </div>
 
             <div class="container">
                 <div class="row" id="participant-list"></div>
@@ -841,23 +235,10 @@ body {
                     </div>
                 </div>
             </script>
-
-        </div>
-
-        <div id="chat-window" style="float: left top; margin-left: 700px">
-            <div id="messages-list" class="chat-messages" style="height: 400px; overflow-y: auto;"></div>
-
-            <div class="compose">
-                <form id="message-form">
-                    <input name="message" placeholder="Message" required autocomplete="off">
-                    <button>Send</button>
-                </form>
-            </div>
-        </div>
-
+        
         <script id="message-template" type="text/html">
             <div class="message" style="position:relative; bottom: 0px;">
-                <p style="color: white">{{ username }}: {{message}}</p>
+                <p style="color: white; font-family: 'Lato'; font-size: 16px;">{{ username }}: {{message}}</p>
             </div>
         </script>
 

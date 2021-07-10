@@ -11,6 +11,7 @@ let slideCardWithBackTemplate = document.querySelector('#slidecardwithback-templ
 let $messagesList = document.querySelector('#messages-list');
 let chatMessageTemplate = document.querySelector('#message-template').innerHTML;
 let messageSubmitForm = document.querySelector("#message-form");
+let messageInput = document.querySelector('#message-input')
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -70,10 +71,19 @@ window.onbeforeunload = function() {
 messageSubmitForm.addEventListener('submit', event => { event.preventDefault(); });
 messageSubmitForm.querySelector('button').addEventListener('click', () => {
     const message = messageSubmitForm.querySelector('input').value;
+    if (message === '') return false
+    messageSubmitForm.querySelector('input').value = ''
     console.log('sending message: ');
     console.log(message);
     socket.emit('chat', { room, username, message }, (error) => { if (error) { console.log('error'); } });
 });
+
+messageInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+     event.preventDefault();
+     messageSubmitForm.querySelector('button').click();
+    }
+  });
 
 socket.on('joinLobbyData', (playerJoiningString) => {
     const joinLobbyData = JSON.parse(playerJoiningString);
