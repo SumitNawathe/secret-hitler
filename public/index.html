@@ -68,7 +68,7 @@
                 }
                 console.log('input room: ' + room);
                 console.log('input username: ' + username);
-                fetch('https://secret-hitler-project.herokuapp.com/checkLobbyAccess?room=' + room + '&username=' + username)
+                fetch('http://localhost:3000/checkLobbyAccess?room=' + room + '&username=' + username)
                 .then(response => {
                     console.log(response);
                     return response.json();
@@ -76,7 +76,7 @@
                     console.log(data);
                     if (data.valid) {
                         console.log('valid');
-                        window.location.href = 'https://secret-hitler-project.herokuapp.com/lobby.html?username=' + username + '&room=' + room;
+                        window.location.href = 'http://localhost:3000/lobby.html?username=' + username + '&room=' + room;
                     } else {
                         console.log(data.error);
                     }
