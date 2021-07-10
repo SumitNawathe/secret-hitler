@@ -922,34 +922,34 @@ socket.on('lobbyData', (lobbyDataString) => {
     //spectator image problem but nobody cares
     clearCards()
     $participantList = document.querySelector('#participant-list');
- participantTemplate = document.querySelector('#participant-template').innerHTML;
- $lobbyActions = document.querySelector('#actions');
- actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
- imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
- slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
- slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+    participantTemplate = document.querySelector('#participant-template').innerHTML;
+    $lobbyActions = document.querySelector('#actions');
+    actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
+    imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
+    slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
+    slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
 
- spectator = false
- dead = false
+    spectator = false
+    dead = false
  
-usernames = []
-  participants = []
-  slidecards = []
-  overlays = []
- previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
-  currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
-  ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
- cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
+    usernames = []
+    participants = []
+    slidecards = []
+    overlays = []
+    previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
+    currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
+    ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
+    cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
  
-  javote = document.querySelector(".javote")
-  neinvote = document.querySelector(".neinvote")
- 
-  $tracker = document.querySelector('.tracker')
+    javote = document.querySelector(".javote")
+    neinvote = document.querySelector(".neinvote")
+    
+    $tracker = document.querySelector('.tracker')
 
-clearOverlay()
-clearSlide()
-clearLobbyActions()
-removeLoaders()
+    clearOverlay()
+    clearSlide()
+    clearLobbyActions()
+    removeLoaders()
 
 
     // console.log('lobbyDataString:');
