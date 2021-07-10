@@ -37,6 +37,9 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     console.log('inside game.startGame');
     console.log(lobbies);
     const lobby = lobbies.get(room);
+
+    randomizePlayerOrder(room);
+    io.to(room).emit('new order', JSON.stringify({usersAndSpectators: lobby.users}));
     // console.log('SETTING GAMESTATE TO ONGOING');
     //lobby.nextPres.push(lobby.users[1].username); //could cause crash if only 1 user
     lobby.nextPres = [lobby.users[1].username];
@@ -54,6 +57,8 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     } else {
         randomAssign(room, 2);
     }
+
+
     lobby.president = lobby.users[0].username;
     lobby.liberalCards = 0;
     lobby.fascistCards = 0;
@@ -116,6 +121,35 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
             }       
         ))
         }, 4000)
+}
+
+const randomizePlayerOrder = (room) => {
+    const lobby = lobbies.get(room);
+    let newUserArray = [];
+    let spectatorArray = [];
+    for(let i = 0; i<lobby.users.length; i++){
+        if(lobby.users[i].type === TYPE_SPECTATOR){
+            spectatorArray.push(lobby.user[i]);
+        } else {
+            newUserArray.push(lobby.user[i]);
+        }
+        if(lobby.users[i].type===TYPE_HOST){
+            lobby.users[i] = TYPE_PLAYER;
+        }
+    }
+
+    for(let i = 0; i<newUserArray.length; i++){
+        let user = newUserArray.splice(Math.round((players-i)*Math.round()), 1)[0];
+        newUserArray.push(user);
+    }
+
+    for(let i =0; i<spectatorArray.length; i++){
+        newUserArray.push(spectatorArray[i]);
+    }
+
+    newUserArray[0].type = TYPE_HOST
+
+    lobby.users = newUserArray;
 }
 
 const setUpVote = (room, chancellorChoice, io) => {
