@@ -151,6 +151,70 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     $participantList.querySelector('#participant'+deleteUsername).remove()
 });
 
+socket.on('new order', (newOrderString) => {
+    const newOrderData = JSON.parse(newOrderString)
+    const users = newOrderData.usersAndSpectators
+
+    participant = $participantList.querySelector('.participant');
+    while(participant) {
+        participant.remove();
+        participant = $participantList.querySelector('.participant');
+    }
+
+    users.forEach((person) => {
+        // let typeString = '';
+        // if (person.type === TYPE_HOST) { typeString = 'Host' }
+        // else if (person.type === TYPE_PLAYER) { typeString = 'Player' }
+        // else if (person.type === TYPE_SPECTATOR) { typeString = 'Spectator' }
+        // else if (person.type === TYPE_LIBERAL) { typeString = 'Liberal' }
+        // else if (person.type === TYPE_FASCIST) { typeString = 'Fascist' }
+        // else if (person.type === TYPE_HITLER) { typeString = 'Hitler' }
+        // else { typeString = '' }
+
+        let statusString = '';
+        // if (person.status === STATUS_VOTING) { statusString = 'voting...' }
+        // else if (person.status === STATUS_PRESCHOOSE) { statusString = 'President choosing Chancellor...' }
+        // else if (person.status === STATUS_PRESDEC) { statusString = 'President deciding...' }
+        // else if (person.status === STATUS_CHANCDEC) { statusString = 'Chancellor deciding...' }
+        // else if (person.status === STATUS_PRESACT1 || person.status === STATUS_PRESACT2 
+        //     || person.status === STATUS_PRESACT3 || person.status === STATUS_PRESACT4) { statusString = 'President taking action...' }
+        // else { statusString = '' }
+
+        const html = Mustache.render(participantTemplate, {
+            participant_id: "participant"+person.username,
+            username: person.username,
+            username_img: person.username+"_img",
+            type: '',
+            status: statusString,
+            slidecard_id: "slidecard"+person.username,
+            image_select_id: "image-select-"+person.username,
+            voteback_id: person.username,
+            party_id: person.username
+        });
+        $participantList.insertAdjacentHTML('beforeend', html);
+    });
+
+    let currentButton = $lobbyActions.querySelector('button');
+    while(currentButton) {
+        currentButton.remove();
+        currentButton = $lobbyActions.querySelector('button');
+    }
+
+    let type = -1;
+    users.every((person) => {
+        if (person.type === -1) {
+            $participantList.querySelector('#participant'+person.username).classList.add("spectator")
+            document.querySelector('#'+person.username+'_img').src = "img/test carback.png"
+        }
+        if (person.username === username) {
+            type = person.type;
+            console.log('TYPE: ' + person.type);
+            console.log('STATUS: ' + person.status);
+        } 
+        return true;
+    });
+})
+
 socket.on('startGameData', (startGameDataString) => {
     clearLobbyActions()
     const startGameData = JSON.parse(startGameDataString)
