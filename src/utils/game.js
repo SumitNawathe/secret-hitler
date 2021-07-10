@@ -121,17 +121,22 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
             }       
         ))
         }, 4000)
+    for(let i = 0; i<lobby.users.length; i++){
+        console.log(lobby.users[i]);
+    }
 }
 
 const randomizePlayerOrder = (room) => {
     const lobby = lobbies.get(room);
     let newUserArray = [];
     let spectatorArray = [];
+    let players = 0;
     for(let i = 0; i<lobby.users.length; i++){
         if(lobby.users[i].type === TYPE_SPECTATOR){
-            spectatorArray.push(lobby.user[i]);
+            spectatorArray.push(lobby.users[i]);
         } else {
-            newUserArray.push(lobby.user[i]);
+            players++;
+            newUserArray.push(lobby.users[i]);
         }
         if(lobby.users[i].type===TYPE_HOST){
             lobby.users[i] = TYPE_PLAYER;
@@ -139,7 +144,9 @@ const randomizePlayerOrder = (room) => {
     }
 
     for(let i = 0; i<newUserArray.length; i++){
-        let user = newUserArray.splice(Math.round((players-i)*Math.round()), 1)[0];
+        let index = Math.round((players-i)*Math.random());
+        let user = newUserArray[index];
+        newUserArray.splice(index, 1);
         newUserArray.push(user);
     }
 
@@ -150,11 +157,12 @@ const randomizePlayerOrder = (room) => {
     newUserArray[0].type = TYPE_HOST
 
     lobby.users = newUserArray;
+    console.log("shuffled array: " + newUserArray);
 }
 
 const setUpVote = (room, chancellorChoice, io) => {
-    console.log('inside game.setUpVote');
-    console.log(lobbies);
+    // console.log('inside game.setUpVote');
+    // console.log(lobbies);
     const lobby = lobbies.get(room);
     // console.log(lobby);
     // console.log(room);
