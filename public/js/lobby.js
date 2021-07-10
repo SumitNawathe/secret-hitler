@@ -8,6 +8,9 @@ let actionButtonTemplate = document.querySelector('#action-button-template').inn
 let imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
 let slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 let slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+let $messagesList = document.querySelector('#messages-list');
+let chatMessageTemplate = document.querySelector('#message-template').innerHTML;
+let messageSubmitForm = document.querySelector("#message-form");
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -63,6 +66,14 @@ $heading.insertAdjacentHTML('beforeend', headingHtml);
 window.onbeforeunload = function() {
     return 'lol'
 }
+
+messageSubmitForm.addEventListener('submit', event => { event.preventDefault(); });
+messageSubmitForm.querySelector('button').addEventListener('click', () => {
+    const message = messageSubmitForm.querySelector('input').value;
+    console.log('sending message: ');
+    console.log(message);
+    socket.emit('chat', { room, username, message }, (error) => { if (error) { console.log('error'); } });
+});
 
 socket.on('joinLobbyData', (playerJoiningString) => {
     const joinLobbyData = JSON.parse(playerJoiningString);
@@ -917,6 +928,17 @@ const clearCards = () => {
             .remove("policy-rotate")
     }
 }
+
+socket.on('chat', (chatDataString) => {
+    console.log('recieved chat');
+    const chatData = JSON.parse(chatDataString);
+    console.log(chatData);
+    if (chatData.type === 'chat') {
+        let html = Mustache.render(chatMessageTemplate, { username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
+        $messagesList.insertAdjacentHTML('beforeend', html);
+        $messagesList.scrollTop = $messagesList.scrollHeight;
+    }
+});
 
 socket.on('lobbyData', (lobbyDataString) => {
     //spectator image problem but nobody cares

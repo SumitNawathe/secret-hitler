@@ -297,6 +297,14 @@ io.on('connection', (socket) => {
     socket.on('get html', ({room}, callback) => {
         io.to(room).emit('html', roomToHTML.get(room));
     });
+
+    socket.on('chat', ({ room, username, message }, callback) => {
+        console.log('recieved chat from ' + username + ": " + message);
+        io.to(room).emit('chat', JSON.stringify({
+            type: 'chat',
+            data: { message, username }
+        }));
+    });
 });
 
 app.get('/checkLobbyAccess', (req, res) => {

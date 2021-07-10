@@ -631,39 +631,41 @@ body {
 
 </style>
 
-        <script
-            src="https://code.jquery.com/jquery-3.1.1.min.js"
-            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-            crossorigin="anonymous"></script>
-        <script src="../semantic/dist/semantic.min.js"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+    <script src="../semantic/dist/semantic.min.js"></script>
     </head>
     <body style="background-color: black;">
-            <div class="menu-container" style="z-index: 9999; position: relative;"> <!--always appears on top-->
-                <section class="ui menu nav-menu">
-                    <div id="heading"></div>
-                        <div class="item">
-                            <span>
-                                <div id="actions"></div>
-                            </span>
-                        </div>
-                    <div class="item right menu">
-                        <a href="/" class="ui primary button">Lobby Select</a>
+        <div class="menu-container" style="z-index: 9999; position: relative;"> <!--always appears on top-->
+            <section class="ui menu nav-menu">
+                <div id="heading"></div>
+                    <div class="item">
+                        <span>
+                            <div id="actions"></div>
+                        </span>
                     </div>
-                </section>
-            </div>
+                <div class="item right menu">
+                    <a href="/" class="ui primary button">Lobby Select</a>
+                </div>
+            </section>
+        </div>
 
-            <script id="heading-template" type="text/html">
-                <a class="item">
-                    <h1 class="ui header">Secret Hitler Lobby {{ room }}</h1>
-                </a>
-            </script>
+        <script id="heading-template" type="text/html">
+            <a class="item">
+                <h1 class="ui header">Secret Hitler Lobby {{ room }}</h1>
+            </a>
+        </script>
 
-            <script id="action-button-template" type="text/html">
-                <button class="ui primary button">{{ text }}</button>
-            </script>
+        <script id="action-button-template" type="text/html">
+            <button class="ui primary button">{{ text }}</button>
+        </script>
 
-            <br>
+        <br>
 
+        <div id="left" style="float: left; width: 650px">
+            
             <div class="layered-image">
                 <img class="image image-overlay1 board libboard" src="img/lib_back.png">
                 <img class="tracker" src="img/electiontracker.png">
@@ -790,52 +792,72 @@ body {
                 <img class="cpolicy2" src="img/liberal policy.png">
 
             </div>
+
             <div class="container">
                 <div class="row" id="participant-list"></div>
             </div>
 
-        <script id="participant-template" type="text/html">
-            <div class="col participant" id={{ participant_id }}>
-                <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
-                    position: relative; bottom: -10px;">
-                    {{ username }}{{ status }}
-                </div>
-                <div class="layered-image center">
-                    <div class="pfpborder center">
-                        <img class="ui tiny image image-overlay2" id={{ username_img }} src="img/default cardback.png">
-                        <div class="ui inverted small loader"></div>
-                        <div id={{ slidecard_id }}></div>
+            <script id="participant-template" type="text/html">
+                <div class="col participant" id={{ participant_id }}>
+                    <div class="ui inverted centered tiny header {{ type }}" style="white-space: nowrap; overflow: hidden;
+                        position: relative; bottom: -10px;">
+                        {{ username }}{{ status }}
                     </div>
-                    <div id={{ image_select_id }}></div>
+                    <div class="layered-image center">
+                        <div class="pfpborder center">
+                            <img class="ui tiny image image-overlay2" id={{ username_img }} src="img/default cardback.png">
+                            <div class="ui inverted small loader"></div>
+                            <div id={{ slidecard_id }}></div>
+                        </div>
+                        <div id={{ image_select_id }}></div>
+                    </div>
                 </div>
+            </script>
+
+            <script id="image-overlay" type="text/html">
+                <img class="image-overlay2" src= "img/{{ src }}">
+            </script>
+
+            <script id="slidecard-template" type="text/html">
+                <div class="flip-card standard-overlay">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="ui tiny image" src="img/{{ src }}">
+                        </div>
+                        <div class="flip-card-back"></div>
+                    </div>
+                </div>
+            </script>
+
+            <script id="slidecardwithback-template" type="text/html">
+                <div class="flip-card standard-overlay">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img class="ui tiny image" src="img/{{ src1 }}">
+                        </div>
+                        <div class="flip-card-back">
+                            <img class="ui tiny image" src="img/{{ src2 }}">
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+        </div>
+
+        <div id="chat-window" style="float: left top; margin-left: 700px">
+            <div id="messages-list" class="chat-messages" style="height: 400px; overflow-y: auto;"></div>
+
+            <div class="compose">
+                <form id="message-form">
+                    <input name="message" placeholder="Message" required autocomplete="off">
+                    <button>Send</button>
+                </form>
             </div>
-        </script>
+        </div>
 
-        <script id="image-overlay" type="text/html">
-            <img class="image-overlay2" src= "img/{{ src }}">
-        </script>
-
-        <script id="slidecard-template" type="text/html">
-            <div class="flip-card standard-overlay">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <img class="ui tiny image" src="img/{{ src }}">
-                    </div>
-                    <div class="flip-card-back"></div>
-                </div>
-            </div>
-        </script>
-
-        <script id="slidecardwithback-template" type="text/html">
-            <div class="flip-card standard-overlay">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <img class="ui tiny image" src="img/{{ src1 }}">
-                    </div>
-                    <div class="flip-card-back">
-                        <img class="ui tiny image" src="img/{{ src2 }}">
-                    </div>
-                </div>
+        <script id="message-template" type="text/html">
+            <div class="message" style="position:relative; bottom: 0px;">
+                <p style="color: white">{{ username }}: {{message}}</p>
             </div>
         </script>
 
