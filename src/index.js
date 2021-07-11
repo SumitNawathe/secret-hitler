@@ -300,10 +300,32 @@ io.on('connection', (socket) => {
 
     socket.on('chat', ({ room, username, message }, callback) => {
         console.log('recieved chat from ' + username + ": " + message);
-        io.to(room).emit('chat', JSON.stringify({
-            type: 'chat',
-            data: { message, username }
-        }));
+        const lobby = lobbies.get(room);
+        if (lobby === null) { console.log('room does not exist'); return; }
+        // console.log(lobby.users);
+        let isSpectator = false;
+        for (user of lobby.users) {
+            if (user.username === username) {
+                isSpectator = (user.type === TYPE_SPECTATOR);
+                break;
+            }
+        }
+        // console.log('isSpectator: ' + isSpectator)
+        if (isSpectator) {
+            for (user of lobby.users) {
+                if (user.type === TYPE_SPECTATOR) {
+                    io.to(user.id).emit('chat', JSON.stringify({
+                        type: 'spectator',
+                        data: { message, username }
+                    }));
+                }
+            }
+        } else {
+            io.to(room).emit('chat', JSON.stringify({
+                type: 'chat',
+                data: { message, username }
+            }));
+        }
     });
 });
 
