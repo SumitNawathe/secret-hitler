@@ -68,7 +68,6 @@ $heading.insertAdjacentHTML('beforeend', headingHtml);
 window.onbeforeunload = function() {
     return 'lol'
 }
-
 messageSubmitForm.addEventListener('submit', event => { event.preventDefault(); });
 messageSubmitForm.querySelector('button').addEventListener('click', () => {
     const message = messageSubmitForm.querySelector('input').value;
@@ -693,7 +692,7 @@ socket.on('president action 3', (thirdString) => {
 
 socket.on('president action 4', (fourthString) => {
     //TODO: add confirmation on execute
-    $lobbyActions.insertAdjacentHTML('beforeend', "WARNING: Choose a player to execute")
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a player to execute")
     const fourthData = JSON.parse(fourthString)
     const president = fourthData.president
     const eligible = []
@@ -701,8 +700,29 @@ socket.on('president action 4', (fourthString) => {
         if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
         else { eligible.push(false) }
     }
-    playerSelect(eligible, 'presAction4')
-})
+    let html=null; newButton=null;
+    console.log('eligible array '+eligible)
+    for (let i = 0; i < eligible.length; i++) {
+        // console.log('player select image: ' + lobbyData.users[i].username);
+        if (eligible[i]) {
+            let username = getUsername(i)
+            console.log('eligible '+username)
+            let $imageSelectOverlay = document.querySelector('#image-select-'+username);
+            html = Mustache.render(imageSelectTemplate, { src: "blank.png"}, (error) => { if (error) { console.log('error'); } })
+            $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+            newButton = $imageSelectOverlay.querySelector("img[src='img/blank.png']")
+            newButton.classList.add("glowing")
+            // console.log('adding event listener');
+            newButton.addEventListener('click', () => {
+                $('#killconfirm').modal('setting', 'closable', false).modal('show')
+                $('#execute_username').text('{'+(i+1)+'} '+username)
+                $('.ok').off().on('click', function() {
+                    clearOverlayExcept(previouslabels.concat(currentlabels))
+                    socket.emit('presAction4', { room, choice: username }, (error) => { if (error) { console.log('error'); } })
+                })
+            });
+        }
+    }})
 
 socket.on('user killed', (killedString) => {
     const killedData = JSON.parse(killedString)
