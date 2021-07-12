@@ -10,7 +10,7 @@ let slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 let slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
 let $messagesList = document.querySelector('#messages-list');
 let chatMessageTemplate = document.querySelector('#message-template').innerHTML;
-let colorMessageTemplate = document.querySelector('#color-message-template').innerHTML;
+let blankMessageTemplate = document.querySelector('#blank-message-template').innerHTML;
 let messageSubmitForm = document.querySelector("#message-form");
 let messageInput = document.querySelector('#message-input')
 
@@ -102,7 +102,7 @@ socket.on('joinLobbyData', (playerJoiningString) => {
     });
     $participantList.insertAdjacentHTML('beforeend', html);
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'yellow', content: joinUsername + ' has joined.' }, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'yellow', content: joinUsername + ' has joined.' }, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 });
@@ -165,7 +165,7 @@ socket.on('removeLobbyData', (playerRemovedString) => {
     const deleteUsername = playerRemovedData.person;
     $participantList.querySelector('#participant'+deleteUsername).remove();
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'yellow', content: deleteUsername + ' has left.' }, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'yellow', content: deleteUsername + ' has left.' }, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 });
@@ -379,7 +379,7 @@ socket.on('new president', (newPresidentString) => {
         playerSelect(eligible, 'chooseChancellor')
     }
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'orange', content: 'President ' + newPres + ' is choosing a Chancellor...' }, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'President ' + newPres + ' is choosing a Chancellor...' }, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 })
@@ -405,7 +405,7 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     //TODO: maybe make loaders sync up
     setVote()
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'orange', content: 'President ' + president + ' has chosen ' + chancellor + ' as Chancellor. Everyone must vote.'}, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'President ' + president + ' has chosen ' + chancellor + ' as Chancellor. Everyone must vote.'}, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 })
@@ -503,7 +503,7 @@ socket.on('election passes', (electionPassString) => {
     $overlay = getDivFromUsername(overlays, chancellor)
     $overlay.querySelector("img[src='img/chancellor_label.png']").classList.remove("blink")
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 })
@@ -514,7 +514,7 @@ socket.on('election failed', (electionFailString) => {
     const passData = JSON.parse(electionFailString)
     //TODO: election tracker stuff
 
-    let messageHtml = Mustache.render(colorMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
     $messagesList.insertAdjacentHTML('beforeend', messageHtml);
     $messagesList.scrollTop = $messagesList.scrollHeight;
 })
@@ -1054,7 +1054,14 @@ socket.on('chat', (chatDataString) => {
     const chatData = JSON.parse(chatDataString);
     console.log(chatData);
     if (chatData.type === 'chat') {
-        let html = Mustache.render(chatMessageTemplate, { username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
+        let html = Mustache.render(chatMessageTemplate, { color: 'white', username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
+        $messagesList.insertAdjacentHTML('beforeend', html);
+        //kinda sus but it works so who cares
+        const isScrolled = $messagesList.scrollHeight - $messagesList.clientHeight <= $messagesList.scrollTop + 25
+        if (isScrolled)
+            $messagesList.scrollTop = $messagesList.scrollHeight;
+    } else if (chatData.type === 'spectator') {
+        let html = Mustache.render(chatMessageTemplate, { color: 'gray', username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
         $messagesList.insertAdjacentHTML('beforeend', html);
         //kinda sus but it works so who cares
         const isScrolled = $messagesList.scrollHeight - $messagesList.clientHeight <= $messagesList.scrollTop + 25
