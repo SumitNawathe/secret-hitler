@@ -71,7 +71,7 @@ const makeBoardCreationMenu = ()=>{
 
     menu = document.createElement("div");
     menu.style.top = "0"
-    menu.style.left = "-50%"
+    // menu.style.left = "-50%"
     menu.style.height = "80%"
     menu.style.width = "80%"
     menu.style.marginLeft = "auto"
@@ -87,12 +87,14 @@ const makeBoardCreationMenu = ()=>{
     boardImage.src = "/img/fascist_back_56.png"
     boardImage.style.marginLeft = "auto"
     boardImage.style.marginRight = "auto"
-    boardImage.style.height = "100%";
+    boardImage.style.height = "250px";
     boardImage.style.width = "auto";
     menu.appendChild(boardImage)
 
 
-    boardImageDiv = document.createElement('div')
+    menu.style.height = boardImage.getBoundingClientRect().height+"px";
+    menu.style.width = boardImage.getBoundingClientRect().height * 739.25/250+"px";
+
 
 
 
