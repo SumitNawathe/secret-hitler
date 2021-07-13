@@ -3,6 +3,8 @@ let menuBoardContainer; // the div at the bottom of the page
 let menu;
 let blackoutBackground; // semi-transparent background
 
+
+
 const makeBoardCreationMenu = ()=>{
     let body = (document.getElementsByTagName("BODY")[0])
 
@@ -32,6 +34,18 @@ const makeBoardCreationMenu = ()=>{
     blackoutBackground.style.top = "-0px"
     blackoutBackground.style.zIndex = "999"
     menuBoardContainer.appendChild(blackoutBackground);
+
+    let keyframeEffect = new KeyframeEffect(
+        menuBoardContainer,
+        [
+            { opacity: "0%"},
+            { opacity: "100%"}                ],
+        {duration: 1000, easing: "ease"},
+    )
+    let animation = new Animation(keyframeEffect, document.timeline);
+    animation.addEventListener('finish', ()=>{
+    })
+    animation.play();  
 
     // console.log(body.getBoundingClientRect())
     menu = document.createElement('div');
