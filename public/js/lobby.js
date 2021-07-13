@@ -1384,7 +1384,14 @@ const createLobbyButtons = (playerType) => {
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
             // console.log('START GAME');
-            if ($participantList.children.length >= 5 || DEBUG_MODE) {
+            let players=0
+            for (let i=0;i<$participantList.children.length; i++) {
+                let username = getUsername(i)
+                if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                    players++
+                }
+            }
+            if (players >= 5 || DEBUG_MODE) {
                 socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
             } else {
                 alert('Minimum of 5 players to begin game.')
