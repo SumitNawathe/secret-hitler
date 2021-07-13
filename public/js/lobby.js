@@ -36,6 +36,8 @@ const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
 
+const DEBUG_MODE = true;
+
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
 
@@ -1382,7 +1384,11 @@ const createLobbyButtons = (playerType) => {
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
             // console.log('START GAME');
-            socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
+            if ($participantList.children.length >= 5 || DEBUG_MODE) {
+                socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
+            } else {
+                alert('Minimum of 5 players to begin game.')
+            }
         });
     } else if (playerType === TYPE_PLAYER) {
         html = Mustache.render(actionButtonTemplate, { text: 'Spectate', id:"spectate" });
