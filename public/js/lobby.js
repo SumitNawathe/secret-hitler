@@ -36,7 +36,10 @@ const STATUS_PRESACT4 = 8;
 const FASCIST = false;
 const LIBERAL = true;
 
-const DEBUG_MODE = true;
+let DEBUG_MODE = false
+
+if (window.location.href.includes('localhost'))
+    DEBUG_MODE = true
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
