@@ -11,7 +11,7 @@ let sliderIntervals = [null, null, null, null, null];
 
 const maxSliderLength = 175;
 const minSliderLength = 52;
-const sliderSpeed = 0.2; // percent per millisecond
+const sliderSpeed = 0.5; // percent per millisecond
 const sliderRefreshDuration = 2; // millisecond
 
 const makeBoardCreationMenu = ()=>{
@@ -79,8 +79,8 @@ const makeBoardCreationMenu = ()=>{
     menu.style.overflow = "visible"
     menu.style.top = "10%"
     menu.style.height = "70%"
-    menu.style.left = "50%"
-    menu.style.transform = "translateX(-50%)"
+    // menu.style.left = "50%"
+    // menu.style.transform = "translateX(-50%)"
     menuBack.appendChild(menu);
 
 
@@ -106,32 +106,7 @@ const makeBoardCreationMenu = ()=>{
 
     // console.log("sliders: "+ sliders)
 
-    for(let i = 0; i<sliders.length; i++){
-        sliders[i].addEventListener('mouseenter', () => {
-            console.log("entered: " +i)
-            if(sliderIntervals[i] !== null){
-                clearInterval(sliderIntervals[i])
-            }
-
-            let sliderInterval = setInterval(() => {
-                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
-                console.log(sliderHeight)
-                if(sliderHeight >= maxSliderLength){
-                    sliders[i].style.height = maxSliderLength+"%"
-                    console.log("clearing")
-                    clearInterval(sliderInterval)
-                } else {
-                    sliderHeight += sliderRefreshDuration * sliderSpeed
-                    sliders[i].style.height = sliderHeight+"%"
-                }
-            }, sliderRefreshDuration);
-
-            sliderIntervals[i] = sliderInterval
-        })
-        sliders[i].addEventListener('mouseleave', () => {
-
-        })
-    }
+    
 
 
     let keyframeEffect = new KeyframeEffect(
@@ -158,12 +133,74 @@ const makeBoardCreationMenu = ()=>{
         menuBack.style.width = '90%'
         menuBack.style.opacity = '100%'
         menuBack.style.overflow = "visible"
+        addEventListenersToSliders();
+    })
+
+    keyframeEffect = new KeyframeEffect(
+        menu,
+        [
+            { transform: "translateX(0%)", left: "0%"},
+            { transform: "translateX(-50%)", left: "50%"}                ],
+        {duration: 1500, delay: 000, easing: "ease-in"},
+    )
+    let menuSlideIntoPlace = new Animation(keyframeEffect, document.timeline);
+    menuSlideIntoPlace.addEventListener('finish', ()=>{
+        menu.style.transform = "translateX(-50%)"
+        menu.style.left = "50%"
     })
 
     animationBlackOutFadeIn.play(); // blacks out anything that isn't the board creation menu
     animationOpenMenu.play()
+    menuSlideIntoPlace.play();
 
     // console.log(body.style.height);
+}
+
+const addEventListenersToSliders = ()=> {
+    for(let i = 0; i<sliders.length; i++){
+        sliders[i].addEventListener('mouseenter', () => {
+            console.log("entered: " +i)
+            if(sliderIntervals[i] !== null){
+                clearInterval(sliderIntervals[i])
+            }
+
+            let sliderInterval = setInterval(() => {
+                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
+                console.log(sliderHeight)
+                if(sliderHeight >= maxSliderLength){
+                    sliders[i].style.height = maxSliderLength+"%"
+                    console.log("clearing")
+                    clearInterval(sliderInterval)
+                } else {
+                    sliderHeight += sliderRefreshDuration * sliderSpeed
+                    sliders[i].style.height = sliderHeight+"%"
+                }
+            }, sliderRefreshDuration);
+
+            sliderIntervals[i] = sliderInterval
+        })
+        sliders[i].addEventListener('mouseleave', () => {
+            console.log("left: " +i)
+            if(sliderIntervals[i] !== null){
+                clearInterval(sliderIntervals[i])
+            }
+
+            let sliderInterval = setInterval(() => {
+                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
+                console.log(sliderHeight)
+                if(sliderHeight <= minSliderLength){
+                    sliders[i].style.height = minSliderLength+"%"
+                    console.log("clearing")
+                    clearInterval(sliderInterval)
+                } else {
+                    sliderHeight -= sliderRefreshDuration * sliderSpeed
+                    sliders[i].style.height = sliderHeight+"%"
+                }
+            }, sliderRefreshDuration);
+
+            sliderIntervals[i] = sliderInterval
+        })
+    }
 }
 
 makeBoardCreationMenu();
