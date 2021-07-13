@@ -65,6 +65,8 @@ let $tracker = document.querySelector('.tracker')
 
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+let fascistPolicyAudio = new Audio('audio/fascistpolicy.m4a');
+
 window.onbeforeunload = function() {
     return 'lol'
 }
@@ -615,6 +617,9 @@ socket.on('place card', (placeCardString) => {
         document.querySelector('.liberal-overlay'+liberalsPlaced).children[0].classList
             .add("policy-rotate")
     } else {
+        if (fascistsPlaced>1) {
+            fascistPolicyAudio.play();
+        }
         document.querySelector('.fascist-overlay'+fascistsPlaced).classList
             .add("fascist"+fascistsPlaced+"-placeandrotate")
         document.querySelector('.fascist-overlay'+fascistsPlaced).children[0].classList
