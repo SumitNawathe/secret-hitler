@@ -141,7 +141,7 @@ const makeBoardCreationMenu = ()=>{
         [
             { transform: "translateX(0%)", left: "0%"},
             { transform: "translateX(-50%)", left: "50%"}                ],
-        {duration: 1500, delay: 000, easing: "ease-in"},
+        {duration: 2000, delay: 000, easing: "ease-out"},
     )
     let menuSlideIntoPlace = new Animation(keyframeEffect, document.timeline);
     menuSlideIntoPlace.addEventListener('finish', ()=>{
