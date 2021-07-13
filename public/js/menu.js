@@ -7,6 +7,12 @@ let spacerOnTopOfMenu;
 let boardImage;
 let boardImageDiv;
 let sliders = [null, null, null, null, null];
+let sliderIntervals = [null, null, null, null, null];
+
+const maxSliderLength = 175;
+const minSliderLength = 52;
+const sliderSpeed = 0.2; // percent per millisecond
+const sliderRefreshDuration = 2; // millisecond
 
 const makeBoardCreationMenu = ()=>{
     let body = (document.getElementsByTagName("BODY")[0])
@@ -57,33 +63,34 @@ const makeBoardCreationMenu = ()=>{
 
 
     spacerOnTopOfMenu = document.createElement("div");
-    spacerOnTopOfMenu.style.height = 0.1*menuBack.getBoundingClientRect().height+"px"
+    spacerOnTopOfMenu.style.height = 0.05*menuBack.getBoundingClientRect().height+"px"
     spacerOnTopOfMenu.style.width = "100%"
     spacerOnTopOfMenu.style.position = "flex"
     spacerOnTopOfMenu.id = "menu-board-spacer"
     spacerOnTopOfMenu.style.backgroundColor = "blue"
     spacerOnTopOfMenu.style.overflow = "visible"
     spacerOnTopOfMenu.style.visibility = 'hidden'
-    menuBack.appendChild(spacerOnTopOfMenu);
+    // menuBack.appendChild(spacerOnTopOfMenu);
 
 
     menu = document.createElement("div");
-    menu.style.top = "0"
-    menu.style.marginLeft = "auto"
-    menu.style.marginRight = "auto"
-    menu.style.position = "flex"
+    menu.style.position = "absolute"
     menu.id = "menu-board"
     menu.style.overflow = "visible"
+    menu.style.top = "10%"
+    menu.style.height = "70%"
+    menu.style.left = "50%"
+    menu.style.transform = "translateX(-50%)"
     menuBack.appendChild(menu);
 
 
     boardImage =  document.createElement("img");
     boardImage.src = "/img/fascist_back_56.png"
-    boardImage.style.height = "270px";
+    boardImage.style.height = "100%";
     boardImage.style.width = "auto";
+
+
     menu.appendChild(boardImage)
-    menu.style.height = boardImage.getBoundingClientRect().height+"px";
-    menu.style.width = boardImage.getBoundingClientRect().height * 739.25/250+"px";
 
     for(let i = 0; i<sliders.length; i++){
         let slider = document.createElement('div')
@@ -92,8 +99,38 @@ const makeBoardCreationMenu = ()=>{
         slider.style.width = "11.6%"
         slider.style.height = "52%"
         slider.style.left = 8.3 + 14.3*i+"%"
-        slider.style.top = -77.4 - 52*i +"%"
-        slider.style.position = "relative"
+        slider.style.top = "24%"
+        slider.style.position = "absolute"
+        slider.style.backgroundColor = "blue"
+    }
+
+    // console.log("sliders: "+ sliders)
+
+    for(let i = 0; i<sliders.length; i++){
+        sliders[i].addEventListener('mouseenter', () => {
+            console.log("entered: " +i)
+            if(sliderIntervals[i] !== null){
+                clearInterval(sliderIntervals[i])
+            }
+
+            let sliderInterval = setInterval(() => {
+                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
+                console.log(sliderHeight)
+                if(sliderHeight >= maxSliderLength){
+                    sliders[i].style.height = maxSliderLength+"%"
+                    console.log("clearing")
+                    clearInterval(sliderInterval)
+                } else {
+                    sliderHeight += sliderRefreshDuration * sliderSpeed
+                    sliders[i].style.height = sliderHeight+"%"
+                }
+            }, sliderRefreshDuration);
+
+            sliderIntervals[i] = sliderInterval
+        })
+        sliders[i].addEventListener('mouseleave', () => {
+
+        })
     }
 
 
@@ -114,7 +151,7 @@ const makeBoardCreationMenu = ()=>{
         [
             { width: "0%", opacity: "100%"},
             { width: "90%", opacity: "100%"}                ],
-        {duration: 1500, delay: 500, easing: "ease"},
+        {duration: 1500, delay: 500, easing: "ease-out"},
     )
     let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
     animationOpenMenu.addEventListener('finish', ()=>{
