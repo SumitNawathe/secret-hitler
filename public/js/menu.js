@@ -6,6 +6,7 @@ let menu; // menu including the board and sliders
 let spacerOnTopOfMenu; 
 let boardImage;
 let boardImageDiv;
+let sliders = [null, null, null, null, null];
 
 const makeBoardCreationMenu = ()=>{
     let body = (document.getElementsByTagName("BODY")[0])
@@ -40,7 +41,7 @@ const makeBoardCreationMenu = ()=>{
 
     // console.log(body.getBoundingClientRect())
     menuBack = document.createElement('div');
-    menuBack.style.height ="350px"
+    menuBack.style.height ="400px"
     menuBack.style.width = '90%'
     menuBack.id = "menu-board-back"
     menuBack.style.position = "relative"
@@ -58,9 +59,6 @@ const makeBoardCreationMenu = ()=>{
     spacerOnTopOfMenu = document.createElement("div");
     spacerOnTopOfMenu.style.height = 0.1*menuBack.getBoundingClientRect().height+"px"
     spacerOnTopOfMenu.style.width = "100%"
-    spacerOnTopOfMenu.style.marginTop = "auto"
-    spacerOnTopOfMenu.style.marginLeft = "auto"
-    spacerOnTopOfMenu.style.marginRight = "auto"
     spacerOnTopOfMenu.style.position = "flex"
     spacerOnTopOfMenu.id = "menu-board-spacer"
     spacerOnTopOfMenu.style.backgroundColor = "blue"
@@ -71,31 +69,32 @@ const makeBoardCreationMenu = ()=>{
 
     menu = document.createElement("div");
     menu.style.top = "0"
-    // menu.style.left = "-50%"
-    menu.style.height = "80%"
-    menu.style.width = "80%"
     menu.style.marginLeft = "auto"
     menu.style.marginRight = "auto"
     menu.style.position = "flex"
     menu.id = "menu-board"
-    menu.style.backgroundColor = "green"
     menu.style.overflow = "visible"
     menuBack.appendChild(menu);
 
 
     boardImage =  document.createElement("img");
     boardImage.src = "/img/fascist_back_56.png"
-    boardImage.style.marginLeft = "auto"
-    boardImage.style.marginRight = "auto"
-    boardImage.style.height = "250px";
+    boardImage.style.height = "270px";
     boardImage.style.width = "auto";
     menu.appendChild(boardImage)
-
-
     menu.style.height = boardImage.getBoundingClientRect().height+"px";
     menu.style.width = boardImage.getBoundingClientRect().height * 739.25/250+"px";
 
-
+    for(let i = 0; i<sliders.length; i++){
+        let slider = document.createElement('div')
+        sliders[i] = slider;
+        menu.appendChild(slider)
+        slider.style.width = "11.6%"
+        slider.style.height = "52%"
+        slider.style.left = 8.3 + 14.3*i+"%"
+        slider.style.top = -77.4 - 52*i +"%"
+        slider.style.position = "relative"
+    }
 
 
     let keyframeEffect = new KeyframeEffect(
@@ -115,7 +114,7 @@ const makeBoardCreationMenu = ()=>{
         [
             { width: "0%", opacity: "100%"},
             { width: "90%", opacity: "100%"}                ],
-        {duration: 1200, delay: 500, easing: "ease"},
+        {duration: 1500, delay: 500, easing: "ease"},
     )
     let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
     animationOpenMenu.addEventListener('finish', ()=>{
