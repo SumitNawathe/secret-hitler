@@ -69,8 +69,10 @@ $heading.insertAdjacentHTML('beforeend', headingHtml);
 
 let fascistPolicyAudio = new Audio('audio/fascistpolicy.m4a');
 
-window.onbeforeunload = function() {
-    return 'lol'
+if (!DEBUG_MODE) {
+    window.onbeforeunload = function() {
+        return 'lol'
+    }
 }
 messageSubmitForm.addEventListener('submit', event => { event.preventDefault(); });
 messageSubmitForm.querySelector('button').addEventListener('click', () => {
@@ -1383,7 +1385,6 @@ const createLobbyButtons = (playerType) => {
         $lobbyActions.insertAdjacentHTML('beforeend', html);
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
-            // console.log('START GAME');
             let players=0
             for (let i=0;i<$participantList.children.length; i++) {
                 let username = getUsername(i)
