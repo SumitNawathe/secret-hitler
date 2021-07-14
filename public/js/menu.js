@@ -10,6 +10,7 @@ let boardImageDiv;
 // let sliderIntervals = [null, null, null, null, null];
 let selectedIcons = [null, null, null, null, null]
 let selectedIndex = -1;
+let policyOptions = [null, null, null, null];
 
 
 const maxSliderLength = 208;
@@ -138,59 +139,72 @@ const makeBoardCreationMenu = ()=>{
         icon.style.top = "32%"
         icon.style.position = "absolute"
         icon.style.backgroundColor = "blue"
+        icon.style.cursor = "pointer"
         menu.appendChild(icon)
+    }
+
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[0] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        menu.appendChild(policyOption)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[1] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        menu.appendChild(policyOption)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[2] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3*3 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        menu.appendChild(policyOption)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[3] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3*4+"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        menu.appendChild(policyOption)
     }
 
 
 
     // console.log("sliders: "+ sliders)
 
-    let keyframeEffect = new KeyframeEffect(
-        blackoutBackground,
-        [
-            { opacity: "0%"},
-            { opacity: "80%"}                ],
-        {duration: 1000, delay: 500, easing: "ease"},
-    )
-    let animationBlackOutFadeIn = new Animation(keyframeEffect, document.timeline);
-    animationBlackOutFadeIn.addEventListener('finish', ()=>{
-        blackoutBackground.style.opacity = "80%"
-    })
-    
-    keyframeEffect = new KeyframeEffect(
-        menuBack,
-        [
-            { width: "0%", opacity: "100%"},
-            { width: "90%", opacity: "100%"}                ],
-        {duration: 1500, delay: 500, easing: "ease-out"},
-    )
-    let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
-    animationOpenMenu.addEventListener('finish', ()=>{
-        menuBack.style.width = '90%'
-        menuBack.style.opacity = '100%'
-        menuBack.style.overflow = "visible"
-        // addEventListenersToSliders();
-    })
 
-    keyframeEffect = new KeyframeEffect(
-        menu,
-        [
-            { transform: "translateX(0%)", left: "0%"},
-            { transform: "translateX(-50%)", left: "50%"}                ],
-        {duration: 2000, delay: 000, easing: "ease-out"},
-    )
-    let menuSlideIntoPlace = new Animation(keyframeEffect, document.timeline);
-    menuSlideIntoPlace.addEventListener('finish', ()=>{
-        menu.style.transform = "translateX(-50%)"
-        menu.style.left = "50%"
-    })
-
-    
-    
-
-    animationBlackOutFadeIn.play(); // blacks out anything that isn't the board creation menu
-    animationOpenMenu.play()
-    menuSlideIntoPlace.play();
 
     // selectedIcons[1].classList.add('glowing')
 
@@ -247,7 +261,7 @@ const addEventListenersToSliders = ()=> {
 let policySelectedGlowAnimations = [];
 const addEventListenersToIcons = () => {
     for(let i = 0; i<selectedIcons.length; i++){
-        keyframeEffect = new KeyframeEffect(
+        let keyframeEffect = new KeyframeEffect(
             selectedIcons[i],
             [
                 { boxShadow: "0px 0px 0px 0px yellow"},
@@ -258,7 +272,7 @@ const addEventListenersToIcons = () => {
         let policySelectedGlow = new Animation(keyframeEffect, document.timeline);
         policySelectedGlowAnimations[i] = (policySelectedGlow)
         selectedIcons[i].addEventListener('click', () => {
-            console.log(i +", "+selectedIndex)
+            // console.log(i +", "+selectedIndex)
             if(i===selectedIndex){
                 policySelectedGlow.cancel()
                 selectedIndex = -1;
@@ -272,9 +286,77 @@ const addEventListenersToIcons = () => {
             }
         })
     }
+    for(let i = 0; i<selectedIcons.length; i++){
+        let keyframeEffect = new KeyframeEffect(
+            selectedIcons[i],
+            [
+                { backgroundColor: "#010101"},
+                { backgroundColor: "blue"}                
+            ],
+            {duration: 500, delay: 000, easing: "ease", iterations: "1"},
+        )
+        let hoverAnim = new Animation(keyframeEffect, document.timeline);
+        selectedIcons[i].addEventListener('mouseover', () => {
+            // hoverAnim.play();
+            // console.log("hover: "+i)
+        })
+        selectedIcons[i].addEventListener('mouseleave', () => {
+            // hoverAnim.cancel();
+            // console.log("leave: "+i)
+        })
+    }
 }
 
+const openningAnimations = () => {
+    let keyframeEffect = new KeyframeEffect(
+        blackoutBackground,
+        [
+            { opacity: "0%"},
+            { opacity: "80%"}                ],
+        {duration: 1000, delay: 500, easing: "ease"},
+    )
+    let animationBlackOutFadeIn = new Animation(keyframeEffect, document.timeline);
+    animationBlackOutFadeIn.addEventListener('finish', ()=>{
+        blackoutBackground.style.opacity = "80%"
+    })
+    
+    keyframeEffect = new KeyframeEffect(
+        menuBack,
+        [
+            { width: "0%", opacity: "100%"},
+            { width: "90%", opacity: "100%"}                ],
+        {duration: 1500, delay: 500, easing: "ease-out"},
+    )
+    let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
+    animationOpenMenu.addEventListener('finish', ()=>{
+        menuBack.style.width = '90%'
+        menuBack.style.opacity = '100%'
+        menuBack.style.overflow = "visible"
+        // addEventListenersToSliders();
+    })
+
+    keyframeEffect = new KeyframeEffect(
+        menu,
+        [
+            { transform: "translateX(0%)", left: "0%"},
+            { transform: "translateX(-50%)", left: "50%"}                ],
+        {duration: 2000, delay: 000, easing: "ease-out"},
+    )
+    let menuSlideIntoPlace = new Animation(keyframeEffect, document.timeline);
+    menuSlideIntoPlace.addEventListener('finish', ()=>{
+        menu.style.transform = "translateX(-50%)"
+        menu.style.left = "50%"
+    })
+
+    
+    
+
+    animationBlackOutFadeIn.play(); // blacks out anything that isn't the board creation menu
+    animationOpenMenu.play()
+    menuSlideIntoPlace.play();
+}
 
 
 makeBoardCreationMenu();
 addEventListenersToIcons();
+openningAnimations();
