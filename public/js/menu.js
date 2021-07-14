@@ -1,3 +1,4 @@
+
 // console.log("menu running")
 let menuBoardContainer; // the div at the bottom of the page
 let menuBack; // background of the menu
@@ -155,6 +156,8 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.position = "absolute"
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        policyOption.textContent = "first"
         menu.appendChild(policyOption)
     }
     {
@@ -169,6 +172,8 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.position = "absolute"
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        policyOption.textContent = "second"
         menu.appendChild(policyOption)
     }
     {
@@ -183,6 +188,8 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.position = "absolute"
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        policyOption.textContent = "third"
         menu.appendChild(policyOption)
     }
     {
@@ -197,6 +204,8 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.position = "absolute"
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        policyOption.textContent = "fourth"
         menu.appendChild(policyOption)
     }
 
@@ -356,7 +365,40 @@ const openningAnimations = () => {
     menuSlideIntoPlace.play();
 }
 
+const addEventListenerToPolicyButtons = () =>{
+    for(let i = 0; i<policyOptions.length; i++){
+        policyOptions[i].addEventListener('click', ()=>{
+            console.log("clicked "+i)
+            if(selectedIndex !== -1){
+                let selectedIconsPositionX = parseFloat(selectedIcons[selectedIndex].style.left.substring(0, selectedIcons[selectedIndex].style.left.length - 1))
+                let selectedIconsPositionY = parseFloat(selectedIcons[selectedIndex].style.top.substring(0, selectedIcons[selectedIndex].style.top.length - 1))
+                
+                let selectedIconsWidth = parseFloat(selectedIcons[selectedIndex].style.width.substring(0, selectedIcons[selectedIndex].style.width.length - 1))
+                let selectedIconsHeight = parseFloat(selectedIcons[selectedIndex].style.height.substring(0, selectedIcons[selectedIndex].style.height.length - 1))
+
+                let policyOptionsPositionX = parseFloat(policyOptions[i].style.left.substring(0, policyOptions[i].style.left.length - 1))
+                let policyOptionsPositionY = parseFloat(policyOptions[i].style.top.substring(0, policyOptions[i].style.top.length - 1))
+
+                let policyOptionWidth = parseFloat(policyOptions[i].style.width.substring(0, policyOptions[i].style.width.length - 1))
+                let policyOptionHeight = parseFloat(policyOptions[i].style.height.substring(0, policyOptions[i].style.height.length - 1))
+                keyframeEffect = new KeyframeEffect(
+                    policyOptions[i],
+                    [
+                        { transform: "translate(0, 0)"},
+                        { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}],
+                    {duration: 2000, delay: 000, easing: "ease"}
+                )
+                console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
+                let translateToMenu = new Animation(keyframeEffect, document.timeline);
+                translateToMenu.play();
+
+            }
+        })
+    }
+}
+
 
 makeBoardCreationMenu();
 addEventListenersToIcons();
 openningAnimations();
+addEventListenerToPolicyButtons()
