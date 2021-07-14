@@ -368,8 +368,17 @@ const openningAnimations = () => {
 const addEventListenerToPolicyButtons = () =>{
     for(let i = 0; i<policyOptions.length; i++){
         policyOptions[i].addEventListener('click', ()=>{
-            console.log("clicked "+i)
+            // console.log("clicked "+i)
             if(selectedIndex !== -1){
+                let clone = policyOptions[i].cloneNode();
+                menu.appendChild(clone);
+                clone.textContent = policyOptions[i].textContent
+
+                console.log(clone);
+
+
+
+
                 let selectedIconsPositionX = parseFloat(selectedIcons[selectedIndex].style.left.substring(0, selectedIcons[selectedIndex].style.left.length - 1))
                 let selectedIconsPositionY = parseFloat(selectedIcons[selectedIndex].style.top.substring(0, selectedIcons[selectedIndex].style.top.length - 1))
                 
@@ -382,13 +391,13 @@ const addEventListenerToPolicyButtons = () =>{
                 let policyOptionWidth = parseFloat(policyOptions[i].style.width.substring(0, policyOptions[i].style.width.length - 1))
                 let policyOptionHeight = parseFloat(policyOptions[i].style.height.substring(0, policyOptions[i].style.height.length - 1))
                 keyframeEffect = new KeyframeEffect(
-                    policyOptions[i],
+                    clone,
                     [
                         { transform: "translate(0, 0)"},
                         { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}],
                     {duration: 2000, delay: 000, easing: "ease"}
                 )
-                console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
+                // console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
                 let translateToMenu = new Animation(keyframeEffect, document.timeline);
                 translateToMenu.play();
 
