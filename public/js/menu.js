@@ -399,7 +399,19 @@ const addEventListenerToPolicyButtons = () =>{
                 )
                 // console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
                 let translateToMenu = new Animation(keyframeEffect, document.timeline);
+                let currentBoardIndex = selectedIndex;
                 translateToMenu.play();
+                translateToMenu.addEventListener('finish', ()=>{
+                    clone.remove();
+                    while (selectedIcons[currentBoardIndex].firstChild) {
+                        selectedIcons[currentBoardIndex].removeChild(selectedIcons[currentBoardIndex].lastChild);
+                    }
+                    clone.style.left = "0"
+                    clone.style.top = "0"
+                    clone.style.width = "100%"
+                    clone.style.height = "100%"
+                    selectedIcons[currentBoardIndex].appendChild(clone);
+                })
 
             }
         })
