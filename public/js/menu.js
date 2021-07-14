@@ -73,7 +73,7 @@ const makeBoardCreationMenu = ()=>{
     spacerOnTopOfMenu.style.width = "100%"
     spacerOnTopOfMenu.style.position = "flex"
     spacerOnTopOfMenu.id = "menu-board-spacer"
-    spacerOnTopOfMenu.style.backgroundColor = "blue"
+    // spacerOnTopOfMenu.style.backgroundColor = "#7a0300"
     spacerOnTopOfMenu.style.overflow = "visible"
     spacerOnTopOfMenu.style.visibility = 'hidden'
     // menuBack.appendChild(spacerOnTopOfMenu);
@@ -139,8 +139,9 @@ const makeBoardCreationMenu = ()=>{
         // slider.style.top = "24%"
         icon.style.top = "32%"
         icon.style.position = "absolute"
-        icon.style.backgroundColor = "blue"
+        icon.style.backgroundColor = "#7a0300"
         icon.style.cursor = "pointer"
+        // icon.style.borderWidth = "5%"
         menu.appendChild(icon)
     }
 
@@ -395,7 +396,7 @@ const addEventListenerToPolicyButtons = () =>{
                     [
                         { transform: "translate(0, 0)"},
                         { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}],
-                    {duration: 2000, delay: 000, easing: "ease"}
+                    {duration: 1500, delay: 000, easing: "ease"}
                 )
                 // console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
                 let translateToMenu = new Animation(keyframeEffect, document.timeline);
@@ -423,3 +424,4 @@ makeBoardCreationMenu();
 addEventListenersToIcons();
 openningAnimations();
 addEventListenerToPolicyButtons()
+selectedIcons[0].click()
