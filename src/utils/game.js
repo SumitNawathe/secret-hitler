@@ -54,8 +54,10 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     console.log("players: "+players);
     if (players <= 6) {
         randomAssign(room, 1);
-    } else {
+    } else if (players <= 8) {
         randomAssign(room, 2);
+    } else {
+        randomAssign(room, 3);
     }
 
 
