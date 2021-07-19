@@ -149,7 +149,7 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 addEventListenersToIcons();
                 openningAnimations();
                 addEventListenerToPolicyButtons()
-                button.style.visibility = 'hidden'
+                button.remove();
             })
 
 
@@ -1432,7 +1432,7 @@ const createLobbyButtons = (playerType) => {
             addEventListenersToIcons();
             openningAnimations();
             addEventListenerToPolicyButtons()
-            button.style.visibility = 'hidden'
+            button.remove();
         })
 
     } else if (playerType === TYPE_PLAYER) {
@@ -2007,7 +2007,7 @@ const addEventListenerToPolicyButtons = () =>{
                     clone.style.height = "100%"
                     selectedIcons[currentBoardIndex].appendChild(clone);
                 })
-                
+
             }
         })
     }
