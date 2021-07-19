@@ -726,12 +726,12 @@ socket.on('president action 4', (fourthString) => {
             newButton.classList.add("glowing")
             // console.log('adding event listener');
             newButton.addEventListener('click', () => {
-                // $('#killconfirm').modal('setting', 'closable', false).modal('show')
-                // $('#execute_username').text('{'+(i+1)+'} '+username)
-                // $('.ok').off().on('click', function() {
+                $('#killconfirm').modal('setting', 'closable', false).modal('show')
+                $('#execute_username').text('{'+(i+1)+'} '+username)
+                $('.ok').off().on('click', function() {
                     clearOverlayExcept(previouslabels.concat(currentlabels))
                     socket.emit('presAction4', { room, choice: username }, (error) => { if (error) { console.log('error'); } })
-                // })
+                })
             });
         }
     }})
