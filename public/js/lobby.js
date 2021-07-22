@@ -2052,7 +2052,7 @@ const addEventListenerToPolicyButtons = () =>{
                                 [
                                     { width: "90%", opacity: "100%"},
                                     { width: "0%", opacity: "100%"}                ],
-                                {duration: 1500, delay: 500, easing: "ease-out"},
+                                {duration: 1000, delay: 500, easing: "ease-out"},
                             )
                             let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
                             animationOpenMenu.addEventListener('finish', ()=>{
