@@ -2044,6 +2044,7 @@ const addEventListenerToPolicyButtons = () =>{
                             )
                             let animationBlackOutFadeOut = new Animation(keyframeEffect, document.timeline);
                             animationBlackOutFadeOut.addEventListener('finish', ()=>{
+                                blackoutBackground.remove();
                             })
                             
                             keyframeEffect = new KeyframeEffect(
