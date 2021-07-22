@@ -41,6 +41,7 @@ const STATUS_PRESACT1 = 5;
 const STATUS_PRESACT2 = 6;
 const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
+const STATUS_PRESACT_NONE = -1;
 const FASCIST = false;
 const LIBERAL = true;
 
@@ -1427,6 +1428,7 @@ const createLobbyButtons = (playerType) => {
                 if(players == 9 || players >= 10){
                     currentBoard = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
                 }
+                console.log(currentBoard);
                 socket.emit('new board', {room, currentBoard});
             } else {
                 alert('Minimum of 5 players to begin game.')
@@ -1975,6 +1977,17 @@ const addEventListenerToPolicyButtons = () =>{
         policyOptions[i].addEventListener('click', ()=>{
             // console.log("clicked "+i)
             if(selectedIndex !== -1){
+                if(i === 0){
+                    currentBoard[selectedIndex] = STATUS_PRESACT1
+                } else if (i === 1){
+                    currentBoard[selectedIndex] = STATUS_PRESACT2
+                } else if (i === 2){
+                    currentBoard[selectedIndex] = STATUS_PRESACT3
+                } else if (i === 3){
+                    currentBoard[selectedIndex] = STATUS_PRESACT4
+                }
+
+
                 let clone = policyOptions[i].cloneNode();
                 menu.appendChild(clone);
                 clone.textContent = policyOptions[i].textContent
@@ -2082,6 +2095,7 @@ const addEventListenerToPolicyButtons = () =>{
                             newButton.remove();
 
                             socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                            console.log(currentBoard);
                             socket.emit('new board', {room, currentBoard});
                         });
 
