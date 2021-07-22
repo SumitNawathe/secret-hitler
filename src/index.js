@@ -185,8 +185,12 @@ io.on('connection', (socket) => {
         //TODO: emit first president
     });
 
-    socket.on('new board', ({room, currentBoard}) => {
+    socket.on('new board', ({room, currentBoard}) => {        
+        const lobby = lobbies.get(room);
+        lobby.presidentActionList = currentBoard;
+        lobby.presidentActionList.push(-1)
         console.log(currentBoard);
+        io.to(room).emit('new board', {room, currentBoard})
     })
 
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
