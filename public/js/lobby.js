@@ -150,6 +150,7 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 openningAnimations();
                 addEventListenerToPolicyButtons()
                 button.remove();
+                newGame.remove();
             })
 
 
@@ -1433,6 +1434,7 @@ const createLobbyButtons = (playerType) => {
             openningAnimations();
             addEventListenerToPolicyButtons()
             button.remove();
+            newGame.remove();
         })
 
     } else if (playerType === TYPE_PLAYER) {
@@ -1787,7 +1789,7 @@ const makeBoardCreationMenu = ()=>{
             players++
         }
     }
-    console.log("players: "+ players)
+    // console.log("players: "+ players)
     if(players == 5){
         selectedIcons[0].style.visibility = "hidden";
     }
@@ -2006,6 +2008,42 @@ const addEventListenerToPolicyButtons = () =>{
                     clone.style.width = "100%"
                     clone.style.height = "100%"
                     selectedIcons[currentBoardIndex].appendChild(clone);
+                    
+                    let players=0
+                    for (let i=0;i<$participantList.children.length; i++) {
+                        let username = getUsername(i)
+                        if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                            players++
+                        }
+                    }
+
+                    let allPoliciesPlaced = true;
+                    if(players > 5){
+                        allPoliciesPlaced = selectedIcons[0].children.length == 1;
+                    }
+                    allPoliciesPlaced = allPoliciesPlaced 
+                        && selectedIcons[1].children.length == 1
+                        && selectedIcons[2].children.length == 1
+                        && selectedIcons[3].children.length == 1
+                        && selectedIcons[4].children.length == 1
+                    if(allPoliciesPlaced){
+                        console.log("all entities placed")
+                        let oldButton = $lobbyActions.querySelector('button');
+                        let newButton = oldButton.cloneNode(true);
+                        newButton.style.position = 'relative'
+                        newButton.style.top = "80%"
+                        newButton.style.left = "80%"
+                        newButton.innerHTML = 'Finish Board Edit'
+                        newButton.addEventListener('click', () => {
+                            // console.log('should change to spectate');
+                            console.log('Start Game With Menu')
+                            newButton.remove();
+                            menuBoardContainer.remove();
+                            socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                        });
+
+                        menuBack.appendChild(newButton)
+                    }
                 })
 
             }
