@@ -99,17 +99,6 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     }
     console.log("eligible chancellors: "+eligibleChancellors);
 
-    if(alive == 5 || alive == 6){
-        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-    }
-    if(alive == 7 || alive == 8){
-        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-    }
-    if(alive == 9 || alive == 10){
-        lobby.presidentActionList = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-
-    }
-
     setTimeout( function() {
     io.to(room).emit('new president', 
         JSON.stringify(

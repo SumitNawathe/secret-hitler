@@ -1418,6 +1418,16 @@ const createLobbyButtons = (playerType) => {
             }
             if (players >= 5 || DEBUG_MODE) {
                 socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
+                if(players == 5 || players == 6){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 7 || players == 8){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 9 || players >= 10){
+                    currentBoard = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                socket.emit('new board', {room, currentBoard});
             } else {
                 alert('Minimum of 5 players to begin game.')
             }
