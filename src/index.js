@@ -185,6 +185,10 @@ io.on('connection', (socket) => {
         //TODO: emit first president
     });
 
+    socket.on('new board', ({room, currentBoard}) => {
+        console.log(currentBoard);
+    })
+
     socket.on('chooseChancellor', ({ room, choice }, callback) => {
         if (DEBUG_MODE) {
             console.log('recieved chooseChancellor: room = ' + room + ', choice = ' + choice);

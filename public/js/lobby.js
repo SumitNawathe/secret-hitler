@@ -150,7 +150,6 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 openningAnimations();
                 addEventListenerToPolicyButtons()
                 button.remove();
-                newGame.remove();
             })
 
 
@@ -1434,7 +1433,6 @@ const createLobbyButtons = (playerType) => {
             openningAnimations();
             addEventListenerToPolicyButtons()
             button.remove();
-            newGame.remove();
         })
 
     } else if (playerType === TYPE_PLAYER) {
@@ -2037,9 +2035,43 @@ const addEventListenerToPolicyButtons = () =>{
                         newButton.addEventListener('click', () => {
                             // console.log('should change to spectate');
                             console.log('Start Game With Menu')
+                            let keyframeEffect = new KeyframeEffect(
+                                blackoutBackground,
+                                [
+                                    { opacity: "80%"},
+                                    { opacity: "0%"}                ],
+                                {duration: 1000, delay: 500, easing: "ease"},
+                            )
+                            let animationBlackOutFadeOut = new Animation(keyframeEffect, document.timeline);
+                            animationBlackOutFadeOut.addEventListener('finish', ()=>{
+                            })
+                            
+                            keyframeEffect = new KeyframeEffect(
+                                menuBack,
+                                [
+                                    { width: "90%", opacity: "100%"},
+                                    { width: "0%", opacity: "100%"}                ],
+                                {duration: 1500, delay: 500, easing: "ease-out"},
+                            )
+                            let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
+                            animationOpenMenu.addEventListener('finish', ()=>{
+                                // addEventListenersToSliders();
+                                    
+                                menuBoardContainer.remove();
+                            })
+
+                            menuBack.style.overflow = "hidden"
+                        
+                            
+                            
+                        
+                            animationBlackOutFadeOut.play(); // blacks out anything that isn't the board creation menu
+                            animationOpenMenu.play()
+
                             newButton.remove();
-                            menuBoardContainer.remove();
+
                             socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                            socket.emit('new board', {room, currentBoard});
                         });
 
                         menuBack.appendChild(newButton)
