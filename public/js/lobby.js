@@ -139,6 +139,25 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 // console.log('should change to spectate');
                 console.log('Start Game')
                 socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                let players=0
+                for (let i=0;i<$participantList.children.length; i++) {
+                    let username = getUsername(i)
+                    if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                        players++
+                    }
+                }
+                if(players == 5 || players == 6){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 7 || players == 8){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 9 || players >= 10){
+                    currentBoard = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                console.log(currentBoard);
+                socket.emit('new board', {room, currentBoard});
+                
             });
             oldButton.parentNode.replaceChild(newButton, oldButton);
             html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
