@@ -2064,8 +2064,10 @@ const addEventListenerToPolicyButtons = () =>{
                     clone,
                     [
                         { transform: "translate(0, 0)"},
-                        { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}],
-                    {duration: 1500, delay: 000, easing: "ease"}
+                        { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"},
+                        {backgroundColor: "transparent", transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}
+                    ],
+                    {duration: 1600, delay: 000, easing: "ease-in"}
                 )
                 // console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
                 let translateToMenu = new Animation(keyframeEffect, document.timeline);
@@ -2073,15 +2075,29 @@ const addEventListenerToPolicyButtons = () =>{
                 translateToMenu.play();
                 translateToMenu.addEventListener('finish', ()=>{
                     clone.remove();
-                    while (selectedIcons[currentBoardIndex].firstChild) {
-                        selectedIcons[currentBoardIndex].removeChild(selectedIcons[currentBoardIndex].lastChild);
-                    }
+                    
+                    keyframeEffect = new KeyframeEffect(
+                        selectedIcons[currentBoardIndex].firstChild,
+                        [
+                            {opacity: "0%"}
+                        ],
+                        {duration: 750, delay: 000, easing: "ease"}
+                    )
+                    let oldIconFadeOut = new Animation(keyframeEffect, document.timeline);
+                    oldIconFadeOut.addEventListener('finish', ()=>{
+                        while (selectedIcons[currentBoardIndex].children.length > 1) {
+                            selectedIcons[currentBoardIndex].removeChild(selectedIcons[currentBoardIndex].firstChild);
+                        }
+                    })
+                    oldIconFadeOut.play()
                     clone.style.left = "0"
                     clone.style.top = "0"
                     clone.style.width = "100%"
                     clone.style.height = "100%"
+                    clone.style.backgroundColor = "transparent"
                     selectedIcons[currentBoardIndex].appendChild(clone);
                     
+
                     let players=0
                     for (let i=0;i<$participantList.children.length; i++) {
                         let username = getUsername(i)
@@ -2100,10 +2116,11 @@ const addEventListenerToPolicyButtons = () =>{
                         && selectedIcons[3].children.length == 1
                         && selectedIcons[4].children.length == 1
                     if(allPoliciesPlaced){
+
                         console.log("all entities placed")
                         let oldButton = $lobbyActions.querySelector('button');
                         let newButton = oldButton.cloneNode(true);
-                        newButton.style.position = 'relative'
+                        newButton.style.position = 'absolute'
                         newButton.style.top = "80%"
                         newButton.style.left = "80%"
                         newButton.innerHTML = 'Finish Board Edit'
