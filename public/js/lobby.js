@@ -2130,7 +2130,7 @@ const addEventListenerToPolicyButtons = () =>{
 socket.on('new board', ({room, currentBoard}) => {
     console.log("making new board")
     document.querySelector("#fascist-layered-image").src = "img/blank_fascist.png"
-    let fasboardDiv = document.querySelector("#fascist-layered-image")
+    let fasboardImage = document.querySelector(".fasboard")
     if(currentBoard[0] !== -1){
         let image = document.createElement('img')
         if(currentBoard[0] === STATUS_PRESACT1){
@@ -2150,7 +2150,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "50px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
     }
     if(currentBoard[1] !== -1){
@@ -2172,7 +2172,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "143px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
 
     }
@@ -2195,7 +2195,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "236px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
 
     }
@@ -2218,7 +2218,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "329px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
 
     }
@@ -2241,7 +2241,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "422px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
 
     }
@@ -2264,7 +2264,7 @@ socket.on('new board', ({room, currentBoard}) => {
         image.style.left = "515px"
         // image.style.zIndex = "100"
 
-        fasboardDiv.appendChild(image)
+        fasboardImage.insertAdjacentElement('afterend', image)
         console.log("there's so much stuff"+image);
 
     }
