@@ -59,6 +59,7 @@ body {
 .policy {
     width: 85px;
     height: auto;
+    z-index: 101;
     box-shadow: 0 0 5px 2px #fff;
 }
 .liberal-overlay1 {

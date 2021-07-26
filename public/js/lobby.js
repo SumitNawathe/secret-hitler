@@ -2146,9 +2146,9 @@ socket.on('new board', ({room, currentBoard}) => {
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
         }
         image.style.position = "absolute"
-        image.style.top = "-70px"
+        image.style.top = "55px"
         image.style.left = "50px"
-        image.style.zIndex = "999999999"
+        // image.style.zIndex = "100"
 
         fasboardDiv.appendChild(image)
         console.log("there's so much stuff"+image);
@@ -2168,9 +2168,9 @@ socket.on('new board', ({room, currentBoard}) => {
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
         }
         image.style.position = "absolute"
-        image.style.top = "-70px"
+        image.style.top = "55px"
         image.style.left = "143px"
-        image.style.zIndex = "999999999"
+        // image.style.zIndex = "100"
 
         fasboardDiv.appendChild(image)
         console.log("there's so much stuff"+image);
@@ -2191,9 +2191,32 @@ socket.on('new board', ({room, currentBoard}) => {
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
         }
         image.style.position = "absolute"
-        image.style.top = "-70px"
+        image.style.top = "55px"
         image.style.left = "236px"
-        image.style.zIndex = "999999999"
+        // image.style.zIndex = "100"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[3] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[3] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "329px"
+        // image.style.zIndex = "100"
 
         fasboardDiv.appendChild(image)
         console.log("there's so much stuff"+image);
@@ -2214,9 +2237,9 @@ socket.on('new board', ({room, currentBoard}) => {
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
         }
         image.style.position = "absolute"
-        image.style.top = "-70px"
-        image.style.left = "329px"
-        image.style.zIndex = "999999999"
+        image.style.top = "55px"
+        image.style.left = "422px"
+        // image.style.zIndex = "100"
 
         fasboardDiv.appendChild(image)
         console.log("there's so much stuff"+image);
@@ -2237,9 +2260,9 @@ socket.on('new board', ({room, currentBoard}) => {
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
         }
         image.style.position = "absolute"
-        image.style.top = "-70px"
-        image.style.left = "422px"
-        image.style.zIndex = "999999999"
+        image.style.top = "55px"
+        image.style.left = "515px"
+        // image.style.zIndex = "100"
 
         fasboardDiv.appendChild(image)
         console.log("there's so much stuff"+image);
