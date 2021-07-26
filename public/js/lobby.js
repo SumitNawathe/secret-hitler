@@ -2128,7 +2128,80 @@ const addEventListenerToPolicyButtons = () =>{
 }
 
 socket.on('new board', ({room, currentBoard}) => {
+    console.log("making new board")
     document.querySelector("#fascistBoardCustomImage").src = "img/blank_fascist.png"
+    let fasboardDiv = document.querySelector(".fasboard")
+    if(currentBoard[0] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[0] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "-70px"
+        image.style.left = "100px"
+        image.id = "helpme"
+        image.style.zIndex = "999999999"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+    }
+    if(currentBoard[1] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[0] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "-70px"
+        image.style.left = "100px"
+        image.id = "helpme"
+        image.style.zIndex = "999999999"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[2] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[0] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "-70px"
+        image.style.left = "100px"
+        image.id = "helpme"
+        image.style.zIndex = "999999999"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+
+    }
 })
 // const makeMenuButton = () => {
 //     let html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
