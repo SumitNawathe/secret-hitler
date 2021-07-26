@@ -625,7 +625,7 @@ socket.on('place card', (placeCardString) => {
             .add("policy-rotate")
     } else {
         if (fascistsPlaced>1) {
-            fascistPolicyAudio.play();
+            //fascistPolicyAudio.play();
         }
         document.querySelector('.fascist-overlay'+fascistsPlaced).classList
             .add("fascist"+fascistsPlaced+"-placeandrotate")
