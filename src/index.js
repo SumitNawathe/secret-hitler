@@ -188,7 +188,6 @@ io.on('connection', (socket) => {
     socket.on('new board', ({room, currentBoard}) => {        
         const lobby = lobbies.get(room);
         lobby.presidentActionList = currentBoard;
-        lobby.presidentActionList.push(-1)
         console.log(currentBoard);
         io.to(room).emit('new board', {room, currentBoard})
     })

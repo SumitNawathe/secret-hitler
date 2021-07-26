@@ -361,8 +361,17 @@ const placeCard = (room, type, io) => {
         setTimeout(function() {
             nextPresident(room, true, io);
         }, 3000)
+        io.to(room).emit('place card', JSON.stringify({type: type, liberalsPlacedIncludingThisCard: lobby.liberalCards, fascistsPlacedIncludingThisCard: lobby.fascistCards}));
     } else {
+        
         lobby.fascistCards++;
+        io.to(room).emit('place card', JSON.stringify({type: type, liberalsPlacedIncludingThisCard: lobby.liberalCards, fascistsPlacedIncludingThisCard: lobby.fascistCards}));
+        if (lobby.fascistCards == 6) {
+            setTimeout(() => {
+                endGame(room, FASCIST, io);
+            }, 3000);
+            return
+        }
         try {
             getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
             if(lobby.failedElectionTracker !== 3 ){
@@ -390,7 +399,6 @@ const placeCard = (room, type, io) => {
     }
     console.log("lobby.fascistCards = " + lobby.fascistCards);
     console.log("lobby.liberalCards = "+lobby.liberalCards);
-    io.to(room).emit('place card', JSON.stringify({type: type, liberalsPlacedIncludingThisCard: lobby.liberalCards, fascistsPlacedIncludingThisCard: lobby.fascistCards}));
 }
 
 const presidentAction = (room, io) => {
