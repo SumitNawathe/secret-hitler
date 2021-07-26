@@ -101,17 +101,6 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     }
     console.log("eligible chancellors: "+eligibleChancellors);
 
-    if(alive == 5 || alive == 6){
-        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-    }
-    if(alive == 7 || alive == 8){
-        lobby.presidentActionList = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-    }
-    if(alive == 9 || alive == 10){
-        lobby.presidentActionList = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4, STATUS_PRESACT_NONE];
-
-    }
-
     setTimeout( function() {
     io.to(room).emit('new president', 
         JSON.stringify(
@@ -370,11 +359,11 @@ const placeCard = (room, type, io) => {
     if (type == LIBERAL){
         lobby.liberalCards++;
         setTimeout(function() {
-        nextPresident(room, true, io);
+            nextPresident(room, true, io);
         }, 3000)
     } else {
-            lobby.fascistCards++;
-            try {
+        lobby.fascistCards++;
+        try {
             getUserFromUsername(room, lobby.chancellor).status = STATUS_NONE;
             if(lobby.failedElectionTracker !== 3 ){
                 setTimeout(() => {
@@ -414,6 +403,7 @@ const presidentAction = (room, io) => {
             numPlayers += 1;
         }
     });
+    console.log("president action: "+lobby.presidentActionList[lobby.fascistCards-1])
     if (lobby.presidentActionList[lobby.fascistCards-1] ===STATUS_PRESACT1) {
         io.to(room).emit('president loading', JSON.stringify({president: lobby.president}));
         io.to(getUserFromUsername(room, lobby.president).id).emit('president action 1', JSON.stringify({president: lobby.president}));
