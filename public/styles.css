@@ -52,6 +52,10 @@ body {
     width: 650px;
     height: auto;
 }
+#fascistBoardCustomImage{
+    width: 100%;
+    height: auto;
+}
 .policy {
     width: 85px;
     height: auto;
@@ -632,3 +636,4 @@ body {
         left: 211.5px;
     }
 }
+

@@ -2107,6 +2107,10 @@ const addEventListenerToPolicyButtons = () =>{
         })
     }
 }
+
+socket.on('new board', ({room, currentBoard}) => {
+    document.querySelector("#fascistBoardCustomImage").src = "img/blank_fascist.png"
+})
 // const makeMenuButton = () => {
 //     let html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
 //     $lobbyActions.insertAdjacentHTML('beforeend', html)
