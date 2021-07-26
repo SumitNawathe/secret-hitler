@@ -290,13 +290,13 @@ socket.on('startGameData', (startGameDataString) => {
     const type = startGameData.type
     const players = startGameData.players
     console.log('players '+players)
-    if (players<7) {
-        document.querySelector(".fasboard").src = "img/fascist_back_56.png"
-    } else if (players>8) {
-        document.querySelector(".fasboard").src = "img/fascist_back_910.png"
-    } else {
-        document.querySelector(".fasboard").src = "img/fascist_back_78.png"
-    }
+    // if (players<7) {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_56.png"
+    // } else if (players>8) {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_910.png"
+    // } else {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_78.png"
+    // }
     try {
         for (let i=0; i<$participantList.children.length; i++) {
             $participantList.querySelector('.spectator').remove()
@@ -2129,8 +2129,8 @@ const addEventListenerToPolicyButtons = () =>{
 
 socket.on('new board', ({room, currentBoard}) => {
     console.log("making new board")
-    document.querySelector("#fascistBoardCustomImage").src = "img/blank_fascist.png"
-    let fasboardDiv = document.querySelector(".fasboard")
+    document.querySelector("#fascist-layered-image").src = "img/blank_fascist.png"
+    let fasboardDiv = document.querySelector("#fascist-layered-image")
     if(currentBoard[0] !== -1){
         let image = document.createElement('img')
         if(currentBoard[0] === STATUS_PRESACT1){
@@ -2147,8 +2147,7 @@ socket.on('new board', ({room, currentBoard}) => {
         }
         image.style.position = "absolute"
         image.style.top = "-70px"
-        image.style.left = "100px"
-        image.id = "helpme"
+        image.style.left = "50px"
         image.style.zIndex = "999999999"
 
         fasboardDiv.appendChild(image)
@@ -2156,22 +2155,21 @@ socket.on('new board', ({room, currentBoard}) => {
     }
     if(currentBoard[1] !== -1){
         let image = document.createElement('img')
-        if(currentBoard[0] === STATUS_PRESACT1){
+        if(currentBoard[1] === STATUS_PRESACT1){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT2){
+        if(currentBoard[1] === STATUS_PRESACT2){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT3){
+        if(currentBoard[1] === STATUS_PRESACT3){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT4){
+        if(currentBoard[1] === STATUS_PRESACT4){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
         }
         image.style.position = "absolute"
         image.style.top = "-70px"
-        image.style.left = "100px"
-        image.id = "helpme"
+        image.style.left = "143px"
         image.style.zIndex = "999999999"
 
         fasboardDiv.appendChild(image)
@@ -2180,22 +2178,67 @@ socket.on('new board', ({room, currentBoard}) => {
     }
     if(currentBoard[2] !== -1){
         let image = document.createElement('img')
-        if(currentBoard[0] === STATUS_PRESACT1){
+        if(currentBoard[2] === STATUS_PRESACT1){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT2){
+        if(currentBoard[2] === STATUS_PRESACT2){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT3){
+        if(currentBoard[2] === STATUS_PRESACT3){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
         }
-        if(currentBoard[0] === STATUS_PRESACT4){
+        if(currentBoard[2] === STATUS_PRESACT4){
             image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
         }
         image.style.position = "absolute"
         image.style.top = "-70px"
-        image.style.left = "100px"
-        image.id = "helpme"
+        image.style.left = "236px"
+        image.style.zIndex = "999999999"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[4] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[4] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "-70px"
+        image.style.left = "329px"
+        image.style.zIndex = "999999999"
+
+        fasboardDiv.appendChild(image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[5] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[5] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "-70px"
+        image.style.left = "422px"
         image.style.zIndex = "999999999"
 
         fasboardDiv.appendChild(image)
