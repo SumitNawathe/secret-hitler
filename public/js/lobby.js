@@ -1760,8 +1760,14 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
         policyOption.style.textAlign = "center"
-        policyOption.textContent = "first"
         menu.appendChild(policyOption)
+
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+
+        policyOption.appendChild(policyImage)
     }
     {
         let policyOption = document.createElement('div')
@@ -1776,8 +1782,14 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
         policyOption.style.textAlign = "center"
-        policyOption.textContent = "second"
         menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+
+        policyOption.appendChild(policyImage)
     }
     {
         let policyOption = document.createElement('div')
@@ -1792,8 +1804,14 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
         policyOption.style.textAlign = "center"
-        policyOption.textContent = "third"
         menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+
+        policyOption.appendChild(policyImage)
     }
     {
         let policyOption = document.createElement('div')
@@ -1808,8 +1826,14 @@ const makeBoardCreationMenu = ()=>{
         policyOption.style.backgroundColor = "#B90000"
         policyOption.style.cursor = "pointer"
         policyOption.style.textAlign = "center"
-        policyOption.textContent = "fourth"
         menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+
+        policyOption.appendChild(policyImage)
     }
     let players=0
     for (let i=0;i<$participantList.children.length; i++) {
@@ -1996,23 +2020,32 @@ const addEventListenerToPolicyButtons = () =>{
         policyOptions[i].addEventListener('click', ()=>{
             // console.log("clicked "+i)
             if(selectedIndex !== -1){
+                
+                let policyImage = document.createElement('img')
+                policyImage.style.width = '100%'
+                policyImage.style.height = 'auto'
+        
                 if(i === 0){
                     currentBoard[selectedIndex] = STATUS_PRESACT1
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
                 } else if (i === 1){
                     currentBoard[selectedIndex] = STATUS_PRESACT2
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
                 } else if (i === 2){
                     currentBoard[selectedIndex] = STATUS_PRESACT3
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
                 } else if (i === 3){
                     currentBoard[selectedIndex] = STATUS_PRESACT4
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
                 }
 
 
                 let clone = policyOptions[i].cloneNode();
+                clone.appendChild(policyOptions[i].children[0].cloneNode());
                 menu.appendChild(clone);
                 clone.textContent = policyOptions[i].textContent
-
-                console.log(clone);
-
+                clone.appendChild(policyImage)
+                // console.log(clone);
 
 
 
