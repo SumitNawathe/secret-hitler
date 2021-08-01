@@ -2181,6 +2181,7 @@ socket.on('new board', ({room, currentBoard}) => {
     console.log("making new board")
     document.querySelector("#fascist-layered-image").src = "img/blank_fascist.png"
     let fasboardImage = document.querySelector(".fasboard")
+    
     if(currentBoard[0] !== -1){
         let image = document.createElement('img')
         if(currentBoard[0] === STATUS_PRESACT1){

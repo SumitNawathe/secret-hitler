@@ -75,6 +75,8 @@ const startGame = (room, io) => { //TODO: dont allow start if not enough users
     drawThreeCards(room);
     lobby.users[0].status = STATUS_PRESCHOOSE;
     lobby.investigations = [];
+    lobby.failedElectionTracker = 0;
+    io.to(room).emit('failed election tracker', JSON.stringify({start: lobby.failedElectionTracker, end: 0}))
     // console.log('USER 0:');
     // console.log(lobby.users[0]);
     
