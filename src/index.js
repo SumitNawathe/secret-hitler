@@ -130,6 +130,7 @@ io.on('connection', (socket) => {
             try {
                 const room = result.room;
                 // io.to(room).emit('lobbyData', JSON.stringify(lobbies.get(room)));
+                if (lobbies.get(room) == undefined) return;
                 if (lobbies.get(room).gameState === GAMESTATE_LOBBY) {
                     io.to(room).emit('removeLobbyData', JSON.stringify({ person: username }));
                     console.log(result)
