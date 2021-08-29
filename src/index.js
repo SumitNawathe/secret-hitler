@@ -140,6 +140,7 @@ io.on('connection', (socket) => {
                 }
             } catch (e) {
                 console.log('error in disconnect');
+                console.log(e)
             }
         }
     });
