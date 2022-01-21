@@ -26,26 +26,27 @@
                     <div class="field">
                         <div class="ui left icon input">
                             <i class="user icon"></i>
-                            <input type="text" name="username" placeholder="Display Name" required>
+                            <input type="text" name="username" placeholder="Display Name" required
+                                pattern="[A-Za-z0-9_]{1,15}" id="username-input">
                         </div>
                     </div>
                     <!--<label>Room</label>-->
                     <div class="field">
                         <div class="ui left icon input">
-                            <input type="text" name="room" placeholder="Room" required>
+                            <input type="text" name="room" placeholder="Room" required id="room-input">
                             <i class="hand spock icon"></i>
                         </div>
                     </div>
-                    <button class="ui positive button fluid large">Join</button>
+                    <button class="ui positive button fluid large" id="join-button">Join</button>
                 </form>
                 <br>
-                <button class="ui primary button fluid large" id="rules-button">Rules</button>
+                <!--<button class="ui primary button fluid large" id="rules-button">Rules</button>-->
             </section>
-            <div class="ui modal" id="modalrules">
+            <!--<div class="ui modal" id="modalrules">
                 <div class="header">
                     TEST
                 </div>
-            </div>
+            </div>-->
         </div>
         <script>
             //$('#modalrules').modal('show');
@@ -56,5 +57,34 @@
                 });
             });
         </script>
+        <!-- <script>
+            document.querySelector('form').addEventListener('submit', event => { event.preventDefault(); });
+            document.querySelector('#join-button').addEventListener('click', () => {
+                const room = document.getElementById('room-input').value;
+                const username = document.getElementById('username-input').value;
+                // if (username.indexOf(' ') >= 0) {
+                //     console.log('username cannot contain whitespace');
+                //     return;
+                // }
+                console.log('input room: ' + room);
+                console.log('input username: ' + username);
+                fetch(window.location.origin+'/checkLobbyAccess?room=' + room + '&username=' + username)
+                .then(response => {
+                    console.log(response);
+                    // return response.json();
+                }).then(data => {
+                    console.log(data);
+                    if (data.valid) {
+                        console.log('valid');
+                        window.location.href = window.location.origin+'/lobby.html?username=' + username + '&room=' + room;
+                    } else {
+                        console.log(data.error);
+                    }
+                }).catch(error => {
+                    console.log('something went wrong')
+                    console.log(error);
+                })
+            });
+        </script> -->
     </body>
 </html>

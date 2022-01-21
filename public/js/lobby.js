@@ -1,5 +1,13 @@
 const socket = io();
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+// const path = require('path');
+
+// const {
+//     makeBoardCreationMenu,
+//     addEventListenersToIcons,
+//     openningAnimations,
+//     addEventListenerToPolicyButtons 
+// } = require('../js/menu')
 
 let $participantList = document.querySelector('#participant-list');
 let participantTemplate = document.querySelector('#participant-template').innerHTML;
@@ -8,6 +16,11 @@ let actionButtonTemplate = document.querySelector('#action-button-template').inn
 let imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
 let slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
 let slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+let $messagesList = document.querySelector('#messages-list');
+let chatMessageTemplate = document.querySelector('#message-template').innerHTML;
+let blankMessageTemplate = document.querySelector('#blank-message-template').innerHTML;
+let messageSubmitForm = document.querySelector("#message-form");
+let messageInput = document.querySelector('#message-input')
 
 const TYPE_SPECTATOR = -1;
 const TYPE_HOST = 0;
@@ -28,8 +41,14 @@ const STATUS_PRESACT1 = 5;
 const STATUS_PRESACT2 = 6;
 const STATUS_PRESACT3 = 7;
 const STATUS_PRESACT4 = 8;
+const STATUS_PRESACT_NONE = -1;
 const FASCIST = false;
 const LIBERAL = true;
+
+let DEBUG_MODE = false
+
+if (window.location.href.includes('localhost'))
+    DEBUG_MODE = true
 
 const STATUS_PRESVETOCHOICE = 9;
 const STATUS_CHANCVETOCHOICE = 10;
@@ -60,14 +79,39 @@ let $tracker = document.querySelector('.tracker')
 
 $heading.insertAdjacentHTML('beforeend', headingHtml);
 
+let fascistPolicyAudio = new Audio('audio/fascistpolicy.m4a');
+
+if (!DEBUG_MODE) {
+    window.onbeforeunload = function() {
+        return 'lol'
+    }
+}
+messageSubmitForm.addEventListener('submit', event => { event.preventDefault(); });
+messageSubmitForm.querySelector('button').addEventListener('click', () => {
+    const message = messageSubmitForm.querySelector('input').value;
+    if (message === '') return false
+    messageSubmitForm.querySelector('input').value = ''
+    console.log('sending message: ');
+    console.log(message);
+    socket.emit('chat', { room, username, message }, (error) => { if (error) { console.log('error'); } });
+});
+
+messageInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+     event.preventDefault();
+     messageSubmitForm.querySelector('button').click();
+    }
+  });
+
 socket.on('joinLobbyData', (playerJoiningString) => {
+    console.log('recieved joinLobbyData');
     const joinLobbyData = JSON.parse(playerJoiningString);
     const joinUsername = joinLobbyData.player;
     const html = Mustache.render(participantTemplate, {
         participant_id: "participant"+joinUsername,
         username: joinUsername,
         username_img: joinUsername+"_img",
-        type: 'Player',
+        type: '',
         status: '',
         slidecard_id: "slidecard"+joinUsername,
         image_select_id: "image-select-"+joinUsername,
@@ -75,6 +119,10 @@ socket.on('joinLobbyData', (playerJoiningString) => {
         party_id: joinUsername
     });
     $participantList.insertAdjacentHTML('beforeend', html);
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'yellow', content: joinUsername + ' has joined.' }, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 });
 
 socket.on('updateLobbyData', (lobbyDataUpdateString) => {
@@ -91,8 +139,40 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
                 // console.log('should change to spectate');
                 console.log('Start Game')
                 socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                let players=0
+                for (let i=0;i<$participantList.children.length; i++) {
+                    let username = getUsername(i)
+                    if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                        players++
+                    }
+                }
+                if(players == 5 || players == 6){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 7 || players == 8){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 9 || players >= 10){
+                    currentBoard = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                console.log(currentBoard);
+                socket.emit('new board', {room, currentBoard});
+                
             });
             oldButton.parentNode.replaceChild(newButton, oldButton);
+            html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
+            $lobbyActions.insertAdjacentHTML('beforeend', html)
+            button = $lobbyActions.children[1]
+            button.addEventListener('click', () => {
+                console.log("making menu or at least trying to")
+                makeBoardCreationMenu();
+                addEventListenersToIcons();
+                openningAnimations();
+                addEventListenerToPolicyButtons()
+                button.remove();
+            })
+
+
         } else if (newState === TYPE_PLAYER) {
             oldButton = $lobbyActions.querySelector('button');
             newButton = oldButton.cloneNode(true);
@@ -115,10 +195,14 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
             oldButton.parentNode.replaceChild(newButton, oldButton);
         }
     }
-    if (newState === TYPE_HOST)
-    document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
-    else if (newState === TYPE_PLAYER)
+    if (newState === TYPE_HOST) {
+        $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
         document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
+    }
+    else if (newState === TYPE_PLAYER) {
+        document.querySelector('#'+updateUsername+'_img').src = "img/default cardback.png"
+        $participantList.querySelector('#participant'+updateUsername).classList.remove("spectator")
+    }
     else if (newState === TYPE_SPECTATOR) {
         $participantList.querySelector('#participant'+updateUsername).classList.add("spectator")
         document.querySelector('#'+updateUsername+'_img').src = "img/test carback.png"
@@ -129,37 +213,96 @@ socket.on('updateLobbyData', (lobbyDataUpdateString) => {
 socket.on('removeLobbyData', (playerRemovedString) => {
     const playerRemovedData = JSON.parse(playerRemovedString);
     const deleteUsername = playerRemovedData.person;
-    $participantList.querySelector('#participant'+deleteUsername).remove()
+    $participantList.querySelector('#participant'+deleteUsername).remove();
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'yellow', content: deleteUsername + ' has left.' }, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 });
-socket.on('startGameData', (startGameDataString) => {
-    //TODO: clean up this terrible terrible mess
+
+socket.on('new order', (newOrderString) => {
+    const newOrderData = JSON.parse(newOrderString)
+    const users = newOrderData.usersAndSpectators
+
+    participant = $participantList.querySelector('.participant');
+    while(participant) {
+        participant.remove();
+        participant = $participantList.querySelector('.participant');
+    }
+
+    users.forEach((person) => {
+        // let typeString = '';
+        // if (person.type === TYPE_HOST) { typeString = 'Host' }
+        // else if (person.type === TYPE_PLAYER) { typeString = 'Player' }
+        // else if (person.type === TYPE_SPECTATOR) { typeString = 'Spectator' }
+        // else if (person.type === TYPE_LIBERAL) { typeString = 'Liberal' }
+        // else if (person.type === TYPE_FASCIST) { typeString = 'Fascist' }
+        // else if (person.type === TYPE_HITLER) { typeString = 'Hitler' }
+        // else { typeString = '' }
+
+        let statusString = '';
+        // if (person.status === STATUS_VOTING) { statusString = 'voting...' }
+        // else if (person.status === STATUS_PRESCHOOSE) { statusString = 'President choosing Chancellor...' }
+        // else if (person.status === STATUS_PRESDEC) { statusString = 'President deciding...' }
+        // else if (person.status === STATUS_CHANCDEC) { statusString = 'Chancellor deciding...' }
+        // else if (person.status === STATUS_PRESACT1 || person.status === STATUS_PRESACT2 
+        //     || person.status === STATUS_PRESACT3 || person.status === STATUS_PRESACT4) { statusString = 'President taking action...' }
+        // else { statusString = '' }
+
+        const html = Mustache.render(participantTemplate, {
+            participant_id: "participant"+person.username,
+            username: person.username,
+            username_img: person.username+"_img",
+            type: '',
+            status: statusString,
+            slidecard_id: "slidecard"+person.username,
+            image_select_id: "image-select-"+person.username,
+            voteback_id: person.username,
+            party_id: person.username
+        });
+        $participantList.insertAdjacentHTML('beforeend', html);
+    });
+
     let currentButton = $lobbyActions.querySelector('button');
     while(currentButton) {
         currentButton.remove();
         currentButton = $lobbyActions.querySelector('button');
     }
 
-    var audio = new Audio('audio/CardPlacingSound.mp3');
-    //audio.play();
-    console.log('start game')
+    let type = -1;
+    users.every((person) => {
+        if (person.type === -1) {
+            $participantList.querySelector('#participant'+person.username).classList.add("spectator")
+            document.querySelector('#'+person.username+'_img').src = "img/test carback.png"
+        }
+        if (person.username === username) {
+            type = person.type;
+            console.log('TYPE: ' + person.type);
+            console.log('STATUS: ' + person.status);
+        } 
+        return true;
+    });
+})
+
+socket.on('startGameData', (startGameDataString) => {
+    clearLobbyActions()
     const startGameData = JSON.parse(startGameDataString)
     const type = startGameData.type
     const players = startGameData.players
     console.log('players '+players)
-    if (players<7) {
-        document.querySelector(".fasboard").src = "img/fascist_back_56.png"
-    } else if (players>8) {
-        document.querySelector(".fasboard").src = "img/fascist_back_910.png"
-    } else {
-        document.querySelector(".fasboard").src = "img/fascist_back_78.png"
-    }
+    // if (players<7) {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_56.png"
+    // } else if (players>8) {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_910.png"
+    // } else {
+    //     document.querySelector(".fasboard").src = "img/fascist_back_78.png"
+    // }
     try {
         for (let i=0; i<$participantList.children.length; i++) {
             $participantList.querySelector('.spectator').remove()
         }
-    } catch (error) {}
-    const list = $participantList.children
-    for (let i=0; i<list.length; i++) {
+    } catch (error) {console.log(error)}
+    for (let i=0; i<$participantList.children.length; i++) {
         let username = getUsername(i)
         usernames.push(username)
         var newObject = new Object()
@@ -178,38 +321,29 @@ socket.on('startGameData', (startGameDataString) => {
     }
     if (type === TYPE_LIBERAL) {
         console.log('liberal')
-        $participantList.querySelector('#participant'+username).children[0].classList.add("Liberal")
+        getDivFromUsername(participants, username).children[0].classList.add("Liberal")
         slideCardOneWithBack("party cardback.png", "liberal cardback.png", username)
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-        // const $voteback = document.querySelector('#voteback'+username)
-        // $voteback.classList.add("slideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
     } else if (type === TYPE_FASCIST) {
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
         const fascists = startGameData.fascists
         for (let i=0; i<fascists.length; i++) {
             let username=fascists[i]
-            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            getDivFromUsername(participants, username).children[0].classList.add("Fascist")
             slideCardOneWithBack("party cardback.png", "fascist cardback.png", username)
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-            // const $voteback = document.querySelector('#voteback'+username)
-            // $voteback.classList.add("slideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         }
         const hitler = startGameData.hitler
-        $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
+        getDivFromUsername(participants, hitler).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", hitler)
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // const $voteback = document.querySelector('#voteback'+hitler)
-        // $voteback.classList.add("slideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
     } else if (type === TYPE_HITLER) {
-        $participantList.querySelector('#participant'+username).children[0].classList.add("Hitler")
+        getDivFromUsername(participants, username).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", username)
-        // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         if (players<7) {
             const fascists = startGameData.fascists
             for (let username of fascists) {
@@ -220,45 +354,33 @@ socket.on('startGameData', (startGameDataString) => {
                 $slidecard.querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
             }
         }
-        // const $voteback = document.querySelector('#voteback'+username)
-        // $voteback.classList.add("slideupanddown")
-        //TODO: depending on player number see others
     } else if (type === TYPE_SPECTATOR) {
         spectator = true
         const fascists = startGameData.fascists
         for (let username of fascists) {
-            $participantList.querySelector('#participant'+username).children[0].classList.add("Fascist")
+            getDivFromUsername(participants, username).children[0].classList.add("Fascist")
             slideCardOneWithBack("party cardback.png", "fascist cardback.png", username)
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-            $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-            // const $voteback = document.querySelector('#voteback'+username)
-            // $voteback.classList.add("slideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+            getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
         }
         const hitler = startGameData.hitler
         $participantList.querySelector('#participant'+hitler).children[0].classList.add("Hitler")
         slideCardOneWithBack("party cardback.png", "hitler cardback.png", hitler)
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-        $participantList.querySelector('#slidecard'+hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
-        // const $voteback = document.querySelector('#voteback'+hitler)
-        // $voteback.classList.add("slideupanddown")
-        for (let i=0; i<$participantList.children.length; i++) {
-            let participantuser = $participantList.children[i]
-            console.log('children '+participantuser.children[0].classList)
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+        getDivFromUsername(slidecards, hitler).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown") 
+        for (let i=0; i<participants.length; i++) {
+            let participantuser = participants[i].div
             if (!participantuser.children[0].classList.contains("Fascist") && !participantuser.children[0].classList.contains("Hitler")) {
                 participantuser.children[0].classList.add("Liberal")
-                let username = participantuser.id.substring(11)
+                let username = participants[i].username
                 console.log('first '+participantuser.id)
                 console.log('username '+username)
                 slideCardOneWithBack("party cardback.png", "liberal cardback.png", username)
-                $participantList.querySelector('#slidecard'+username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
-                $participantList.querySelector('#slidecard'+username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")        
-                // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
-                // const $voteback = document.querySelector('#voteback'+username)
-                // $voteback.classList.add("slideupanddown")
+                getDivFromUsername(slidecards, username).querySelector('.flip-card').classList.add("rotateandslideupanddown")
+                getDivFromUsername(slidecards, username).querySelector('.flip-card-inner').classList.add("rotateandslideupanddown")
             }
         }
     }
-    
 })
 
 socket.on('new president', (newPresidentString) => {
@@ -306,6 +428,10 @@ socket.on('new president', (newPresidentString) => {
         }
         playerSelect(eligible, 'chooseChancellor')
     }
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'President ' + newPres + ' is choosing a Chancellor...' }, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 })
 
 socket.on('chancellor chosen', (chancellorChosenString) => {
@@ -328,6 +454,10 @@ socket.on('chancellor chosen', (chancellorChosenString) => {
     
     //TODO: maybe make loaders sync up
     setVote()
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'President ' + president + ' has chosen ' + chancellor + ' as Chancellor. Everyone must vote.'}, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 })
 
 socket.on('did vote', (didVoteString) => {
@@ -422,6 +552,10 @@ socket.on('election passes', (electionPassString) => {
     getDivFromUsername(participants, president).querySelector(".loader").classList.add("active")
     $overlay = getDivFromUsername(overlays, chancellor)
     $overlay.querySelector("img[src='img/chancellor_label.png']").classList.remove("blink")
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 })
 
 socket.on('election failed', (electionFailString) => {
@@ -429,6 +563,10 @@ socket.on('election failed', (electionFailString) => {
     clearSlide()
     const passData = JSON.parse(electionFailString)
     //TODO: election tracker stuff
+
+    let messageHtml = Mustache.render(blankMessageTemplate, { color: 'orange', content: 'The election has passed!' }, (error) => { if (error) { console.log('error'); } });
+    $messagesList.insertAdjacentHTML('beforeend', messageHtml);
+    $messagesList.scrollTop = $messagesList.scrollHeight;
 })
 
 socket.on('get three cards', (threeCardsString) => {
@@ -527,6 +665,9 @@ socket.on('place card', (placeCardString) => {
         document.querySelector('.liberal-overlay'+liberalsPlaced).children[0].classList
             .add("policy-rotate")
     } else {
+        if (fascistsPlaced>1) {
+            //fascistPolicyAudio.play();
+        }
         document.querySelector('.fascist-overlay'+fascistsPlaced).classList
             .add("fascist"+fascistsPlaced+"-placeandrotate")
         document.querySelector('.fascist-overlay'+fascistsPlaced).children[0].classList
@@ -604,7 +745,7 @@ socket.on('president action 3', (thirdString) => {
 
 socket.on('president action 4', (fourthString) => {
     //TODO: add confirmation on execute
-    $lobbyActions.insertAdjacentHTML('beforeend', "WARNING: Choose a player to execute")
+    $lobbyActions.insertAdjacentHTML('beforeend', "Choose a player to execute")
     const fourthData = JSON.parse(fourthString)
     const president = fourthData.president
     const eligible = []
@@ -612,8 +753,29 @@ socket.on('president action 4', (fourthString) => {
         if (participants[i].username !== president && !participants[i].dead) { eligible.push(true) }
         else { eligible.push(false) }
     }
-    playerSelect(eligible, 'presAction4')
-})
+    let html=null; newButton=null;
+    console.log('eligible array '+eligible)
+    for (let i = 0; i < eligible.length; i++) {
+        // console.log('player select image: ' + lobbyData.users[i].username);
+        if (eligible[i]) {
+            let username = getUsername(i)
+            console.log('eligible '+username)
+            let $imageSelectOverlay = document.querySelector('#image-select-'+username);
+            html = Mustache.render(imageSelectTemplate, { src: "blank.png"}, (error) => { if (error) { console.log('error'); } })
+            $imageSelectOverlay.insertAdjacentHTML('beforeend', html);
+            newButton = $imageSelectOverlay.querySelector("img[src='img/blank.png']")
+            newButton.classList.add("glowing")
+            // console.log('adding event listener');
+            newButton.addEventListener('click', () => {
+                $('#killconfirm').modal('setting', 'closable', false).modal('show')
+                $('#execute_username').text('{'+(i+1)+'} '+username)
+                $('.ok').off().on('click', function() {
+                    clearOverlayExcept(previouslabels.concat(currentlabels))
+                    socket.emit('presAction4', { room, choice: username }, (error) => { if (error) { console.log('error'); } })
+                })
+            });
+        }
+    }})
 
 socket.on('user killed', (killedString) => {
     const killedData = JSON.parse(killedString)
@@ -828,6 +990,10 @@ const getUsername = (i) => {
 }
 
 const getDivFromUsername = (arr, username) => {
+    console.log('username '+username)
+    for (let o of arr) {
+        console.log(o.username)
+    }
     return arr.find(o => o.username === username).div;
 }
 
@@ -897,6 +1063,11 @@ const playerSelect = (eligible, eventType) => {
 }
 
 
+
+
+
+
+
 socket.on('policyPeek', (cardDataString) => {
     console.log('recieved policyPeek');
     console.log(cardDataString);
@@ -916,37 +1087,74 @@ socket.on('policyPeek', (cardDataString) => {
     }
 });
 
+const clearCards = () => {
+    for (let i=1; i<6; i++) {
+        document.querySelector('.liberal-overlay'+i).classList
+            .remove("liberal"+i+"-placeandrotate")
+        document.querySelector('.liberal-overlay'+i).children[0].classList
+            .remove("policy-rotate")
+    }
+    for (let i=1; i<7; i++) {
+        document.querySelector('.fascist-overlay'+i).classList
+            .remove("fascist"+i+"-placeandrotate")
+        document.querySelector('.fascist-overlay'+i).children[0].classList
+            .remove("policy-rotate")
+    }
+}
+
+socket.on('chat', (chatDataString) => {
+    console.log('recieved chat');
+    const chatData = JSON.parse(chatDataString);
+    console.log(chatData);
+    if (chatData.type === 'chat') {
+        let html = Mustache.render(chatMessageTemplate, { color: 'white', username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
+        $messagesList.insertAdjacentHTML('beforeend', html);
+        //kinda sus but it works so who cares
+        const isScrolled = $messagesList.scrollHeight - $messagesList.clientHeight <= $messagesList.scrollTop + 25
+        if (isScrolled)
+            $messagesList.scrollTop = $messagesList.scrollHeight;
+    } else if (chatData.type === 'spectator') {
+        let html = Mustache.render(chatMessageTemplate, { color: 'gray', username: chatData.data.username, message: chatData.data.message }, (error) => { if (error) { console.log('error'); } })
+        $messagesList.insertAdjacentHTML('beforeend', html);
+        //kinda sus but it works so who cares
+        const isScrolled = $messagesList.scrollHeight - $messagesList.clientHeight <= $messagesList.scrollTop + 25
+        if (isScrolled)
+            $messagesList.scrollTop = $messagesList.scrollHeight;
+    }
+});
+
 socket.on('lobbyData', (lobbyDataString) => {
     //spectator image problem but nobody cares
+    clearCards()
     $participantList = document.querySelector('#participant-list');
- participantTemplate = document.querySelector('#participant-template').innerHTML;
- $lobbyActions = document.querySelector('#actions');
- actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
- imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
- slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
- slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
+    participantTemplate = document.querySelector('#participant-template').innerHTML;
+    $lobbyActions = document.querySelector('#actions');
+    actionButtonTemplate = document.querySelector('#action-button-template').innerHTML;
+    imageSelectTemplate = document.querySelector('#image-overlay').innerHTML;
+    slideCardTemplate = document.querySelector('#slidecard-template').innerHTML;
+    slideCardWithBackTemplate = document.querySelector('#slidecardwithback-template').innerHTML
 
- spectator = false
- dead = false
+    spectator = false
+    dead = false
  
-usernames = []
-  participants = []
-  slidecards = []
-  overlays = []
- previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
-  currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
-  ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
- cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
+    usernames = []
+    participants = []
+    slidecards = []
+    overlays = []
+    previouslabels = ["img[src='img/previous president label.png']", "img[src='img/previous_chancellor_label.png']"]
+    currentlabels = ["img[src='img/president_label.png']", "img[src='img/chancellor_label.png']"]
+    ppolicies = [document.querySelector(".ppolicy1"), document.querySelector(".ppolicy2"), document.querySelector(".ppolicy3")]
+    cpolicies = [document.querySelector(".cpolicy1"), document.querySelector(".cpolicy2")]
  
-  javote = document.querySelector(".javote")
-  neinvote = document.querySelector(".neinvote")
- 
-  $tracker = document.querySelector('.tracker')
+    javote = document.querySelector(".javote")
+    neinvote = document.querySelector(".neinvote")
+    
+    $tracker = document.querySelector('.tracker')
 
-clearOverlay()
-clearSlide()
-clearLobbyActions()
-removeLoaders()
+    clearOverlay()
+    clearSlide()
+    clearLobbyActions()
+    removeLoaders()
 
 
     // console.log('lobbyDataString:');
@@ -985,9 +1193,10 @@ removeLoaders()
         else { statusString = '' }
 
         const html = Mustache.render(participantTemplate, {
+            participant_id: "participant"+person.username,
             username: person.username,
             username_img: person.username+"_img",
-            type: typeString,
+            type: '',
             status: statusString,
             slidecard_id: "slidecard"+person.username,
             image_select_id: "image-select-"+person.username,
@@ -1005,13 +1214,17 @@ removeLoaders()
     }
 
     if (lobbyData.gameState === GAMESTATE_LOBBY) {
+        console.log('gamestate')
         let type = -1;
         lobbyData.users.every((person) => {
+            if (person.type === -1) {
+                $participantList.querySelector('#participant'+person.username).classList.add("spectator")
+                document.querySelector('#'+person.username+'_img').src = "img/test carback.png"
+            }
             if (person.username === username) {
                 type = person.type;
                 console.log('TYPE: ' + person.type);
                 console.log('STATUS: ' + person.status);
-                return false;
             } 
             return true;
         });
@@ -1065,11 +1278,11 @@ removeLoaders()
         let otherUsersVoting = false;
         lobbyData.users.forEach((user) => (otherUsersVoting = otherUsersVoting || user.status === STATUS_VOTING));
         if (slideup && myStatus !== STATUS_VOTING && !otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             voteanim("slidedown");
         }
         if (myStatus === STATUS_VOTING || otherUsersVoting) {
-            slidecard(slideCardTemplate, "voteback", "voting cardback.png")
+            // slidecard(slideCardTemplate, "voteback", "voting cardback.png")
             console.log('slide'+document.querySelector('#voteback'+lobbyData.users[0].username).classList.contains('slideup'));
             if (!slideup) {
                 // console.log('cha cha real smooth')
@@ -1216,9 +1429,43 @@ const createLobbyButtons = (playerType) => {
         $lobbyActions.insertAdjacentHTML('beforeend', html);
         newButton = $lobbyActions.querySelector('button');
         newButton.addEventListener('click', () => {
-            // console.log('START GAME');
-            socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
+            let players=0
+            for (let i=0;i<$participantList.children.length; i++) {
+                let username = getUsername(i)
+                if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                    players++
+                }
+            }
+            if (players >= 5 || DEBUG_MODE) {
+                socket.emit('startGame', { room: room }, (error) => { if (error) { console.log('error') } });
+                if(players == 5 || players == 6){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT_NONE,STATUS_PRESACT3, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 7 || players == 8){
+                    currentBoard = [STATUS_PRESACT_NONE,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                if(players == 9 || players >= 10){
+                    currentBoard = [STATUS_PRESACT1,STATUS_PRESACT1,STATUS_PRESACT2, STATUS_PRESACT4, STATUS_PRESACT4];
+                }
+                console.log(currentBoard);
+                socket.emit('new board', {room, currentBoard});
+            } else {
+                alert('Minimum of 5 players to begin game.')
+            }
         });
+
+        html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
+        $lobbyActions.insertAdjacentHTML('beforeend', html)
+        button = $lobbyActions.children[1]
+        button.addEventListener('click', () => {
+            console.log("making menu or at least trying to")
+            makeBoardCreationMenu();
+            addEventListenersToIcons();
+            openningAnimations();
+            addEventListenerToPolicyButtons()
+            button.remove();
+        })
+
     } else if (playerType === TYPE_PLAYER) {
         html = Mustache.render(actionButtonTemplate, { text: 'Spectate', id:"spectate" });
         $lobbyActions.insertAdjacentHTML('beforeend', html);
@@ -1321,7 +1568,6 @@ const slideCardOneWithBack = (src1, src2, username) => {
     console.log($slidecard)
     html = Mustache.render(slideCardWithBackTemplate, {src1: src1, src2: src2}, (error) => { if (error) { console.log('error'); } })
         $slidecard.insertAdjacentHTML('beforeend', html);
-
 }
 
 // const slidecard = (id, src) => {
@@ -1341,3 +1587,752 @@ socket.emit('join', { username, room }, (error) => {
         location.href = '/';
     }
 });
+
+
+
+const STATUSPRESACT1 = 5;
+const STATUSPRESACT2 = 6;
+const STATUSPRESACT3 = 7;
+const STATUSPRESACT4 = 8;
+const STATUSPRESACT_NONE = -1;
+
+// console.log("menu running")
+let menuBoardContainer; // the div at the bottom of the page
+let menuBack; // background of the menu
+let blackoutBackground; // semi-transparent background
+let menu; // menu including the board and sliders
+let spacerOnTopOfMenu; 
+let boardImage;
+let boardImageDiv;
+// let sliders = [null, null, null, null, null];
+// let sliderIntervals = [null, null, null, null, null];
+let selectedIcons = [null, null, null, null, null]
+let selectedIndex = -1;
+let policyOptions = [null, null, null, null];
+let currentBoard = [STATUSPRESACT_NONE, STATUSPRESACT_NONE, STATUSPRESACT_NONE, STATUSPRESACT_NONE, STATUSPRESACT_NONE]
+
+$participantList = document.querySelector('#participant-list');
+
+
+
+
+const maxSliderLength = 208;
+const minSliderLength = 44;
+const sliderSpeed = 0.5; // percent per millisecond
+const sliderRefreshDuration = 2; // millisecond
+
+const makeBoardCreationMenu = ()=>{
+    let body = (document.getElementsByTagName("BODY")[0])
+
+    
+    menuBoardContainer = document.createElement('div')
+    menuBoardContainer.style.height = '0%'
+    menuBoardContainer.style.width = '100%'
+    menuBoardContainer.id = "menu-board-container"
+    menuBoardContainer.style.position = "flex"
+    menuBoardContainer.style.marginLeft = "auto"
+    menuBoardContainer.style.marginRight = "auto"
+    menuBoardContainer.style.alignItems = "center"
+    menuBoardContainer.style.backgroundColor = "red"
+    menuBoardContainer.style.overflow = "visible"
+    menuBoardContainer.style.zIndex = "9999"
+    // menuBoardContainer.style.boxShadow
+    menuBoardContainer.style.opacity = "100%"
+    body.appendChild(menuBoardContainer);
+    
+    
+    blackoutBackground = document.createElement('div');
+    blackoutBackground.style.opacity = "0%"
+    blackoutBackground.style.height = body.getBoundingClientRect().height + "px"
+    blackoutBackground.style.width = "100%"
+    blackoutBackground.style.backgroundColor = "black"
+    blackoutBackground.style.position = "absolute"
+    // blackoutBackground.style.top = -body.getBoundingClientRect().height + "px"
+    blackoutBackground.style.top = "-0px"
+    blackoutBackground.style.zIndex = "999"
+    menuBoardContainer.appendChild(blackoutBackground);
+
+
+    // console.log(body.getBoundingClientRect())
+    menuBack = document.createElement('div');
+    menuBack.style.height ="550px"
+    menuBack.style.width = '90%'
+    menuBack.id = "menu-board-back"
+    menuBack.style.position = "relative"
+    menuBack.style.marginLeft = "auto"
+    menuBack.style.marginRight = "auto"
+    menuBack.style.top = -0.85*menuBoardContainer.getBoundingClientRect().y+"px" 
+    menuBack.style.alignItems = "center"
+    menuBack.style.backgroundColor = "red"
+    menuBack.style.overflow = "hidden"
+    menuBack.style.zIndex = "99999"
+    menuBack.style.opacity = "0"
+    menuBoardContainer.appendChild(menuBack);
+
+
+    spacerOnTopOfMenu = document.createElement("div");
+    spacerOnTopOfMenu.style.height = 0.05*menuBack.getBoundingClientRect().height+"px"
+    spacerOnTopOfMenu.style.width = "100%"
+    spacerOnTopOfMenu.style.position = "flex"
+    spacerOnTopOfMenu.id = "menu-board-spacer"
+    // spacerOnTopOfMenu.style.backgroundColor = "#7a0300"
+    spacerOnTopOfMenu.style.overflow = "visible"
+    spacerOnTopOfMenu.style.visibility = 'hidden'
+    // menuBack.appendChild(spacerOnTopOfMenu);
+
+
+    menu = document.createElement("div");
+    menu.style.position = "absolute"
+    menu.id = "menu-board"
+    menu.style.overflow = "visible"
+    menu.style.top = "5%"
+    menu.style.height = "45%"
+    // menu.style.left = "50%"
+    // menu.style.transform = "translateX(-50%)"
+    menuBack.appendChild(menu);
+
+
+    boardImage =  document.createElement("img");
+    boardImage.src = "/img/blank_fascist.png"
+    boardImage.style.height = "100%";
+    boardImage.style.width = "auto";
+
+
+    menu.appendChild(boardImage)
+/*
+    for(let i = 0; i<sliders.length; i++){
+        let slider = document.createElement('div')
+        sliders[i] = slider;
+        slider.style.width = "11.6%"
+        // slider.style.height = "52%"
+        slider.style.height = "44%"
+        slider.style.left = 8.3 + 14.3*i+"%"
+        // slider.style.top = "24%"
+        slider.style.top = "32%"
+        slider.style.position = "absolute"
+        slider.style.backgroundColor = "blue"
+        menu.appendChild(slider)
+
+        let sliderIcon = document.createElement('div')
+        sliderIcon.zIndex = '999999'
+        sliderIcon.style.width = "90%";
+        sliderIcon.style.height = slider.getBoundingClientRect().height + "px";
+        sliderIcon.style.textAlign = 'center';
+        // sliderIcon.style.left = 8.3 + 14.3*i+"%"
+        // sliderIcon.style.top = "32%"
+        sliderIcon.style.position = "absolute"
+        sliderIcon.style.backgroundColor = "green"
+        sliderIcon.textContent = "yeet "+(i+1)
+        sliderIcon.style.marginLeft = "5%" 
+        sliderIcon.style.marginRight = "5%"
+        selectedIcons[i] = sliderIcon;
+        slider.appendChild(sliderIcon)
+
+    }
+*/
+
+    for(let i =0; i<selectedIcons.length; i++){
+        let icon = document.createElement('div')
+        selectedIcons[i] = icon;
+        icon.style.width = "11.6%"
+        // slider.style.height = "52%"
+        icon.style.height = "44%"
+        icon.style.left = 8.3 + 14.3*i+"%"
+        // slider.style.top = "24%"
+        icon.style.top = "32%"
+        icon.style.position = "absolute"
+        icon.style.backgroundColor = "#7a0300"
+        icon.style.cursor = "pointer"
+        // icon.style.borderWidth = "5%"
+        menu.appendChild(icon)
+    }
+
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[0] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        menu.appendChild(policyOption)
+
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+
+        policyOption.appendChild(policyImage)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[1] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+
+        policyOption.appendChild(policyImage)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[2] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3*3 +"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+
+        policyOption.appendChild(policyImage)
+    }
+    {
+        let policyOption = document.createElement('div')
+        policyOptions[3] = policyOption;
+        policyOption.style.width = "11.6%"
+        // slider.style.height = "52%"
+        policyOption.style.height = "44%"
+        policyOption.style.left = 8.3 +14.3/2 + 14.3*4+"%"
+        // slider.style.top = "24%"
+        policyOption.style.top = "130%"
+        policyOption.style.position = "absolute"
+        policyOption.style.backgroundColor = "#B90000"
+        policyOption.style.cursor = "pointer"
+        policyOption.style.textAlign = "center"
+        menu.appendChild(policyOption)
+        
+        let policyImage = document.createElement('img')
+        policyImage.style.width = '100%'
+        policyImage.style.height = 'auto'
+        policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+
+        policyOption.appendChild(policyImage)
+    }
+    let players=0
+    for (let i=0;i<$participantList.children.length; i++) {
+        let username = getUsername(i)
+        if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+            players++
+        }
+    }
+    // console.log("players: "+ players)
+    if(players == 5){
+        selectedIcons[0].style.visibility = "hidden";
+    }
+
+
+
+    // console.log("sliders: "+ sliders)
+
+
+
+    // selectedIcons[1].classList.add('glowing')
+
+    // console.log(body.style.height);
+}
+
+const addEventListenersToSliders = ()=> {
+    for(let i = 0; i<sliders.length; i++){
+        sliders[i].addEventListener('mouseenter', () => {
+            // console.log("entered: " +i)
+            if(sliderIntervals[i] !== null){
+                clearInterval(sliderIntervals[i])
+            }
+
+            let sliderInterval = setInterval(() => {
+                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
+                // console.log(sliderHeight)
+                if(sliderHeight >= maxSliderLength){
+                    sliders[i].style.height = maxSliderLength+"%"
+                    // console.log("clearing")
+                    clearInterval(sliderInterval)
+                } else {
+                    sliderHeight += sliderRefreshDuration * sliderSpeed
+                    sliders[i].style.height = sliderHeight+"%"
+                }
+            }, sliderRefreshDuration);
+
+            sliderIntervals[i] = sliderInterval
+        })
+        sliders[i].addEventListener('mouseleave', () => {
+            // console.log("left: " +i)
+            if(sliderIntervals[i] !== null){
+                clearInterval(sliderIntervals[i])
+            }
+
+            let sliderInterval = setInterval(() => {
+                let sliderHeight = parseFloat(sliders[i].style.height.substring(0, sliders[i].style.height.length-1))
+                // console.log(sliderHeight)
+                if(sliderHeight <= minSliderLength){
+                    sliders[i].style.height = minSliderLength+"%"
+                    // console.log("clearing")
+                    clearInterval(sliderInterval)
+                } else {
+                    sliderHeight -= sliderRefreshDuration * sliderSpeed
+                    sliders[i].style.height = sliderHeight+"%"
+                }
+            }, sliderRefreshDuration);
+
+            sliderIntervals[i] = sliderInterval
+        })
+    }
+}
+
+let policySelectedGlowAnimations = [];
+const addEventListenersToIcons = () => {
+    for(let i = 0; i<selectedIcons.length; i++){
+        let keyframeEffect = new KeyframeEffect(
+            selectedIcons[i],
+            [
+                { boxShadow: "0px 0px 0px 0px yellow"},
+                { boxShadow: "0px 0px 5px 5px yellow"}                
+            ],
+            {duration: 1000, delay: 000, easing: "ease-in-out", iterations: "999999", direction: "alternate"},
+        )
+        let policySelectedGlow = new Animation(keyframeEffect, document.timeline);
+        policySelectedGlowAnimations[i] = (policySelectedGlow)
+        selectedIcons[i].addEventListener('click', () => {
+            // console.log(i +", "+selectedIndex)
+            if(i===selectedIndex){
+                policySelectedGlow.cancel()
+                selectedIndex = -1;
+            } else if (selectedIndex === -1){
+                policySelectedGlow.play();
+                selectedIndex = i;
+            } else {
+                policySelectedGlowAnimations[selectedIndex].cancel();
+                policySelectedGlow.play();
+                selectedIndex = i;
+            }
+        })
+    }
+    for(let i = 0; i<selectedIcons.length; i++){
+        let keyframeEffect = new KeyframeEffect(
+            selectedIcons[i],
+            [
+                { backgroundColor: "#010101"},
+                { backgroundColor: "blue"}                
+            ],
+            {duration: 500, delay: 000, easing: "ease", iterations: "1"},
+        )
+        let hoverAnim = new Animation(keyframeEffect, document.timeline);
+        selectedIcons[i].addEventListener('mouseover', () => {
+            // hoverAnim.play();
+            // console.log("hover: "+i)
+        })
+        selectedIcons[i].addEventListener('mouseleave', () => {
+            // hoverAnim.cancel();
+            // console.log("leave: "+i)
+        })
+    }
+    let players=0
+    for (let i=0;i<$participantList.children.length; i++) {
+        let username = getUsername(i)
+        if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+            players++
+        }
+    }
+    if(players == 5){
+        selectedIcons[1].click()
+    } else {
+        selectedIcons[0].click()
+    }
+}
+
+const openningAnimations = () => {
+    let keyframeEffect = new KeyframeEffect(
+        blackoutBackground,
+        [
+            { opacity: "0%"},
+            { opacity: "80%"}                ],
+        {duration: 1000, delay: 500, easing: "ease"},
+    )
+    let animationBlackOutFadeIn = new Animation(keyframeEffect, document.timeline);
+    animationBlackOutFadeIn.addEventListener('finish', ()=>{
+        blackoutBackground.style.opacity = "80%"
+    })
+    
+    keyframeEffect = new KeyframeEffect(
+        menuBack,
+        [
+            { width: "0%", opacity: "100%"},
+            { width: "90%", opacity: "100%"}                ],
+        {duration: 1500, delay: 500, easing: "ease-out"},
+    )
+    let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
+    animationOpenMenu.addEventListener('finish', ()=>{
+        menuBack.style.width = '90%'
+        menuBack.style.opacity = '100%'
+        menuBack.style.overflow = "visible"
+        // addEventListenersToSliders();
+    })
+
+    keyframeEffect = new KeyframeEffect(
+        menu,
+        [
+            { transform: "translateX(0%)", left: "0%"},
+            { transform: "translateX(-50%)", left: "50%"}                ],
+        {duration: 2000, delay: 000, easing: "ease-out"},
+    )
+    let menuSlideIntoPlace = new Animation(keyframeEffect, document.timeline);
+    menuSlideIntoPlace.addEventListener('finish', ()=>{
+        menu.style.transform = "translateX(-50%)"
+        menu.style.left = "50%"
+    })
+
+    
+    
+
+    animationBlackOutFadeIn.play(); // blacks out anything that isn't the board creation menu
+    animationOpenMenu.play()
+    menuSlideIntoPlace.play();
+}
+
+const addEventListenerToPolicyButtons = () =>{
+    for(let i = 0; i<policyOptions.length; i++){
+        policyOptions[i].addEventListener('click', ()=>{
+            // console.log("clicked "+i)
+            if(selectedIndex !== -1){
+                
+                let policyImage = document.createElement('img')
+                policyImage.style.width = '100%'
+                policyImage.style.height = 'auto'
+        
+                if(i === 0){
+                    currentBoard[selectedIndex] = STATUS_PRESACT1
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+                } else if (i === 1){
+                    currentBoard[selectedIndex] = STATUS_PRESACT2
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+                } else if (i === 2){
+                    currentBoard[selectedIndex] = STATUS_PRESACT3
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+                } else if (i === 3){
+                    currentBoard[selectedIndex] = STATUS_PRESACT4
+                    policyImage.src = "/Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+                }
+
+
+                let clone = policyOptions[i].cloneNode();
+                clone.appendChild(policyOptions[i].children[0].cloneNode());
+                menu.appendChild(clone);
+                clone.textContent = policyOptions[i].textContent
+                clone.appendChild(policyImage)
+                // console.log(clone);
+
+
+
+                let selectedIconsPositionX = parseFloat(selectedIcons[selectedIndex].style.left.substring(0, selectedIcons[selectedIndex].style.left.length - 1))
+                let selectedIconsPositionY = parseFloat(selectedIcons[selectedIndex].style.top.substring(0, selectedIcons[selectedIndex].style.top.length - 1))
+                
+                let selectedIconsWidth = parseFloat(selectedIcons[selectedIndex].style.width.substring(0, selectedIcons[selectedIndex].style.width.length - 1))
+                let selectedIconsHeight = parseFloat(selectedIcons[selectedIndex].style.height.substring(0, selectedIcons[selectedIndex].style.height.length - 1))
+
+                let policyOptionsPositionX = parseFloat(policyOptions[i].style.left.substring(0, policyOptions[i].style.left.length - 1))
+                let policyOptionsPositionY = parseFloat(policyOptions[i].style.top.substring(0, policyOptions[i].style.top.length - 1))
+
+                let policyOptionWidth = parseFloat(policyOptions[i].style.width.substring(0, policyOptions[i].style.width.length - 1))
+                let policyOptionHeight = parseFloat(policyOptions[i].style.height.substring(0, policyOptions[i].style.height.length - 1))
+                keyframeEffect = new KeyframeEffect(
+                    clone,
+                    [
+                        { transform: "translate(0, 0)"},
+                        { transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"},
+                        {backgroundColor: "transparent", transform: "translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)"}
+                    ],
+                    {duration: 1600, delay: 000, easing: "ease-in"}
+                )
+                // console.log("translate("+ (selectedIconsPositionX-policyOptionsPositionX) / policyOptionWidth * 100+"%, "+(selectedIconsPositionY-policyOptionsPositionY) / policyOptionHeight * 100+"%)")
+                let translateToMenu = new Animation(keyframeEffect, document.timeline);
+                let currentBoardIndex = selectedIndex;
+                translateToMenu.play();
+                translateToMenu.addEventListener('finish', ()=>{
+                    clone.remove();
+                    
+                    keyframeEffect = new KeyframeEffect(
+                        selectedIcons[currentBoardIndex].firstChild,
+                        [
+                            {opacity: "0%"}
+                        ],
+                        {duration: 750, delay: 000, easing: "ease"}
+                    )
+                    let oldIconFadeOut = new Animation(keyframeEffect, document.timeline);
+                    oldIconFadeOut.addEventListener('finish', ()=>{
+                        while (selectedIcons[currentBoardIndex].children.length > 1) {
+                            selectedIcons[currentBoardIndex].removeChild(selectedIcons[currentBoardIndex].firstChild);
+                        }
+                    })
+                    oldIconFadeOut.play()
+                    clone.style.left = "0"
+                    clone.style.top = "0"
+                    clone.style.width = "100%"
+                    clone.style.height = "100%"
+                    clone.style.backgroundColor = "transparent"
+                    selectedIcons[currentBoardIndex].appendChild(clone);
+                    
+
+                    let players=0
+                    for (let i=0;i<$participantList.children.length; i++) {
+                        let username = getUsername(i)
+                        if (document.querySelector('#'+username+'_img').getAttribute('src') === 'img/default cardback.png') {
+                            players++
+                        }
+                    }
+
+                    let allPoliciesPlaced = true;
+                    if(players > 5){
+                        allPoliciesPlaced = selectedIcons[0].children.length == 1;
+                    }
+                    allPoliciesPlaced = allPoliciesPlaced 
+                        && selectedIcons[1].children.length == 1
+                        && selectedIcons[2].children.length == 1
+                        && selectedIcons[3].children.length == 1
+                        && selectedIcons[4].children.length == 1
+                    if(allPoliciesPlaced){
+
+                        console.log("all entities placed")
+                        let oldButton = $lobbyActions.querySelector('button');
+                        let newButton = oldButton.cloneNode(true);
+                        newButton.style.position = 'absolute'
+                        newButton.style.top = "80%"
+                        newButton.style.left = "80%"
+                        newButton.innerHTML = 'Finish Board Edit'
+                        newButton.addEventListener('click', () => {
+                            // console.log('should change to spectate');
+                            console.log('Start Game With Menu')
+                            let keyframeEffect = new KeyframeEffect(
+                                blackoutBackground,
+                                [
+                                    { opacity: "80%"},
+                                    { opacity: "0%"}                ],
+                                {duration: 1000, delay: 500, easing: "ease"},
+                            )
+                            let animationBlackOutFadeOut = new Animation(keyframeEffect, document.timeline);
+                            animationBlackOutFadeOut.addEventListener('finish', ()=>{
+                                blackoutBackground.remove();
+                            })
+                            
+                            keyframeEffect = new KeyframeEffect(
+                                menuBack,
+                                [
+                                    { width: "90%", opacity: "100%"},
+                                    { width: "0%", opacity: "100%"}                ],
+                                {duration: 1000, delay: 500, easing: "ease-out"},
+                            )
+                            let animationOpenMenu = new Animation(keyframeEffect, document.timeline);
+                            animationOpenMenu.addEventListener('finish', ()=>{
+                                // addEventListenersToSliders();
+                                    
+                                menuBoardContainer.remove();
+                            })
+
+                            menuBack.style.overflow = "hidden"
+                        
+                            
+                            
+                        
+                            animationBlackOutFadeOut.play(); // blacks out anything that isn't the board creation menu
+                            animationOpenMenu.play()
+
+                            newButton.remove();
+
+                            socket.emit('startGame', { username, room, newType: TYPE_SPECTATOR }, (error) => { if (error) { console.log('error'); } })
+                            console.log(currentBoard);
+                            socket.emit('new board', {room, currentBoard});
+                        });
+
+                        menuBack.appendChild(newButton)
+                    }
+                })
+
+            }
+        })
+    }
+}
+
+socket.on('new board', ({room, currentBoard}) => {
+    console.log("making new board")
+    document.querySelector("#fascist-layered-image").src = "img/blank_fascist.png"
+    let fasboardImage = document.querySelector(".fasboard")
+    
+    if(currentBoard[0] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[0] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[0] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "50px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+    }
+    if(currentBoard[1] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[1] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[1] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[1] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[1] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "143px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[2] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[2] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInv.png"
+        }
+        if(currentBoard[2] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElect.png"
+        }
+        if(currentBoard[2] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeek.png"
+        }
+        if(currentBoard[2] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGun.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "236px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[3] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[3] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[3] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "329px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[4] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[4] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[4] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "422px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+
+    }
+    if(currentBoard[5] !== -1){
+        let image = document.createElement('img')
+        if(currentBoard[5] === STATUS_PRESACT1){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerInvLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT2){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerElectLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT3){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerPeekLight.png"
+        }
+        if(currentBoard[5] === STATUS_PRESACT4){
+            image.src = "Secret_Hitler_Policy_Cards/fasPowerGunLight.png"
+        }
+        image.style.position = "absolute"
+        image.style.top = "55px"
+        image.style.left = "515px"
+        // image.style.zIndex = "100"
+
+        fasboardImage.insertAdjacentElement('afterend', image)
+        console.log("there's so much stuff"+image);
+
+    }
+})
+// const makeMenuButton = () => {
+//     let html = Mustache.render(actionButtonTemplate, { text: "Edit Fascist Actions" });
+//     $lobbyActions.insertAdjacentHTML('beforeend', html)
+//     let button = $lobbyActions.querySelector('.button')
+//     button.addEventListener('click', () => {
+//         makeBoardCreationMenu();
+//         addEventListenersToIcons();
+//         openningAnimations();
+//         addEventListenerToPolicyButtons()        
+//     })
+// }
+
+// makeBoardCreationMenu();
+// addEventListenersToIcons();
+// openningAnimations();
+// addEventListenerToPolicyButtons() 
