@@ -7,7 +7,7 @@ View our release website: https://secret-hitler-project.herokuapp.com/
 
 Jump right into the fun! Clunky over the table actions are transformed into easy, intuitive clicks of the mouse!
 
-https:![Voting and Policy](https://user-images.githubusercontent.com/36702191/213878732-edcdc72d-e5f7-41f7-82cb-608a8eb835fc.gif)
+![Voting and Policy](https://user-images.githubusercontent.com/36702191/213878732-edcdc72d-e5f7-41f7-82cb-608a8eb835fc.gif)
 
 # Chat
 
