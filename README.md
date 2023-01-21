@@ -1,9 +1,12 @@
-# Secret Hitler
+### Secret Hitler Online
 
-This is an online version of the mafia-style board game
+Play everybody's favorite social deduction game online! Made by fans of the game, for fans of the game.
 View our release website: https://secret-hitler-project.herokuapp.com/
  
 
+#Edit Fascist Actions
+
+Tired of playing with the same old actionset? Now you can customize the board before every game!
 
 https://user-images.githubusercontent.com/36702191/213878256-ee2cb249-28ad-4fea-aa90-aaebe2bf22e3.mp4
 
