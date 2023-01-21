@@ -1,4 +1,4 @@
-### Secret Hitler Online
+# Secret Hitler Online
 
 Play everybody's favorite social deduction game online! Made by fans of the game, for fans of the game.
 View our release website: https://secret-hitler-project.herokuapp.com/
