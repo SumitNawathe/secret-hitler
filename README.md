@@ -29,4 +29,5 @@ No need to create a new lobby after every game! Simply hit "Remake Lobby" to ins
 
 ## Special Actions
 Played a fascist card? Investigate friend or foe!
+
 ![Reveal](https://user-images.githubusercontent.com/36702191/213879161-f80cb782-235d-4a08-b881-0de415fe1064.gif)
