@@ -28,5 +28,5 @@ No need to create a new lobby after every game! Simply hit "Remake Lobby" to ins
 ![End of Game](https://user-images.githubusercontent.com/36702191/213878717-94c6d11f-581e-421f-abf3-b8671c406907.gif)
 
 ## Special Actions
-Reveal allegiances with a click of the mouse! It's on the house!
+Played a fascist card? Investigate friend or foe!
 ![Reveal](https://user-images.githubusercontent.com/36702191/213879161-f80cb782-235d-4a08-b881-0de415fe1064.gif)
