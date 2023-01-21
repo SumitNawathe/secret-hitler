@@ -4,7 +4,7 @@ Play everybody's favorite social deduction game online! Made by fans of the game
 View our release website: https://secret-hitler-project.herokuapp.com/
  
 
-##Edit Fascist Actions
+## Edit Fascist Actions
 
 Tired of playing with the same old actionset? Now you can customize the board before every game!
 
